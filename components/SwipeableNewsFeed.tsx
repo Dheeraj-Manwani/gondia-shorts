@@ -9,7 +9,7 @@ import NewsCard from "./NewsCard";
 // Import required modules from swiper
 import { Virtual, Mousewheel, Keyboard, Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
-import { translateToHindi } from "@/lib/translateService";
+// import { translateToHindi } from "@/lib/translateService";
 import { Article } from "@/db/schema/news";
 import { useAction } from "@/hooks/use-action";
 import { fetchArticles } from "@/actions/news";
@@ -23,7 +23,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
 }) => {
   const [page, setPage] = useState(0);
   const [articles, setArticles] = useState<Article[]>([]);
-  const [isHindi, setIsHindi] = useState(false);
+  // const [isHindi, setIsHindi] = useState(false);
   const limit = 10; // Number of articles to fetch at once
   const swiperRef = useRef<SwiperType | null>(null);
 
@@ -67,17 +67,17 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   };
 
   // Handle navigation actions
-  const handlePrevCard = () => {
-    if (swiperRef.current) {
-      swiperRef.current.slidePrev();
-    }
-  };
+  // const handlePrevCard = () => {
+  //   if (swiperRef.current) {
+  //     swiperRef.current.slidePrev();
+  //   }
+  // };
 
-  const handleNextCard = () => {
-    if (swiperRef.current) {
-      swiperRef.current.slideNext();
-    }
-  };
+  // const handleNextCard = () => {
+  //   if (swiperRef.current) {
+  //     swiperRef.current.slideNext();
+  //   }
+  // };
 
   // Initial loading state
   if (page === 0 && isLoading) {

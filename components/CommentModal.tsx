@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 // import { Article } from '@shared/schema';
 import { formatDate } from "@/lib/helpers";
-import { useTranslate } from "@/hooks/use-translate";
+// import { useTranslate } from "@/hooks/use-translate";
 import { translateUiText } from "@/lib/translateService";
+import { Article } from "@/db/schema/news";
 
 interface CommentModalProps {
-  article: any;
+  article: Article;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -24,7 +25,7 @@ const CommentModal: React.FC<CommentModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { isHindi } = useTranslate();
+  // const { isHindi } = useTranslate();
   const [comments, setComments] = useState<Comment[]>([
     {
       id: 1,
@@ -109,19 +110,20 @@ const CommentModal: React.FC<CommentModalProps> = ({
         <div className="overflow-y-auto flex-1 p-4">
           {/* Article reference */}
           <div className="flex items-start space-x-3 mb-6 pb-4 border-b border-gray-200">
-            {article.imageUrl && (
+            {article.imageUrls && (
               <img
-                src={article.imageUrl}
-                alt={article.headline}
+                src={article.imageUrls[0]}
+                alt={article.title}
                 className="w-16 h-16 object-cover rounded-md"
               />
             )}
             <div>
               <h3 className="font-medium text-sm line-clamp-2">
-                {article.headline}
+                {article.title}
               </h3>
               <p className="text-xs text-gray-500 mt-1">
-                {article.sourceText} • {formatDate(article.publishedAt)}
+                {article.sourceText} •{" "}
+                {formatDate(article.publishedAt ?? new Date())}
               </p>
             </div>
           </div>

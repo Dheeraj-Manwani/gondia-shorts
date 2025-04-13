@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import NewsCard from "./NewsCard";
 import { useAction } from "@/hooks/use-action";
 import { fetchArticles } from "@/actions/news";
+import { Article } from "@/db/schema/news";
 
 interface NewsFeedProps {
   categoryId: number;
@@ -13,7 +14,7 @@ interface NewsFeedProps {
 
 const NewsFeed: React.FC<NewsFeedProps> = ({ categoryId }) => {
   const [page, setPage] = useState(0);
-  const [articles, setArticles] = useState<any[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
   const loader = useRef<HTMLDivElement>(null);
   const limit = 4; // Number of articles to fetch per page
 

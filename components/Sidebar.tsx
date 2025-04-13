@@ -17,13 +17,13 @@ const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose,
   selectedCategoryId,
-  onSelectCategory,
+  // onSelectCategory,
 }) => {
   // const { data: categories } = useQuery<Category[]>({
   //   queryKey: ['/api/categories'],
   //   enabled: true,
   // });
-
+  console.log(selectedCategoryId);
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -46,7 +46,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     ).matches;
     const isIOSStandalone =
       "standalone" in window.navigator &&
-      (window.navigator as any).standalone === true;
+      (window.navigator as Navigator & { standalone?: boolean }).standalone ===
+        true;
 
     if (isStandalone || isFullscreen || isIOSStandalone) {
       setIsInstalled(true);
@@ -88,10 +89,10 @@ const Sidebar: React.FC<SidebarProps> = ({
     };
   }, [isOpen]);
 
-  const handleCategorySelect = (categoryId: number) => {
-    onSelectCategory(categoryId);
-    onClose();
-  };
+  // const handleCategorySelect = (categoryId: number) => {
+  //   onSelectCategory(categoryId);
+  //   onClose();
+  // };
 
   return (
     <>

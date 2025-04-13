@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { formatDate } from "@/lib/helpers";
 import CommentModal from "./CommentModal";
 import { useTranslate } from "@/hooks/use-translate";
-import { translateToHindi, translateUiText } from "@/lib/translateService";
+import { translateToHindi } from "@/lib/translateService";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -14,7 +14,7 @@ import { Article } from "@/db/schema/news";
 import { Share2 } from "lucide-react";
 
 interface NewsCardProps {
-  article: any;
+  article: Article;
 }
 
 const NewsCard: React.FC<NewsCardProps> = ({
@@ -252,7 +252,9 @@ const NewsCard: React.FC<NewsCardProps> = ({
             pagination={{ clickable: true }}
             autoplay={{ delay: 5000, disableOnInteraction: true }}
             className="h-full w-full"
-            onClick={(e: any) => e.stopPropagation()}
+            onClick={(swiper, e: TouchEvent | MouseEvent | PointerEvent) =>
+              e.stopPropagation()
+            }
           >
             <SwiperSlide>
               <img
@@ -262,7 +264,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
                 loading="lazy"
               />
             </SwiperSlide>
-            {article.imageUrls.map((imgUrl: any, index: any) => (
+            {article.imageUrls.map((imgUrl: string, index: number) => (
               <SwiperSlide key={index}>
                 <img
                   src={imgUrl}

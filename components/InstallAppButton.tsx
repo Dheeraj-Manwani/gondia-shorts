@@ -1,22 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed', platform: string }>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
 interface InstallAppButtonProps {
   className?: string;
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  variant?:
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link";
 }
 
-const InstallAppButton = ({ 
-  className = '', 
-  variant = 'default' 
+const InstallAppButton = ({
+  className = "",
+  variant = "default",
 }: InstallAppButtonProps) => {
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [installPrompt, setInstallPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
@@ -25,36 +32,43 @@ const InstallAppButton = ({
       setInstallPrompt(e as BeforeInstallPromptEvent);
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
+    window.addEventListener("beforeinstallprompt", handler);
 
     // Check if app is already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    const isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
-    const isIOSStandalone = 'standalone' in window.navigator && (window.navigator as any).standalone === true;
-    
+    const isStandalone = window.matchMedia(
+      "(display-mode: standalone)"
+    ).matches;
+    const isFullscreen = window.matchMedia(
+      "(display-mode: fullscreen)"
+    ).matches;
+    const isIOSStandalone =
+      "standalone" in window.navigator &&
+      (window.navigator as Navigator & { standalone?: boolean }).standalone ===
+        true;
+
     if (isStandalone || isFullscreen || isIOSStandalone) {
       setIsInstalled(true);
     }
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener("beforeinstallprompt", handler);
     };
   }, []);
 
   const promptInstall = async () => {
     if (!installPrompt) return;
-    
+
     // Show the install prompt
     await installPrompt.prompt();
-    
+
     // Wait for the user to respond to the prompt
     const choiceResult = await installPrompt.userChoice;
-    
-    if (choiceResult.outcome === 'accepted') {
-      console.log('User accepted the PWA installation');
+
+    if (choiceResult.outcome === "accepted") {
+      console.log("User accepted the PWA installation");
       setIsInstalled(true);
     }
-    
+
     // Clear the saved prompt since it can't be used twice
     setInstallPrompt(null);
   };
