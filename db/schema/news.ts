@@ -28,13 +28,16 @@ export const insertArticleSchema = z.object({
 
 export type InsertArticle = z.infer<typeof insertArticleSchema>;
 
+export const MediaTypeEnum = z.enum(["IMAGE", "VIDEO", "YOUTUBE"]);
+export type MediaType = z.infer<typeof MediaTypeEnum>;
+
 export const articleSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   content: z.string().min(1),
   imageUrls: z.array(z.string().url()).default([]),
   videoUrl: z.string().url().optional(),
-  isVideo: z.boolean().optional().default(false),
+  mediaType: MediaTypeEnum,
   sourceText: z.string().min(1),
   sourceLogoUrl: z.string().url().optional(),
   author: z.string().optional(),

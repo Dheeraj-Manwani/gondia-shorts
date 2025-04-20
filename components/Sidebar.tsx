@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Download } from "lucide-react";
+import Image from "next/image";
+import googleIcon from "@/public/google-icon.svg";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { Button } from "./ui/button";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -136,6 +140,36 @@ const Sidebar: React.FC<SidebarProps> = ({
                 />
               </svg>
             </button>
+          </div>
+
+          {/* User info */}
+          <div className="p-5 border-b border-gray-200">
+            <h3 className="text-sm font-medium text-gray-700 uppercase mb-3">
+              Categories
+            </h3>
+            <ul className="space-y-1">
+              <li>
+                <Button
+                  variant="outline"
+                  className="relative"
+                  // onClick={(e) => {
+                  //   e.preventDefault;
+                  //   signIn("google")
+                  // }}
+                  onClick={(e) => signIn("google")}
+                >
+                  Sign In
+                  <Image
+                    priority
+                    src={googleIcon}
+                    alt="Sign In"
+                    // height={15}
+                    // width={15}
+                    className="pl-2 w-7 aspect-square"
+                  />
+                </Button>
+              </li>
+            </ul>
           </div>
 
           {/* Categories */}

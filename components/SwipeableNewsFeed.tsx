@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState, useRef } from "react";
 // import { useQuery } from '@tanstack/react-query';
 // import { Article } from '@shared/schema';
@@ -5,6 +7,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import NewsCard from "./NewsCard";
+import { v4 as uuid } from "uuid";
 
 // Import required modules from swiper
 import { Virtual, Mousewheel, Keyboard, Navigation } from "swiper/modules";
@@ -24,7 +27,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   const [page, setPage] = useState(0);
   const [articles, setArticles] = useState<Article[]>([]);
   // const [isHindi, setIsHindi] = useState(false);
-  const limit = 10; // Number of articles to fetch at once
+  const limit = Number(process.env.NEXT_PUBLIC_FETCH_LIMIT); // Number of articles to fetch at once
   const swiperRef = useRef<SwiperType | null>(null);
 
   // const { data, isLoading, error } = useQuery<Article[]>({
@@ -32,27 +35,31 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   //   enabled: true,
   // });
 
-  const { execute, data, isLoading, error } = useAction(fetchArticles);
+  const { execute, data, isLoading, error } = useAction(fetchArticles, {
+    toastMessages: {
+      loading:
+        articles.length == 0
+          ? `Loading first ${limit} articles...`
+          : `Loading next ${limit} articles...`,
+      success: "Articles loaded successfully!!",
+      error: "Failed to load articles",
+    },
+  });
 
   // Update articles when data changes
   useEffect(() => {
     console.log("data inside use eff ", data);
     if (data && data.length > 0) {
       const articleData = data as Article[];
-      if (page === 0) {
-        setArticles(articleData);
-      } else {
-        setArticles((prev) => [...prev, ...articleData]);
-      }
+      setArticles((prev) => [...prev, ...articleData]);
     }
-  }, [data, page]);
+  }, [data]);
 
   // Reset articles and page when category changes
   useEffect(() => {
     setArticles([]);
     setPage(0);
-    execute({});
-
+    execute({ limit: limit, offset: 0 });
     // Reset swiper to first slide when category changes
     if (swiperRef.current) {
       swiperRef.current.slideTo(0, 0);
@@ -61,9 +68,30 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
 
   // Load more articles when reaching the end
   const handleReachEnd = () => {
+    console.log(
+      "handleReachEnd called ::::::: 🔚🔚🔚🔚🔚🔚🔚🔚",
+      isLoading,
+      data,
+      page
+    );
     if (!isLoading && data && data.length >= limit) {
-      setPage((prevPage) => prevPage + 1);
+      // setPage((prevPage) => prevPage + 1);
     }
+  };
+
+  const handleSwipe = async (swiper: SwiperType) => {
+    setPage((_) => swiper.realIndex);
+    console.log("swiper real index => ", swiper.realIndex);
+
+    if (swiper.realIndex === articles.length - 4) {
+      console.log("Fetching more articles...");
+      await execute({ limit: limit, offset: articles.length });
+    }
+
+    // if (swiper.realIndex === page) {
+    //   console.log("Fetching more articles...");
+    //   await execute({ limit: limit, offset: (page + 1) * limit });
+    // }
   };
 
   // Handle navigation actions
@@ -101,7 +129,6 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
 
   return (
     <div className="h-screen w-full pt-14 relative">
-      {" "}
       {/* Add padding top for header */}
       <Swiper
         modules={[Virtual, Mousewheel, Keyboard, Navigation]}
@@ -114,14 +141,17 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
         onReachEnd={handleReachEnd}
         className="h-full"
         onSwiper={(swiper) => (swiperRef.current = swiper)}
+        onSlideChange={(swiper) => {
+          handleSwipe(swiper);
+        }}
       >
         {articles.map((article, index) => (
-          <SwiperSlide
-            key={article.id}
-            virtualIndex={index}
-            className="h-full w-full"
-          >
-            <NewsCard article={article} />
+          <SwiperSlide virtualIndex={index} className="h-full w-full">
+            <NewsCard
+              article={article}
+              isCurrentActive={page === index}
+              key={uuid()}
+            />
           </SwiperSlide>
         ))}
 
@@ -133,13 +163,21 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
         )}
 
         {/* No more articles message */}
-        {!isLoading && data && data.length === 0 && page > 0 && (
+        {!isLoading && data && page > 0 && (
           <SwiperSlide className="h-full flex items-center justify-center">
-            <div className="text-center text-gray-500 px-6 py-4 bg-gray-50 rounded-lg shadow-sm">
-              <p>No more articles to load</p>
+            <div className="text-center text-gray-700 px-6 py-8 bg-white rounded-lg shadow-lg border border-gray-200">
+              <p className="text-lg font-semibold">You’ve reached the end!</p>
+              <p className="text-sm text-gray-500 mt-2">
+                No more articles to load at the moment.
+              </p>
               <button
-                onClick={() => setPage(0)}
-                className="mt-3 text-blue-600 text-sm underline"
+                onClick={() => {
+                  setPage(0);
+                  if (swiperRef.current) {
+                    swiperRef.current.slideTo(0, 0);
+                  }
+                }}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
               >
                 Back to start
               </button>
@@ -152,7 +190,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
         <div className="flex flex-col items-center animate-bounce">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-white drop-shadow-md"
+            className="h-6 w-6 text-black drop-shadow-md"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -162,7 +200,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          <p className="text-xs text-white font-medium drop-shadow-md">
+          <p className="text-xs text-black font-medium drop-shadow-md">
             Swipe up for next
           </p>
         </div>

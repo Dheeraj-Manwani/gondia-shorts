@@ -7,21 +7,23 @@ import { useTranslate } from "@/hooks/use-translate";
 import { translateToHindi } from "@/lib/translateService";
 
 import { Swiper, SwiperSlide } from "swiper/react";
+import ReactPlayer from "react-player/youtube";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Pagination, Autoplay } from "swiper/modules";
 import { Article } from "@/db/schema/news";
 import { Share2 } from "lucide-react";
+import { MediaType } from "@prisma/client";
 
 interface NewsCardProps {
+  isCurrentActive: boolean;
   article: Article;
 }
 
 const NewsCard: React.FC<NewsCardProps> = ({
   article,
-}: {
-  article: Article;
-}) => {
+  isCurrentActive,
+}: NewsCardProps) => {
   // const [, setLocation] = useLocation();
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -32,6 +34,9 @@ const NewsCard: React.FC<NewsCardProps> = ({
   const [translatedSummary, setTranslatedSummary] = useState(article.content);
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  // const cardRef = useRef(null);
+  // const [shouldPlay, setShouldPlay] = useState(false);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoMuted, setVideoMuted] = useState(true);
 
@@ -58,7 +63,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
 
   // Effect for autoplay when the video comes into view
   useEffect(() => {
-    if (article.isVideo && videoRef.current) {
+    if (article.mediaType == MediaType.VIDEO && videoRef.current) {
       const handleIntersection = (entries: IntersectionObserverEntry[]) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -83,7 +88,26 @@ const NewsCard: React.FC<NewsCardProps> = ({
         }
       };
     }
-  }, [article.isVideo]);
+  }, [article.mediaType == MediaType.VIDEO]);
+
+  // Effect for youtube
+  // useEffect(() => {
+  //   if (article.mediaType === MediaType.YOUTUBE && cardRef.current) {
+  //     const observer = new IntersectionObserver(
+  //       ([entry]) => {
+  //         setShouldPlay(entry.isIntersecting);
+  //         console.log("setting shouldPlay to", entry);
+  //       },
+  //       { threshold: 0.5 }
+  //     );
+
+  //     observer.observe(cardRef.current);
+
+  //     return () => {
+  //       observer.disconnect();
+  //     };
+  //   }
+  // }, []);
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -138,12 +162,15 @@ const NewsCard: React.FC<NewsCardProps> = ({
 
   return (
     <article
+      key={article.id}
+      id={article.id}
       className="news-card w-full h-full bg-white overflow-hidden relative flex flex-col cursor-pointer"
       onClick={handleCardClick}
+      // ref={cardRef}
     >
       {/* Card Media - Image, Multiple Images, or Video */}
-      <div className="h-[40vh] relative bg-gray-200">
-        {article.isVideo && article.videoUrl ? (
+      <div className="h-[40vh] relative bg-gray-200 m-auto">
+        {article.mediaType == MediaType.VIDEO && article.videoUrl ? (
           <div className="h-full w-full relative">
             <video
               ref={videoRef}
@@ -243,7 +270,9 @@ const NewsCard: React.FC<NewsCardProps> = ({
               </button>
             </div>
           </div>
-        ) : article.imageUrls && article.imageUrls.length > 1 ? (
+        ) : article.imageUrls &&
+          article.imageUrls.length > 1 &&
+          article.mediaType == MediaType.IMAGE ? (
           // Image carousel for multiple images
           <Swiper
             modules={[Pagination, Autoplay]}
@@ -256,14 +285,16 @@ const NewsCard: React.FC<NewsCardProps> = ({
               e.stopPropagation()
             }
           >
-            <SwiperSlide>
-              <img
-                src={article.imageUrls[0]}
-                alt={article.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </SwiperSlide>
+            {article.imageUrls ? (
+              <SwiperSlide>
+                <img
+                  src={article.imageUrls[0]}
+                  alt={article.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </SwiperSlide>
+            ) : null}
             {article.imageUrls.map((imgUrl: string, index: number) => (
               <SwiperSlide key={index}>
                 <img
@@ -276,28 +307,78 @@ const NewsCard: React.FC<NewsCardProps> = ({
             ))}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none"></div>
           </Swiper>
-        ) : (
-          // Single image display
+        ) : // Single image display
+        article.imageUrls && article.mediaType == MediaType.IMAGE ? (
           <img
             src={article.imageUrls[0]}
             alt={article.title}
             className="w-full h-full object-cover"
             loading="lazy"
           />
-        )}
+        ) : null}
 
         {/* Image gradient overlay - only for single image */}
-        {!article.isVideo &&
+        {article.mediaType == MediaType.IMAGE &&
           (!article.imageUrls || article.imageUrls.length === 1) && (
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
           )}
+
+        {article.mediaType == MediaType.YOUTUBE && article.videoUrl && (
+          // <div className="h-[30vh] w-full relative bg-gray-200">
+          // <ReactPlayer
+          //   url={article.videoUrl}
+          //   playing={false}
+          //   controls={true}
+          //   style={{ height: "30vh", width: "100%", position: "relative" }}
+          //   config={{
+          //     playerVars: {
+          //       start: 15, // time in seconds
+          //     },
+          //   }}
+          // />
+          // </div>
+
+          <div
+            style={{
+              width: "100vw",
+              height: "40vh",
+              position: "relative",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <ReactPlayer
+              url={article.videoUrl}
+              playing={isCurrentActive}
+              controls={true}
+              width="100%"
+              height="100%"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                marginTop: "10px",
+              }}
+              config={{
+                playerVars: {
+                  start: 15,
+                  modestbranding: 1, // hides YouTube logo in controls
+                  rel: 0, // disables showing related videos from other channels
+                  showinfo: 0, // hides video title and uploader
+                  controls: 0, // shows video controls
+                },
+              }}
+            />
+          </div>
+        )}
 
         {/* Category tag removed as requested */}
 
         {/* Source info overlay at the bottom of the image */}
         <div className="absolute bottom-0 left-0 right-0 z-10 px-6 py-3 flex items-center justify-between">
           <div className="flex items-center">
-            <span className="text-sm font-medium text-white drop-shadow-md">
+            {/* <span className="text-sm font-medium text-white drop-shadow-md">
               {article.sourceText}
             </span>
             {article.sourceLogoUrl && (
@@ -306,7 +387,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
                 alt="Source logo"
                 className="h-4 ml-2 bg-white rounded-full p-0.5"
               />
-            )}
+            )} */}
           </div>
           <span className="text-xs text-white/90 drop-shadow-md">
             {formatDate(article.publishedAt || new Date())}

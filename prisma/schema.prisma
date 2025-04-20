@@ -13,9 +13,17 @@ enum Role {
   ADMIN
 }
 
+enum MediaType {
+  IMAGE
+  VIDEO
+  YOUTUBE
+}
+
 model User {
   id        Int      @id @default(autoincrement())
-  username  String   @unique
+  email     String   @unique
+  number    String   @unique
+  name      String
   password  String
   role      Role     @default(USER)
   createdAt DateTime @default(now())
@@ -36,10 +44,12 @@ model Category {
 model Article {
   id            Int      @id @default(autoincrement())
   title         String
+  slug          String   @unique
+  mediaType     MediaType 
+  
   content       String
   imageUrls     String[]
   videoUrl      String?
-  isVideo       Boolean  @default(false)
   source        String
   sourceLogoUrl String?
   author        String

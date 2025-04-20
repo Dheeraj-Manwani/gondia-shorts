@@ -1,13 +1,26 @@
 "use server";
 
 import prisma from "@/db/db";
+import { seed } from "./data";
 
-export const fetchArticles = async () => {
+interface FetchParams {
+  categoryId?: number; // optional now
+  limit: number;
+  offset: number;
+}
+
+export const fetchArticles = async (fetchParams: FetchParams) => {
+  const { categoryId, limit, offset } = fetchParams;
   const articles = await prisma.article.findMany({
+    where: categoryId ? { categoryId } : undefined,
     orderBy: {
-      id: "desc",
+      id: "asc",
     },
+    take: limit,
+    skip: offset,
   });
+
+  await seed();
 
   return { success: true, data: articles };
 };
