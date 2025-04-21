@@ -16,6 +16,7 @@ import type { Swiper as SwiperType } from "swiper";
 import { Article } from "@/db/schema/news";
 import { useAction } from "@/hooks/use-action";
 import { fetchArticles } from "@/actions/news";
+import { NewsCardSkeleton } from "./Skeletons";
 
 interface SwipeableNewsFeedProps {
   categoryId: number;
@@ -110,9 +111,10 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   // Initial loading state
   if (page === 0 && isLoading) {
     return (
-      <div className="h-screen w-full pt-14 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      // <div className="h-screen w-full pt-14 flex items-center justify-center">
+      //   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      // </div>
+      <NewsCardSkeleton />
     );
   }
 
@@ -186,11 +188,11 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
         )}
       </Swiper>
       {/* Swipe indicator */}
-      <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center justify-center pointer-events-none">
+      <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center justify-center pointer-events-none z-20">
         <div className="flex flex-col items-center animate-bounce">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-black drop-shadow-md"
+            className="h-6 w-6 text-gray-300 drop-shadow-md"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -200,7 +202,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          <p className="text-xs text-black font-medium drop-shadow-md">
+          <p className="text-xs text-gray-300 font-medium drop-shadow-md">
             Swipe up for next
           </p>
         </div>

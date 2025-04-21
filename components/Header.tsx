@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         </div>
 
         <button
-          className="text-gray-700 p-2 rounded-full hover:bg-gray-100"
+          className="text-gray-700 p-2 rounded-full hover:bg-gray-100 cursor-pointer"
           aria-label="Menu"
           onClick={onMenuClick}
         >

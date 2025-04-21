@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Download } from "lucide-react";
+import { Download, LogOut } from "lucide-react";
 import Image from "next/image";
 import googleIcon from "@/public/google-icon.svg";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Button } from "./ui/button";
+import { UserProfile } from "./UserProfile";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -31,6 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const session = useSession();
 
   // Handle PWA installation
   useEffect(() => {
@@ -117,12 +119,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="px-5 py-5 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-black text-xl font-semibold">
+            {/* <h2 className="text-black text-xl font-semibold">
               Gondia<span className="text-blue-600">Shorts</span>
-            </h2>
+            </h2> */}
+            <UserProfile />
             <button
               onClick={onClose}
-              className="text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+              className="text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
               aria-label="Close menu"
             >
               <svg
@@ -143,7 +146,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* User info */}
-          <div className="p-5 border-b border-gray-200">
+          {/* <div className="p-5 border-b border-gray-200">
             <h3 className="text-sm font-medium text-gray-700 uppercase mb-3">
               Categories
             </h3>
@@ -170,15 +173,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </Button>
               </li>
             </ul>
-          </div>
+          </div> */}
 
           {/* Categories */}
-          <div className="p-5 border-b border-gray-200">
+          {/* <div className="p-5 border-b border-gray-200">
             <h3 className="text-sm font-medium text-gray-700 uppercase mb-3">
               Categories
             </h3>
             <ul className="space-y-1">
-              {/* {categories?.map((category) => (
+          {categories?.map((category) => (
                 <li key={category.id}>
                   <button
                     onClick={() => handleCategorySelect(category.id)}
@@ -191,9 +194,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                     {category.name}
                   </button>
                 </li>
-              ))} */}
+              ))}
             </ul>
-          </div>
+          </div> */}
 
           {/* Other options */}
           <div className="p-5">
@@ -201,7 +204,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               Options
             </h3>
             <ul className="space-y-1 text-gray-600">
-              <li>
+              {/* <li>
                 <button className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -257,31 +260,18 @@ const Sidebar: React.FC<SidebarProps> = ({
                   </svg>
                   Dark Mode
                 </button>
-              </li>
-              <li>
-                <button className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-5 h-5"
+              </li> */}
+              {session.status == "authenticated" && (
+                <li>
+                  <button
+                    className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
+                    onClick={() => signOut()}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  Settings
-                </button>
-              </li>
+                    <LogOut />
+                    Log out
+                  </button>
+                </li>
+              )}
 
               {/* Install App button - only shows if installable and not already installed */}
               {installPrompt && !isInstalled && (

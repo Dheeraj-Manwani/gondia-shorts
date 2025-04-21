@@ -1,15 +1,24 @@
 import GoogleProvider from "next-auth/providers/google";
 import prisma from "@/db/db";
-
 import { NextAuthOptions, Session } from "next-auth";
+import { Role } from "@prisma/client";
 
 export interface session extends Session {
   user?: {
-    email?: string | null;
-    name?: string | null;
-    image?: string | null;
     id?: string | null;
+    name?: string | null;
+    email?: string | null;
+    role?: Role;
+    profilePic?: string | null;
   };
+}
+
+interface Token {
+  id?: string;
+  name?: string | null;
+  email: string;
+  role?: Role;
+  profilePic?: string | undefined | null;
 }
 
 export const authConfig = {
@@ -22,49 +31,49 @@ export const authConfig = {
   ],
   callbacks: {
     // @ts-ignore
-    session: ({
+    session: async ({
       session,
       token,
     }: {
       session: session;
-      token: { id: string };
-    }): session => {
+      token: Token;
+    }): Promise<session> => {
       const newSession: session = session as session;
-      if (newSession.user && token.id) {
+      if (newSession.user) {
         newSession.user.id = token.id ?? "";
+        newSession.user.name = token.name ?? "";
+        newSession.user.email = token.email ?? "";
+        newSession.user.role = token.role;
+        newSession.user.profilePic = token.profilePic ?? undefined;
       }
-      // console.log("newSession", newSession);
-      return newSession!;
+      return newSession;
     },
     // @ts-ignore
-    async jwt({
-      token,
-    }: //  account, profile
-    {
-      token: { email: string; id: String };
-    }) {
+    jwt: async ({ token }: { token: Token }) => {
       const user = await prisma.user.findFirst({
         where: {
           email: token?.email ?? "",
         },
       });
       if (user) {
-        token.id = user.id;
+        token.id = user.id.toString();
+        token.name = user.name;
+        token.email = user.email;
+        token.role = user.role;
+        token.profilePic = user.profilePic;
       }
-      // console.log("token ", token);
       return token;
     },
     // @ts-ignore
-    async signIn({
+    signIn: async ({
       user,
       account,
       profile,
-    }: //  email, credentials
-    {
+    }: {
       user: { email: string };
       account: { provider: string | null };
-      profile: { name: string | null };
-    }) {
+      profile: { name: string | null; picture?: string };
+    }) => {
       if (account?.provider === "google") {
         const email = user.email;
         if (!email) {
@@ -84,15 +93,14 @@ export const authConfig = {
         await prisma.user.create({
           data: {
             email: email,
-            name: profile?.name,
+            name: profile?.name ?? "Unknown",
+            profilePic: profile?.picture, // <-- Save the Google profile image
+            role: "USER",
+            password: "",
+            number: "",
           },
         });
 
-        // console.log("inside sign in ", {
-        //   user,
-        //   account,
-        //   profile,
-        // });
         return true;
       }
 

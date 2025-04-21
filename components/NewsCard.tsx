@@ -164,7 +164,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
     <article
       key={article.id}
       id={article.id}
-      className="news-card w-full h-full bg-white overflow-hidden relative flex flex-col cursor-pointer"
+      className="news-card w-full h-full bg-white overflow-hidden relative flex flex-col"
       onClick={handleCardClick}
       // ref={cardRef}
     >
@@ -324,20 +324,6 @@ const NewsCard: React.FC<NewsCardProps> = ({
           )}
 
         {article.mediaType == MediaType.YOUTUBE && article.videoUrl && (
-          // <div className="h-[30vh] w-full relative bg-gray-200">
-          // <ReactPlayer
-          //   url={article.videoUrl}
-          //   playing={false}
-          //   controls={true}
-          //   style={{ height: "30vh", width: "100%", position: "relative" }}
-          //   config={{
-          //     playerVars: {
-          //       start: 15, // time in seconds
-          //     },
-          //   }}
-          // />
-          // </div>
-
           <div
             style={{
               width: "100vw",
@@ -348,7 +334,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
               justifyContent: "center",
             }}
           >
-            <ReactPlayer
+            {/* <ReactPlayer
               url={article.videoUrl}
               playing={isCurrentActive}
               controls={true}
@@ -358,7 +344,6 @@ const NewsCard: React.FC<NewsCardProps> = ({
                 position: "absolute",
                 top: 0,
                 left: 0,
-                marginTop: "10px",
               }}
               config={{
                 playerVars: {
@@ -366,10 +351,9 @@ const NewsCard: React.FC<NewsCardProps> = ({
                   modestbranding: 1, // hides YouTube logo in controls
                   rel: 0, // disables showing related videos from other channels
                   showinfo: 0, // hides video title and uploader
-                  controls: 0, // shows video controls
                 },
               }}
-            />
+            /> */}
           </div>
         )}
 
@@ -389,9 +373,9 @@ const NewsCard: React.FC<NewsCardProps> = ({
               />
             )} */}
           </div>
-          <span className="text-xs text-white/90 drop-shadow-md">
+          {/* <span className="text-xs text-white/90 drop-shadow-md">
             {formatDate(article.publishedAt || new Date())}
-          </span>
+          </span> */}
         </div>
       </div>
 
@@ -433,7 +417,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
             {/* Comment button */}
             <button
               onClick={handleComment}
-              className="text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
+              className="text-red-700 p-1 rounded-full hover:bg-gray-100 transition-colors cursor-pointer "
               aria-label="Comment"
             >
               <svg

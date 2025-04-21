@@ -109,7 +109,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ categoryId }) => {
   return (
     <main className="container mx-auto px-4 py-4 max-w-lg">
       {articles.map((article) => (
-        <NewsCard key={article.id} article={article} />
+        <NewsCard key={article.id} article={article} isCurrentActive={false} />
       ))}
 
       {/* Loading indicator at the bottom */}

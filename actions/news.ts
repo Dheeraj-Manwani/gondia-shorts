@@ -20,7 +20,5 @@ export const fetchArticles = async (fetchParams: FetchParams) => {
     skip: offset,
   });
 
-  await seed();
-
   return { success: true, data: articles };
 };
