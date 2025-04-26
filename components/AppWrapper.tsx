@@ -32,7 +32,12 @@ export const AppWrapper: FC<AppWrapperProps> = ({ children }) => {
           selectedCategoryId={selectedCategoryId}
           onSelectCategory={setSelectedCategoryId}
         />
-        <Toaster richColors closeButton mobileOffset={20} />
+        <Toaster
+          richColors
+          closeButton
+          mobileOffset={20}
+          position="bottom-center"
+        />
         {children}
       </div>
     </SessionProvider>

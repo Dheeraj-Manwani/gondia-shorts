@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 // import { useLocation } from 'wouter';
 // import { Article } from '@shared/schema';
-import { formatDate } from "@/lib/helpers";
-import CommentModal from "./CommentModal";
+// import { formatDate } from "@/lib/helpers";
+import CommentModal from "@/components/comments/CommentModal";
 import { useTranslate } from "@/hooks/use-translate";
 import { translateToHindi } from "@/lib/translateService";
 
@@ -334,7 +334,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
               justifyContent: "center",
             }}
           >
-            {/* <ReactPlayer
+            <ReactPlayer
               url={article.videoUrl}
               playing={isCurrentActive}
               controls={true}
@@ -353,7 +353,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
                   showinfo: 0, // hides video title and uploader
                 },
               }}
-            /> */}
+            />
           </div>
         )}
 

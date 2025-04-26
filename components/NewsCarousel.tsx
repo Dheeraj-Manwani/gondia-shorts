@@ -22,9 +22,9 @@ export default function NewsCarousel() {
     data: newsItems,
     isLoading,
     error,
-  } = useAction<{}, Article>(fetchArticles);
+  } = useAction<{ limit: number; offset: number }, Article>(fetchArticles);
   useEffect(() => {
-    if (!newsItems && !isLoading) execute({});
+    if (!newsItems && !isLoading) execute({ limit: 5, offset: 10 });
   }, []);
 
   if (isLoading || !newsItems)

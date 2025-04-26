@@ -2,6 +2,7 @@
 
 import prisma from "@/db/db";
 import { seed } from "./data";
+import { sampleArticles } from "@/lib/data";
 
 interface FetchParams {
   categoryId?: number; // optional now
@@ -19,6 +20,9 @@ export const fetchArticles = async (fetchParams: FetchParams) => {
     take: limit,
     skip: offset,
   });
+
+  // ! For dev
+  // const articles = sampleArticles.slice(offset, offset + limit);
 
   return { success: true, data: articles };
 };

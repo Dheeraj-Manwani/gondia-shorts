@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Download, LogOut } from "lucide-react";
-import Image from "next/image";
-import googleIcon from "@/public/google-icon.svg";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { Button } from "./ui/button";
+// import Image from "next/image";
+// import googleIcon from "@/public/google-icon.svg";
+import { signOut, useSession } from "next-auth/react";
+// import { Button } from "./ui/button";
 import { UserProfile } from "./UserProfile";
 
 interface BeforeInstallPromptEvent extends Event {

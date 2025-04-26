@@ -71,8 +71,8 @@ export default function FeaturesSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           We make it easy to stay connected with your community through a
-          modern, intuitive news experience designed specifically for Gondia's
-          residents.
+          modern, intuitive news experience designed specifically for
+          Gondia&apos;s residents.
         </motion.p>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

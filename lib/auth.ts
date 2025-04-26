@@ -30,7 +30,7 @@ export const authConfig = {
     }),
   ],
   callbacks: {
-    // @ts-ignore
+    // @ts-expect-error to be taken care of
     session: async ({
       session,
       token,
@@ -48,7 +48,7 @@ export const authConfig = {
       }
       return newSession;
     },
-    // @ts-ignore
+    // @ts-expect-error to be taken care of
     jwt: async ({ token }: { token: Token }) => {
       const user = await prisma.user.findFirst({
         where: {
@@ -64,7 +64,7 @@ export const authConfig = {
       }
       return token;
     },
-    // @ts-ignore
+    // @ts-expect-error to be taken care of
     signIn: async ({
       user,
       account,

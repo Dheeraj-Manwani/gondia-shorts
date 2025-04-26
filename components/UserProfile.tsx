@@ -1,5 +1,5 @@
 // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import profileImg from "@/public/profile.png";
+// import profileImg from "@/public/profile.png";
 import { Avatar } from "./Avatar";
 import { signIn, useSession } from "next-auth/react";
 import { Button } from "./ui/button";

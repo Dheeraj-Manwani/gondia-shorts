@@ -81,7 +81,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   };
 
   const handleSwipe = async (swiper: SwiperType) => {
-    setPage((_) => swiper.realIndex);
+    setPage(() => swiper.realIndex);
     console.log("swiper real index => ", swiper.realIndex);
 
     if (swiper.realIndex === articles.length - 4) {
@@ -148,7 +148,11 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
         }}
       >
         {articles.map((article, index) => (
-          <SwiperSlide virtualIndex={index} className="h-full w-full">
+          <SwiperSlide
+            virtualIndex={index}
+            className="h-full w-full"
+            key={uuid()}
+          >
             <NewsCard
               article={article}
               isCurrentActive={page === index}
@@ -202,7 +206,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          <p className="text-xs text-gray-300 font-medium drop-shadow-md">
+          <p className="text-xs text-zinc-400 font-medium drop-shadow-md">
             Swipe up for next
           </p>
         </div>
