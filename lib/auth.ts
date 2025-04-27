@@ -74,36 +74,38 @@ export const authConfig = {
       account: { provider: string | null };
       profile: { name: string | null; picture?: string };
     }) => {
-      if (account?.provider === "google") {
-        const email = user.email;
-        if (!email) {
-          return false;
-        }
+      try {
+        if (account?.provider === "google") {
+          const email = user.email;
+          if (!email) {
+            return false;
+          }
 
-        const userDb = await prisma.user.findFirst({
-          where: {
-            email: email,
-          },
-        });
+          const userDb = await prisma.user.findFirst({
+            where: {
+              email: email,
+            },
+          });
 
-        if (userDb) {
+          if (userDb) {
+            return true;
+          }
+
+          await prisma.user.create({
+            data: {
+              email: email,
+              name: profile?.name ?? "Unknown",
+              profilePic: profile?.picture, // <-- Save the Google profile image
+              role: "USER",
+              password: "",
+            },
+          });
+
           return true;
         }
-
-        await prisma.user.create({
-          data: {
-            email: email,
-            name: profile?.name ?? "Unknown",
-            profilePic: profile?.picture, // <-- Save the Google profile image
-            role: "USER",
-            password: "",
-            number: "",
-          },
-        });
-
-        return true;
+      } catch (error) {
+        console.error("Error in signIn callback", error);
       }
-
       return false;
     },
   },

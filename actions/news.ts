@@ -21,6 +21,8 @@ export const fetchArticles = async (fetchParams: FetchParams) => {
     skip: offset,
   });
 
+  // await seed();
+
   // ! For dev
   // const articles = sampleArticles.slice(offset, offset + limit);
 

@@ -4,7 +4,7 @@ export const sampleArticles = [
     slug: "unseasonal-rain-damages-crops-in-gondia",
     content:
       "Recent unseasonal rainfall has adversely affected farmers in Gondia, leading to significant crop damage. The unexpected weather patterns have raised concerns among the agricultural community.",
-    mediaType: "YOUTUBE",
+    type: "YOUTUBE",
     source: "ChatGPT",
     videoUrl: "https://www.youtube.com/watch?v=l7wT7IUOqAM",
     categoryId: 3,
@@ -14,7 +14,7 @@ export const sampleArticles = [
     slug: "allegations-of-bogus-teacher-recruitment-in-gondia",
     content:
       "A controversy has emerged in Gondia over alleged bogus teacher recruitments. Reports suggest that salaries continue to be disbursed to teachers whose appointments have been deemed unauthorized.",
-    mediaType: "YOUTUBE",
+    type: "YOUTUBE",
     source: "ChatGPT",
     videoUrl: "https://www.youtube.com/watch?v=IlwbvaAAQXE",
     categoryId: 2,
@@ -25,7 +25,7 @@ export const sampleArticles = [
     slug: "assault-on-businessman-over-alleged-disrespect-to-great-personalities",
     content:
       "In a recent incident, a businessman in Gondia was assaulted following accusations of disrespecting revered personalities. The event has sparked discussions about freedom of expression and respect for cultural icons.",
-    mediaType: "YOUTUBE",
+    type: "YOUTUBE",
     source: "ChatGPT",
     videoUrl: "https://www.youtube.com/watch?v=l1xiZ17FXA8",
     categoryId: 5,
@@ -35,7 +35,7 @@ export const sampleArticles = [
     slug: "controversy-over-religious-tiles-installed-on-the-ground",
     content:
       "A dispute has arisen in Gondia concerning the installation of tiles bearing religious images on the ground. Community members have expressed concerns over the perceived disrespect, leading to tensions in the area.",
-    mediaType: "YOUTUBE",
+    type: "YOUTUBE",
     source: "ChatGPT",
     videoUrl: "https://www.youtube.com/watch?v=h9nmxghIl7A",
     categoryId: 4,
@@ -45,7 +45,7 @@ export const sampleArticles = [
     slug: "bus-accident-in-gondia-results-in-multiple-fatalities",
     content:
       "A tragic bus accident occurred in Gondia, resulting in the loss of several lives. Authorities are investigating the cause of the accident, and safety measures are being reviewed to prevent future incidents.",
-    mediaType: "YOUTUBE",
+    type: "YOUTUBE",
     source: "ChatGPT",
     videoUrl: "https://www.youtube.com/watch?v=OCmQBqNMvCQ",
     categoryId: 1,
@@ -61,7 +61,7 @@ export const sampleArticles = [
     ],
     videoUrl:
       "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    mediaType: "VIDEO",
+    type: "VIDEO_N_TEXT",
     source: "The Washington Post",
     sourceLogoUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/The_Logo_of_The_Washington_Post_Newspaper.svg/512px-The_Logo_of_The_Washington_Post_Newspaper.svg.png",
@@ -75,7 +75,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "National Health Journal",
     sourceLogoUrl: null,
     categoryId: 6, // Health
@@ -88,7 +88,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "ESPN",
     sourceLogoUrl:
       "https://a.espncdn.com/combiner/i?img=%2Fi%2Fespn%2Fespn_logos%2Fespn_red.png",
@@ -103,7 +103,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1544441893-675973e31985?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Financial Times",
     sourceLogoUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Financial_Times_corporate_logo.svg/640px-Financial_Times_corporate_logo.svg.png",
@@ -119,7 +119,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1536617621572-1d5f1e6269a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Lokmat Times",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -132,7 +132,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Maharashtra Times",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -148,7 +148,7 @@ export const sampleArticles = [
       "https://images.unsplash.com/photo-1543682704-15fd2a5b320d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
       "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "National Geographic India",
     sourceLogoUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/National_Geographic_Channel.svg/640px-National_Geographic_Channel.svg.png",
@@ -162,7 +162,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1474487548417-781cb71495f3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Indian Railways News",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -175,7 +175,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1436262513933-a0b06755c784?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Maharashtra Water Resources",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -190,7 +190,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1559136555-9303baea8ebd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Economic Times",
     sourceLogoUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/The_Economic_Times_logo.svg/640px-The_Economic_Times_logo.svg.png",
@@ -204,7 +204,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Maharashtra Education",
     sourceLogoUrl: null,
     categoryId: 11, // Education
@@ -219,7 +219,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1509391366360-2e959784a276?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Agriculture Today",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -232,7 +232,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Indian Medical Times",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -245,7 +245,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Cultural Heritage Journal",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -258,7 +258,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Green Mobility India",
     sourceLogoUrl: null,
     categoryId: 10, // Maharashtra
@@ -271,7 +271,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Tourism Today",
     sourceLogoUrl: null,
     categoryId: 10, // Maharashtra
@@ -284,7 +284,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Tech Maharashtra",
     sourceLogoUrl: null,
     categoryId: 10, // Maharashtra
@@ -297,7 +297,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Science India",
     sourceLogoUrl: null,
     categoryId: 6, // Health
@@ -310,7 +310,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Business Standard",
     sourceLogoUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Business_Standard_logo.svg/512px-Business_Standard_logo.svg.png",
@@ -324,7 +324,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Education Times",
     sourceLogoUrl: null,
     categoryId: 11, // Education
@@ -337,7 +337,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1438449805896-28a666819a20?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Maharashtra Weather Bureau",
     sourceLogoUrl: null,
     categoryId: 10, // Maharashtra
@@ -350,7 +350,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Yoga Journal India",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -363,7 +363,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Health Maharashtra",
     sourceLogoUrl: null,
     categoryId: 10, // Maharashtra
@@ -376,7 +376,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1582139329536-e7284fece509?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Heritage India",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -389,7 +389,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Krishi Maharashtra",
     sourceLogoUrl: null,
     categoryId: 10, // Maharashtra
@@ -402,7 +402,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Digital India",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -415,7 +415,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1509391366360-2e959784a276?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Energy Today",
     sourceLogoUrl: null,
     categoryId: 10, // Maharashtra
@@ -428,7 +428,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Rural Entrepreneurship",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -441,7 +441,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Tech for Governance",
     sourceLogoUrl: null,
     categoryId: 10, // Maharashtra
@@ -454,7 +454,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1453745558060-956d4c4deff8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "MIDC News",
     sourceLogoUrl: null,
     categoryId: 9, // Gondia
@@ -467,7 +467,7 @@ export const sampleArticles = [
     imageUrls: [
       "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
-    mediaType: "IMAGE",
+    type: "IMAGE_N_TEXT",
     source: "Cricket Maharashtra",
     sourceLogoUrl: null,
     categoryId: 10, // Maharashtra

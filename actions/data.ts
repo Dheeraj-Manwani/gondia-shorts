@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/db/db";
-import { MediaType } from "@prisma/client";
+import { ArticleType } from "@prisma/client";
 import { sampleArticles } from "@/lib/data";
 
 export async function seed() {
@@ -47,7 +47,7 @@ export async function seed() {
     await prisma.article.create({
       data: {
         ...article,
-        mediaType: (article.mediaType as MediaType) || "IMAGE",
+        type: (article.type as ArticleType) || "IMAGE",
         categoryId: defaultCategory.id,
         author: "system",
         submittedById: defaultUser.id,

@@ -13,7 +13,7 @@ import "swiper/css/pagination";
 import { Pagination, Autoplay } from "swiper/modules";
 import { Article } from "@/db/schema/news";
 import { Share2 } from "lucide-react";
-import { MediaType } from "@prisma/client";
+import { ArticleType } from "@prisma/client";
 
 interface NewsCardProps {
   isCurrentActive: boolean;
@@ -63,7 +63,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
 
   // Effect for autoplay when the video comes into view
   useEffect(() => {
-    if (article.mediaType == MediaType.VIDEO && videoRef.current) {
+    if (article.type == ArticleType.VIDEO_N_TEXT && videoRef.current) {
       const handleIntersection = (entries: IntersectionObserverEntry[]) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -88,11 +88,11 @@ const NewsCard: React.FC<NewsCardProps> = ({
         }
       };
     }
-  }, [article.mediaType == MediaType.VIDEO]);
+  }, [article.type == ArticleType.VIDEO_N_TEXT]);
 
   // Effect for youtube
   // useEffect(() => {
-  //   if (article.mediaType === MediaType.YOUTUBE && cardRef.current) {
+  //   if (article.type === ArticleType.YOUTUBE && cardRef.current) {
   //     const observer = new IntersectionObserver(
   //       ([entry]) => {
   //         setShouldPlay(entry.isIntersecting);
@@ -170,7 +170,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
     >
       {/* Card Media - Image, Multiple Images, or Video */}
       <div className="h-[40vh] relative bg-gray-200 m-auto">
-        {article.mediaType == MediaType.VIDEO && article.videoUrl ? (
+        {article.type == ArticleType.VIDEO_N_TEXT && article.videoUrl ? (
           <div className="h-full w-full relative">
             <video
               ref={videoRef}
@@ -272,7 +272,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
           </div>
         ) : article.imageUrls &&
           article.imageUrls.length > 1 &&
-          article.mediaType == MediaType.IMAGE ? (
+          article.type == ArticleType.IMAGE_N_TEXT ? (
           // Image carousel for multiple images
           <Swiper
             modules={[Pagination, Autoplay]}
@@ -308,7 +308,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none"></div>
           </Swiper>
         ) : // Single image display
-        article.imageUrls && article.mediaType == MediaType.IMAGE ? (
+        article.imageUrls && article.type == ArticleType.IMAGE_N_TEXT ? (
           <img
             src={article.imageUrls[0]}
             alt={article.title}
@@ -318,12 +318,12 @@ const NewsCard: React.FC<NewsCardProps> = ({
         ) : null}
 
         {/* Image gradient overlay - only for single image */}
-        {article.mediaType == MediaType.IMAGE &&
+        {article.type == ArticleType.IMAGE_N_TEXT &&
           (!article.imageUrls || article.imageUrls.length === 1) && (
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
           )}
 
-        {article.mediaType == MediaType.YOUTUBE && article.videoUrl && (
+        {article.type == ArticleType.YOUTUBE && article.videoUrl && (
           <div
             style={{
               width: "100vw",

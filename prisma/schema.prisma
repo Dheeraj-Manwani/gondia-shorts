@@ -13,16 +13,18 @@ enum Role {
   ADMIN
 }
 
-enum MediaType {
-  IMAGE
-  VIDEO
+enum ArticleType {
+  IMAGE_N_TEXT
+  VIDEO_N_TEXT
+  FULL_IMAGE
+  FULL_VIDEO
   YOUTUBE
 }
 
 model User {
   id         Int      @id @default(autoincrement())
   email      String   @unique
-  number     String   @unique
+  number     String?   @unique
   name       String
   password   String
   role       Role     @default(USER)
@@ -47,7 +49,7 @@ model Article {
   id            Int      @id @default(autoincrement())
   title         String
   slug          String   @unique
-  mediaType     MediaType 
+  type          ArticleType 
   
   content       String
   imageUrls     String[]

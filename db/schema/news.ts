@@ -13,23 +13,14 @@ export const insertCategorySchema = z.object({
 
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
 
-export const insertArticleSchema = z.object({
-  title: z.string().min(1),
-  content: z.string().min(1),
-  imageUrls: z.array(z.string().url()).default([]),
-  videoUrl: z.string().url().optional(),
-  isVideo: z.boolean().optional().default(false),
-  sourceText: z.string().min(1),
-  sourceLogoUrl: z.string().url().optional(),
-  author: z.string().optional(),
-  categoryId: z.number(),
-  adminId: z.number(),
-});
-
-export type InsertArticle = z.infer<typeof insertArticleSchema>;
-
-export const MediaTypeEnum = z.enum(["IMAGE", "VIDEO", "YOUTUBE"]);
-export type MediaType = z.infer<typeof MediaTypeEnum>;
+export const ArticleTypeEnum = z.enum([
+  "IMAGE_N_TEXT",
+  "VIDEO_N_TEXT",
+  "FULL_IMAGE",
+  "FULL_VIDEO",
+  "YOUTUBE",
+]);
+export type ArticleType = z.infer<typeof ArticleTypeEnum>;
 
 export const articleSchema = z.object({
   id: z.string().min(1),
@@ -37,12 +28,27 @@ export const articleSchema = z.object({
   content: z.string().min(1),
   imageUrls: z.array(z.string().url()).default([]),
   videoUrl: z.string().url().optional(),
-  mediaType: MediaTypeEnum,
+  type: ArticleTypeEnum,
   sourceText: z.string().min(1),
   sourceLogoUrl: z.string().url().optional(),
   author: z.string().optional(),
   publishedAt: z.date().optional(),
   categoryId: z.number(),
-  adminId: z.number(),
+  submittedById: z.number(),
 });
 export type Article = z.infer<typeof articleSchema>;
+
+export const createArticleSchema = z.object({
+  type: ArticleTypeEnum,
+  title: z.string().min(1),
+  content: z.string().min(1),
+  imageUrls: z.array(z.string().url()).default([]).optional(),
+  videoUrl: z.string().url().optional(),
+  sourceText: z.string().min(1).optional(),
+  sourceLogoUrl: z.string().url().optional(),
+  author: z.string().optional(),
+  categoryId: z.number().optional(),
+  submittedById: z.number().optional(),
+});
+
+export type CreateArticle = z.infer<typeof createArticleSchema>;
