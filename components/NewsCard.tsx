@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { v4 as uuid } from "uuid";
 // import { useLocation } from 'wouter';
 // import { Article } from '@shared/schema';
 // import { formatDate } from "@/lib/helpers";
@@ -17,12 +18,14 @@ import { ArticleType } from "@prisma/client";
 
 interface NewsCardProps {
   isCurrentActive: boolean;
+  isPreview?: boolean;
   article: Article;
 }
 
 const NewsCard: React.FC<NewsCardProps> = ({
-  article,
   isCurrentActive,
+  isPreview = false,
+  article,
 }: NewsCardProps) => {
   // const [, setLocation] = useLocation();
   const [isLiked, setIsLiked] = useState(false);
@@ -146,13 +149,16 @@ const NewsCard: React.FC<NewsCardProps> = ({
 
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Open WhatsApp directly instead of showing the share modal
-    const shareUrl = `${window.location.origin}/article/${article.id}`;
-    const text = `Check out this article: ${article.title}`;
-    const whatsappLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-      text + " " + shareUrl
-    )}`;
-    window.open(whatsappLink, "_blank");
+
+    if (article.id && !isPreview) {
+      // Open WhatsApp directly instead of showing the share modal
+      const shareUrl = `${window.location.origin}/article/${article.id}`;
+      const text = `Check out this article: ${article.title}`;
+      const whatsappLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+        text + " " + shareUrl
+      )}`;
+      window.open(whatsappLink, "_blank");
+    }
   };
 
   const handleComment = (e: React.MouseEvent) => {
@@ -162,8 +168,8 @@ const NewsCard: React.FC<NewsCardProps> = ({
 
   return (
     <article
-      key={article.id}
-      id={article.id}
+      key={isPreview ? uuid() : article.id}
+      id={isPreview ? uuid() : article.id}
       className="news-card w-full h-full bg-white overflow-hidden relative flex flex-col"
       onClick={handleCardClick}
       // ref={cardRef}

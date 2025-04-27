@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Share2, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAction } from "@/hooks/use-action";
-import { fetchArticles } from "@/actions/news";
+import { fetchArticles } from "@/actions/articles/articles";
 import { Article } from "@/db/schema/news";
 import { useRouter } from "next/navigation";
 // import { newsItems } from "@/data/sample-news";

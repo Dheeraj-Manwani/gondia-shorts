@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,41 +23,58 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { CloudUpload, Paperclip } from "lucide-react";
-// import {
-//   FileInput,
-//   FileUploader,
-//   FileUploaderContent,
-//   FileUploaderItem,
-// } from "@/components/ui/file-upload";
+import { CloudUpload, Eye, Paperclip } from "lucide-react";
+
 import { Textarea } from "@/components/ui/textarea";
 import { ArticleAttachment } from "./ArticleAttachment";
-import { createArticleSchema } from "@/db/schema/news";
+import { CreateArticle, createArticleSchema } from "@/db/schema/news";
 import { ArticleType } from "@prisma/client";
+import { isAttachmentRequired } from "@/lib/utils";
 
-export default function NewArticle() {
-  // const [files, setFiles] = useState<File[] | null>(null);
-
-  // const dropZoneConfig = {
-  //   maxFiles: 5,
-  //   maxSize: 1024 * 1024 * 4,
-  //   multiple: true,
-  // };
-
+export default function NewArticle({
+  article,
+  setArticle,
+  togglePreviewMode,
+}: {
+  article: CreateArticle | null;
+  setArticle: (article: CreateArticle) => void;
+  togglePreviewMode: (isPreviewMode: boolean) => void;
+}) {
   const [files, setFiles] = React.useState<File[]>([]);
 
   const form = useForm<z.infer<typeof createArticleSchema>>({
     resolver: zodResolver(createArticleSchema),
   });
+  const selectedType = form.watch("type");
+
+  useEffect(() => {
+    if (article) {
+      form.setValue("type", article.type);
+      form.setValue("videoUrl", article.videoUrl);
+      form.setValue("imageUrls", article.imageUrls);
+      form.setValue("title", article.title);
+      form.setValue("content", article.content);
+    }
+  }, []);
 
   function onSubmit(values: z.infer<typeof createArticleSchema>) {
     try {
+      if (selectedType == ArticleType.YOUTUBE && !values.videoUrl) {
+        form.setError("videoUrl", {
+          type: "manual",
+          message: "Youtube URL is required",
+        });
+        return;
+      }
+
+      setArticle(values);
+      togglePreviewMode(true);
       console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      // toast(
+      //   <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+      //     <code className="text-white">{JSON.stringify(values, null, 2)}</code>
+      //   </pre>
+      // );
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Failed to submit the form. Please try again.");
@@ -97,7 +114,7 @@ export default function NewArticle() {
           )}
         />
 
-        {form.getValues("type") == ArticleType.YOUTUBE && (
+        {selectedType == ArticleType.YOUTUBE && (
           <FormField
             control={form.control}
             name="videoUrl"
@@ -166,48 +183,67 @@ export default function NewArticle() {
           )}
         /> */}
 
-        {form.getValues("type") != ArticleType.YOUTUBE && (
+        {isAttachmentRequired(selectedType) && (
           <ArticleAttachment files={files} setFiles={setFiles} />
         )}
 
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter title"
-                  className="resize-y"
-                  {...field}
-                />
-              </FormControl>
+        {selectedType && (
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter title"
+                    className="resize-y"
+                    {...field}
+                  />
+                </FormControl>
 
-              <FormMessage />
-            </FormItem>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {selectedType && (
+          <FormField
+            control={form.control}
+            name="content"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Content</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter content"
+                    className="resize-none"
+                    {...field}
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        <div className="flex flex-col items-center justify-between gap-2">
+          {/* <Button
+            type="submit"
+            variant={"ghost"}
+            className="w-full bg-zinc-300 hover:bg-zinc-400"
+            onClick={() => togglePreviewMode(true)}
+          >
+            
+          </Button> */}
+          {selectedType && (
+            <Button type="submit" className="w-full">
+              Submit
+            </Button>
           )}
-        />
-
-        <FormField
-          control={form.control}
-          name="content"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Content</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter content"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Submit</Button>
+        </div>
       </form>
     </Form>
   );

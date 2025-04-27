@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 // import { Article } from '@shared/schema';
 import NewsCard from "./NewsCard";
 import { useAction } from "@/hooks/use-action";
-import { fetchArticles } from "@/actions/news";
+import { fetchArticles } from "@/actions/articles/articles";
 import { Article } from "@/db/schema/news";
 
 interface NewsFeedProps {

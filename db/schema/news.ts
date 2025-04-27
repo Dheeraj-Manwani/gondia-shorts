@@ -26,7 +26,7 @@ export const articleSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   content: z.string().min(1),
-  imageUrls: z.array(z.string().url()).default([]),
+  imageUrls: z.array(z.string().url()).default([]).optional(),
   videoUrl: z.string().url().optional(),
   type: ArticleTypeEnum,
   sourceText: z.string().min(1),

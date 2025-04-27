@@ -15,7 +15,7 @@ import type { Swiper as SwiperType } from "swiper";
 // import { translateToHindi } from "@/lib/translateService";
 import { Article } from "@/db/schema/news";
 import { useAction } from "@/hooks/use-action";
-import { fetchArticles } from "@/actions/news";
+import { fetchArticles } from "@/actions/articles/articles";
 import { NewsCardSkeleton } from "./Skeletons";
 
 interface SwipeableNewsFeedProps {
