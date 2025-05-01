@@ -16,11 +16,11 @@ import * as React from "react";
 import { toast } from "sonner";
 
 export function ArticleAttachment({
-  files,
-  setFiles,
+  fileMap,
+  setFileMap,
 }: {
-  files: File[];
-  setFiles: (files: File[]) => void;
+  fileMap: Map<string, File>;
+  setFileMap: (files: File[]) => void;
 }) {
   const onFileReject = React.useCallback((file: File, message: string) => {
     toast(message, {
@@ -32,22 +32,22 @@ export function ArticleAttachment({
 
   return (
     <FileUpload
-      maxFiles={2}
+      maxFiles={6}
       maxSize={5 * 1024 * 1024}
       className="w-full max-w-md"
-      value={files}
-      onValueChange={setFiles}
+      onValueChange={setFileMap}
       onFileReject={onFileReject}
       multiple
+      label="Add Images (max 6 files, up to 5MB each)"
     >
       <FileUploadDropzone>
         <div className="flex flex-col items-center gap-1">
-          <div className="flex items-center justify-center rounded-full border p-2.5">
+          <div className="flex items-center justify-center rounded-full border p-1">
             <Upload className="size-6 text-muted-foreground" />
           </div>
-          <p className="font-medium text-sm">Drag & drop files here</p>
+          {/* <p className="font-medium text-sm">Drag & drop files here</p> */}
           <p className="text-muted-foreground text-xs">
-            Or click to browse (max 2 files, up to 5MB each)
+            Add Images (max 6 files, up to 5MB each)
           </p>
         </div>
         <FileUploadTrigger asChild>
@@ -57,7 +57,7 @@ export function ArticleAttachment({
         </FileUploadTrigger>
       </FileUploadDropzone>
       <FileUploadList>
-        {files.map((file, index) => (
+        {Array.from(fileMap.values()).map((file, index) => (
           <FileUploadItem key={index} value={file}>
             <FileUploadItemPreview />
             <FileUploadItemMetadata />

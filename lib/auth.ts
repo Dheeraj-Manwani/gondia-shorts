@@ -3,6 +3,19 @@ import prisma from "@/db/db";
 import { NextAuthOptions, Session } from "next-auth";
 import { Role } from "@prisma/client";
 
+export interface appSession extends Session {
+  status: "loading" | "authenticated" | "unauthenticated";
+  data: {
+    user?: {
+      id?: string | null;
+      name?: string | null;
+      email?: string | null;
+      role?: Role;
+      profilePic?: string | null;
+    };
+  };
+}
+
 export interface session extends Session {
   user?: {
     id?: string | null;

@@ -1,3 +1,4 @@
+import { isAttachmentRequired } from "@/lib/utils";
 import { z } from "zod";
 
 export const insertUserSchema = z.object({
@@ -38,17 +39,39 @@ export const articleSchema = z.object({
 });
 export type Article = z.infer<typeof articleSchema>;
 
-export const createArticleSchema = z.object({
-  type: ArticleTypeEnum,
-  title: z.string().min(1),
-  content: z.string().min(1),
-  imageUrls: z.array(z.string().url()).default([]).optional(),
-  videoUrl: z.string().url().optional(),
-  sourceText: z.string().min(1).optional(),
-  sourceLogoUrl: z.string().url().optional(),
-  author: z.string().optional(),
-  categoryId: z.number().optional(),
-  submittedById: z.number().optional(),
-});
+export const createArticleSchema = z
+  .object({
+    type: ArticleTypeEnum,
+    title: z.string().min(1),
+    content: z.string().min(1),
+    imageUrls: z.array(z.string().url()).default([]).optional(),
+    videoUrl: z.string().trim().url().or(z.literal("")).optional(),
+    sourceText: z.string().min(1).optional(),
+    sourceLogoUrl: z.string().url().optional(),
+    author: z.string().optional(),
+    categoryId: z.number().optional(),
+    submittedById: z.number().optional(),
+  })
+
+  .superRefine((data, ctx) => {
+    if (data.type === "YOUTUBE" && !data.videoUrl) {
+      ctx.addIssue({
+        path: ["videoUrl"],
+        message: "YouTube URL is required for YouTube articles",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+    if (
+      isAttachmentRequired(data.type) &&
+      (!data.imageUrls || data.imageUrls.length === 0)
+    ) {
+      console.log("added issue ===================================");
+      ctx.addIssue({
+        path: ["imageUrls"],
+        message: "At least one image is required for this article type",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });
 
 export type CreateArticle = z.infer<typeof createArticleSchema>;

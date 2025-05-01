@@ -1,10 +1,15 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
-import { Download, LogOut } from "lucide-react";
+import { Download, LogOut, Plus } from "lucide-react";
 // import Image from "next/image";
 // import googleIcon from "@/public/google-icon.svg";
 import { signOut, useSession } from "next-auth/react";
 // import { Button } from "./ui/button";
 import { UserProfile } from "./UserProfile";
+import { appSession } from "@/lib/auth";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -32,7 +37,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
-  const session = useSession();
+  const session = useSession() as unknown as appSession;
+  const router = useRouter();
 
   // Handle PWA installation
   useEffect(() => {
@@ -261,6 +267,24 @@ const Sidebar: React.FC<SidebarProps> = ({
                   Dark Mode
                 </button>
               </li> */}
+
+              {session.status == "authenticated" &&
+                (session.data.user?.role === "ADMIN" ||
+                  session.data.user?.role === "PUBLISHER") && (
+                  <li>
+                    <button
+                      className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onClose();
+                        router.push("/new");
+                      }}
+                    >
+                      <Plus />
+                      New Article
+                    </button>
+                  </li>
+                )}
               {session.status == "authenticated" && (
                 <li>
                   <button

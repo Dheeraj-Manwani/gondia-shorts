@@ -30,6 +30,7 @@ import { ArticleAttachment } from "./ArticleAttachment";
 import { CreateArticle, createArticleSchema } from "@/db/schema/news";
 import { ArticleType } from "@prisma/client";
 import { isAttachmentRequired } from "@/lib/utils";
+import { storeFileInS3 } from "@/actions/s3";
 
 export default function NewArticle({
   article,
@@ -40,7 +41,7 @@ export default function NewArticle({
   setArticle: (article: CreateArticle) => void;
   togglePreviewMode: (isPreviewMode: boolean) => void;
 }) {
-  const [files, setFiles] = React.useState<File[]>([]);
+  const [fileMap, setFileMap] = React.useState<Map<string, File>>(new Map());
 
   const form = useForm<z.infer<typeof createArticleSchema>>({
     resolver: zodResolver(createArticleSchema),
@@ -57,15 +58,64 @@ export default function NewArticle({
     }
   }, []);
 
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "type") {
+        form.setValue("videoUrl", "");
+        form.setValue("imageUrls", []);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
+  const handleSetFiles = async (newFiles: File[]) => {
+    console.log("handle set file ============ newFiles", newFiles);
+    const toastId = toast.loading("Uploading files...");
+    const newFileMap = new Map(fileMap);
+
+    try {
+      for (const file of newFiles) {
+        const alreadyExists = Object.values(fileMap).some(
+          (existingFile) => existingFile.name === file.name
+        );
+
+        if (alreadyExists) continue;
+
+        const result = await storeFileInS3(file);
+        console.log("Uploaded", file.name, "->", result);
+
+        if (result) {
+          newFileMap.set(
+            `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${result}`,
+            file
+          );
+        }
+      }
+      setFileMap(newFileMap);
+      const filesArray = Array.from(newFileMap.keys());
+
+      form.setValue("imageUrls", filesArray);
+      console.log("seeting imageUrls", filesArray);
+      toast.success("Files uploaded successfully", { id: toastId });
+    } catch (error) {
+      console.error("Error uploading files", error);
+      toast.error("Failed to upload files. Please try again.", { id: toastId });
+    }
+
+    console.log(form.getValues("imageUrls"));
+    console.log(form.getValues("title"));
+    console.log(form.getValues("content"));
+  };
+
   function onSubmit(values: z.infer<typeof createArticleSchema>) {
     try {
-      if (selectedType == ArticleType.YOUTUBE && !values.videoUrl) {
-        form.setError("videoUrl", {
-          type: "manual",
-          message: "Youtube URL is required",
-        });
-        return;
-      }
+      // if (selectedType == ArticleType.YOUTUBE && !values.videoUrl) {
+      //   form.setError("videoUrl", {
+      //     type: "manual",
+      //     message: "Youtube URL is required",
+      //   });
+      //   return;
+      // }
 
       setArticle(values);
       togglePreviewMode(true);
@@ -81,10 +131,15 @@ export default function NewArticle({
     }
   }
 
+  function onError(errors: any, data: any) {
+    console.error("❌ Form errors:", errors, data);
+    toast.error("Please fix the errors in the form before submitting.");
+  }
+
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit, onError)}
         className="space-y-6 max-w-full py-10 mx-5"
       >
         <FormField
@@ -143,8 +198,8 @@ export default function NewArticle({
               <FormLabel>Add Images</FormLabel>
               <FormControl>
                  <FileUploader
-                  value={files}
-                  onValueChange={setFiles}
+                  value={fileMap}
+                  onValueChange={setFileMap}
                   dropzoneOptions={dropZoneConfig}
                   className="relative bg-background rounded-lg p-2"
                 >
@@ -164,9 +219,9 @@ export default function NewArticle({
                     </div>
                   </FileInput>
                   <FileUploaderContent>
-                    {files &&
-                      files.length > 0 &&
-                      files.map((file, i) => (
+                    {fileMap &&
+                      fileMap.length > 0 &&
+                      fileMap.map((file, i) => (
                         <FileUploaderItem key={i} index={i}>
                           <Paperclip className="h-4 w-4 stroke-current" />
                           <span>{file.name}</span>
@@ -184,7 +239,7 @@ export default function NewArticle({
         /> */}
 
         {isAttachmentRequired(selectedType) && (
-          <ArticleAttachment files={files} setFiles={setFiles} />
+          <ArticleAttachment fileMap={fileMap} setFileMap={handleSetFiles} />
         )}
 
         {selectedType && (
@@ -238,11 +293,18 @@ export default function NewArticle({
           >
             
           </Button> */}
-          {selectedType && (
+          {/* {selectedType && (
             <Button type="submit" className="w-full">
               Submit
             </Button>
-          )}
+          )} */}
+          <Button
+            type="submit"
+            className="w-full"
+            // disabled={!form.formState.isValid}
+          >
+            Submit
+          </Button>
         </div>
       </form>
     </Form>

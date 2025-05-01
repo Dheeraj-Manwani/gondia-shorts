@@ -13,7 +13,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["lh3.googleusercontent.com", "your-image-domain.com"], // 👈 add all required domains here
+    // domains: [
+    //   "lh3.googleusercontent.com",
+    //   "your-image-domain.com",
+    //   "d7z3col9dhc88.cloudfront.net",
+    // ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "d7z3col9dhc88.cloudfront.net",
+      },
+      { protocol: "https", hostname: "images.unsplash.com" },
+    ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "20mb",
+    },
   },
 };
 

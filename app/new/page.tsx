@@ -9,8 +9,12 @@ import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
 import { createArticle } from "@/actions/articles/articles";
 import { twMerge } from "tailwind-merge";
+import { useSession } from "next-auth/react";
+import { appSession, authConfig } from "@/lib/auth";
 
 export default function () {
+  // @ts-expect-error to be taken care of
+  const session: appSession = useSession(authConfig);
   const [isPreviewMode, setIsPreviewMode] = React.useState<boolean>(false);
   const [currentArticle, setCurrentArticle] =
     React.useState<null | CreateArticle>(null);
@@ -28,6 +32,11 @@ export default function () {
   };
 
   console.log("page render", currentArticle, isPreviewMode);
+
+  console.log("session inside new page", session);
+  if (session.status === "loading") return null;
+  if (session.status === "unauthenticated") return <div>Unauthorized</div>;
+  if (session?.data.user?.role != "ADMIN") return <div>No Access</div>;
   return (
     <div
       className={twMerge(

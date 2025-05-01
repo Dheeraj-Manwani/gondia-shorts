@@ -51,7 +51,7 @@ export const fetchArticles = async (fetchParams: FetchParams) => {
   const articles = await prisma.article.findMany({
     where: categoryId ? { categoryId } : undefined,
     orderBy: {
-      id: "asc",
+      id: "desc",
     },
     take: limit,
     skip: offset,
