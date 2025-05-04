@@ -1,12 +1,12 @@
 "use server";
 
 import prisma from "@/db/db";
-import { seed } from "../data";
-import { sampleArticles } from "@/lib/data";
+// import { seed } from "../data";
+// import { sampleArticles } from "@/lib/data";
 import { getServerSession } from "next-auth";
 import { authConfig } from "@/lib/auth";
-import { Role } from "@prisma/client";
-import { CreateArticle, createArticleSchema } from "@/db/schema/news";
+import { Role } from "@prisma/client/index.js";
+import { CreateArticle } from "@/db/schema/news";
 
 interface FetchParams {
   categoryId?: number; // optional now

@@ -8,7 +8,6 @@ import { signOut, useSession } from "next-auth/react";
 // import { Button } from "./ui/button";
 import { UserProfile } from "./UserProfile";
 import { appSession } from "@/lib/auth";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -26,14 +25,13 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose,
-  selectedCategoryId,
+  // selectedCategoryId,
   // onSelectCategory,
 }) => {
   // const { data: categories } = useQuery<Category[]>({
   //   queryKey: ['/api/categories'],
   //   enabled: true,
   // });
-  console.log(selectedCategoryId);
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);

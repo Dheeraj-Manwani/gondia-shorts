@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
+  // FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,12 +23,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { CloudUpload, Eye, Paperclip } from "lucide-react";
 
 import { Textarea } from "@/components/ui/textarea";
 import { ArticleAttachment } from "./ArticleAttachment";
 import { CreateArticle, createArticleSchema } from "@/db/schema/news";
-import { ArticleType } from "@prisma/client";
+import { ArticleType } from "@prisma/client/index.js";
 import { isAttachmentRequired } from "@/lib/utils";
 import { storeFileInS3 } from "@/actions/s3";
 
@@ -55,6 +54,19 @@ export default function NewArticle({
       form.setValue("imageUrls", article.imageUrls);
       form.setValue("title", article.title);
       form.setValue("content", article.content);
+
+      if (article.imageUrls && article.imageUrls.length > 0) {
+        console.log(
+          "article.imageUrls inside useefffff ========== ",
+          article.imageUrls
+        );
+        const newFileMap = new Map();
+        article.imageUrls.forEach((url) => {
+          const fileName = url.split("_")[0] || url;
+          newFileMap.set(url, new File([], fileName));
+        });
+        setFileMap(newFileMap);
+      }
     }
   }, []);
 
@@ -69,7 +81,6 @@ export default function NewArticle({
   }, [form]);
 
   const handleSetFiles = async (newFiles: File[]) => {
-    console.log("handle set file ============ newFiles", newFiles);
     const toastId = toast.loading("Uploading files...");
     const newFileMap = new Map(fileMap);
 
@@ -95,7 +106,6 @@ export default function NewArticle({
       const filesArray = Array.from(newFileMap.keys());
 
       form.setValue("imageUrls", filesArray);
-      console.log("seeting imageUrls", filesArray);
       toast.success("Files uploaded successfully", { id: toastId });
     } catch (error) {
       console.error("Error uploading files", error);
@@ -131,16 +141,11 @@ export default function NewArticle({
     }
   }
 
-  function onError(errors: any, data: any) {
-    console.error("❌ Form errors:", errors, data);
-    toast.error("Please fix the errors in the form before submitting.");
-  }
-
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit, onError)}
-        className="space-y-6 max-w-full py-10 mx-5"
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 max-w-full pt-4 mb-20 mx-5"
       >
         <FormField
           control={form.control}
@@ -190,56 +195,11 @@ export default function NewArticle({
           />
         )}
 
-        {/* <FormField
-          control={form.control}
-          name="imageUrls"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Add Images</FormLabel>
-              <FormControl>
-                 <FileUploader
-                  value={fileMap}
-                  onValueChange={setFileMap}
-                  dropzoneOptions={dropZoneConfig}
-                  className="relative bg-background rounded-lg p-2"
-                >
-                  <FileInput
-                    id="fileInput"
-                    className="outline-dashed outline-1 outline-slate-500"
-                  >
-                    <div className="flex items-center justify-center flex-col p-8 w-full ">
-                      <CloudUpload className="text-gray-500 w-10 h-10" />
-                      <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                        <span className="font-semibold">Click to upload</span>
-                        &nbsp; or drag and drop
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        SVG, PNG, JPG or GIF
-                      </p>
-                    </div>
-                  </FileInput>
-                  <FileUploaderContent>
-                    {fileMap &&
-                      fileMap.length > 0 &&
-                      fileMap.map((file, i) => (
-                        <FileUploaderItem key={i} index={i}>
-                          <Paperclip className="h-4 w-4 stroke-current" />
-                          <span>{file.name}</span>
-                        </FileUploaderItem>
-                      ))}
-                  </FileUploaderContent>
-                </FileUploader> 
-
-                <ArticleAttachment />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
-
         {isAttachmentRequired(selectedType) && (
-          <ArticleAttachment fileMap={fileMap} setFileMap={handleSetFiles} />
+          <FormItem>
+            <FormLabel>Images</FormLabel>
+            <ArticleAttachment fileMap={fileMap} setFileMap={handleSetFiles} />
+          </FormItem>
         )}
 
         {selectedType && (
@@ -285,19 +245,6 @@ export default function NewArticle({
         )}
 
         <div className="flex flex-col items-center justify-between gap-2">
-          {/* <Button
-            type="submit"
-            variant={"ghost"}
-            className="w-full bg-zinc-300 hover:bg-zinc-400"
-            onClick={() => togglePreviewMode(true)}
-          >
-            
-          </Button> */}
-          {/* {selectedType && (
-            <Button type="submit" className="w-full">
-              Submit
-            </Button>
-          )} */}
           <Button
             type="submit"
             className="w-full"

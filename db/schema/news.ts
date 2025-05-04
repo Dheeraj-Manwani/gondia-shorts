@@ -65,7 +65,6 @@ export const createArticleSchema = z
       isAttachmentRequired(data.type) &&
       (!data.imageUrls || data.imageUrls.length === 0)
     ) {
-      console.log("added issue ===================================");
       ctx.addIssue({
         path: ["imageUrls"],
         message: "At least one image is required for this article type",

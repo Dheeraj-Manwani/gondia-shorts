@@ -90,14 +90,16 @@ export default function NewsCarousel() {
                 }}
               >
                 <div className="w-full h-44 bg-gray-200 relative">
-                  <div
-                    className="w-full h-full object-cover"
-                    style={{
-                      backgroundImage: `url(${news.imageUrls[0]})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                    }}
-                  />
+                  {news.imageUrls && (
+                    <div
+                      className="w-full h-full object-cover"
+                      style={{
+                        backgroundImage: `url(${news.imageUrls[0]})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    />
+                  )}
                 </div>
                 <div className="p-4">
                   <div className="text-xs text-gray-500 mb-1">

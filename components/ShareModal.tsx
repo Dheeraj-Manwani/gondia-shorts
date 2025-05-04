@@ -105,7 +105,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
 
         {/* Article preview */}
         <div className="flex items-start space-x-3 mb-6 pb-4 border-b border-gray-200">
-          {article.imageUrls[0] && (
+          {article.imageUrls && (
             <img
               src={article.imageUrls[0]}
               alt={article.title}

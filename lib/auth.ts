@@ -1,7 +1,7 @@
 import GoogleProvider from "next-auth/providers/google";
 import prisma from "@/db/db";
 import { NextAuthOptions, Session } from "next-auth";
-import { Role } from "@prisma/client";
+import { Role } from "@prisma/client/index.js";
 
 export interface appSession extends Session {
   status: "loading" | "authenticated" | "unauthenticated";

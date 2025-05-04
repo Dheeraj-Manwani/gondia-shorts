@@ -49,7 +49,6 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
 
   // Update articles when data changes
   useEffect(() => {
-    console.log("data inside use eff ", data);
     if (data && data.length > 0) {
       const articleData = data as Article[];
       setArticles((prev) => [...prev, ...articleData]);
@@ -60,7 +59,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   useEffect(() => {
     setArticles([]);
     setPage(0);
-    execute({ limit: limit, offset: 0 });
+    if (!isLoading) execute({ limit: limit, offset: 0 });
     // Reset swiper to first slide when category changes
     if (swiperRef.current) {
       swiperRef.current.slideTo(0, 0);
@@ -84,7 +83,10 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
     setPage(() => swiper.realIndex);
     console.log("swiper real index => ", swiper.realIndex);
 
-    if (swiper.realIndex === articles.length - 4) {
+    if (
+      swiper.realIndex ===
+      articles.length - (Number(process.env.NEXT_PUBLIC_FETCH_BEFORE) || 4)
+    ) {
       console.log("Fetching more articles...");
       await execute({ limit: limit, offset: articles.length });
     }

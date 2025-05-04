@@ -12,7 +12,6 @@ import { Button } from "./ui/button";
 
 export const UserProfile = () => {
   const session = useSession();
-  console.log("session inside user profile", session);
   return (
     <div className="flex items-center gap-2 p-2">
       {/* <Avatar className="h-10 w-10">

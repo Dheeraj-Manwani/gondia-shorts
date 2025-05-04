@@ -7,28 +7,31 @@ import { Pagination, Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import Image from "next/image";
-import { ArticleType } from "@prisma/client";
+import { ArticleType } from "@prisma/client/index.js";
 import { Article } from "@/db/schema/news";
 import CommentModal from "@/components/comments/CommentModal";
-import { useTranslate } from "@/hooks/use-translate";
-import { translateToHindi } from "@/lib/translateService";
+// import { useTranslate } from "@/hooks/use-translate";
+// import { translateToHindi } from "@/lib/translateService";
 import ReactPlayer from "react-player/youtube";
-import { Share2 } from "lucide-react";
+import { Bookmark, Heart, MessageSquareMore, Share2 } from "lucide-react";
+import { twMerge } from "tailwind-merge";
 
 interface NewsCardProps {
   isCurrentActive: boolean;
   isPreview?: boolean;
+  isPreviewActive?: boolean;
   article: Article;
 }
 
 export default function NewsCard({
   isCurrentActive,
   isPreview = false,
+  isPreviewActive = false,
   article,
 }: NewsCardProps) {
-  const { isHindi } = useTranslate();
-  const [translatedHeadline, setTranslatedHeadline] = useState(article.title);
-  const [translatedSummary, setTranslatedSummary] = useState(article.content);
+  // const { isHindi } = useTranslate();
+  // const [translatedHeadline, setTranslatedHeadline] = useState(article.title);
+  // const [translatedSummary, setTranslatedSummary] = useState(article.content);
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
@@ -37,21 +40,21 @@ export default function NewsCard({
   const [videoMuted, setVideoMuted] = useState(true);
 
   // Translation effect
-  useEffect(() => {
-    (async () => {
-      if (isHindi) {
-        try {
-          setTranslatedHeadline(await translateToHindi(article.title));
-          setTranslatedSummary(await translateToHindi(article.content));
-        } catch {
-          /* ignore */
-        }
-      } else {
-        setTranslatedHeadline(article.title);
-        setTranslatedSummary(article.content);
-      }
-    })();
-  }, [isHindi, article.title, article.content]);
+  // useEffect(() => {
+  //   (async () => {
+  //     if (isHindi) {
+  //       try {
+  //         setTranslatedHeadline(await translateToHindi(article.title));
+  //         setTranslatedSummary(await translateToHindi(article.content));
+  //       } catch {
+  //         /* ignore */
+  //       }
+  //     } else {
+  //       setTranslatedHeadline(article.title);
+  //       setTranslatedSummary(article.content);
+  //     }
+  //   })();
+  // }, [isHindi, article.title, article.content]);
 
   // Video intersection autoplay
   useEffect(() => {
@@ -82,25 +85,36 @@ export default function NewsCard({
   const [slideWidths, setSlideWidths] = useState<Record<string, number>>({});
 
   // compute width for 40vh based on natural dimensions
+  // const handleLoad = (url: string, nw: number, nh: number) => {
+  //   const hPx = window.innerHeight * 0.4;
+  //   setSlideWidths((w) => ({ ...w, [url]: (nw / nh) * hPx }));
+  // };
+
   const handleLoad = (url: string, nw: number, nh: number) => {
     const hPx = window.innerHeight * 0.4;
-    setSlideWidths((w) => ({ ...w, [url]: (nw / nh) * hPx }));
+    const newWidth = (nw / nh) * hPx;
+    setSlideWidths((prev) => {
+      if (prev[url] === newWidth) return prev; // Prevent re-renders
+      return { ...prev, [url]: newWidth };
+    });
   };
 
-  const handleImageLoad = (
-    url: string,
-    naturalWidth: number,
-    naturalHeight: number
-  ) => {
-    const vh40px = window.innerHeight * 0.4;
-    const computedWidth = (naturalWidth / naturalHeight) * vh40px;
-    setSlideWidths((w) => ({ ...w, [url]: computedWidth }));
-  };
+  // const handleImageLoad = (
+  //   url: string,
+  //   naturalWidth: number,
+  //   naturalHeight: number
+  // ) => {
+  //   const vh40px = window.innerHeight * 0.4;
+  //   const computedWidth = (naturalWidth / naturalHeight) * vh40px;
+  //   setSlideWidths((w) => ({ ...w, [url]: computedWidth }));
+  // };
 
+  if (isPreview && !isPreviewActive) return <div>dead</div>; // don't render if not active
+  const articleIdForPreview = uuid();
   // --- RENDERS ---
   return (
     <article
-      key={isPreview ? uuid() : article.id}
+      key={isPreview ? articleIdForPreview : article.id}
       className="w-full h-full bg-white flex flex-col overflow-hidden"
     >
       {/* MEDIA */}
@@ -117,9 +131,11 @@ export default function NewsCard({
               loop
               onClick={() => {
                 if (videoRef.current) {
-                  isPlaying
-                    ? videoRef.current.pause()
-                    : videoRef.current.play();
+                  if (isPlaying) {
+                    videoRef.current.pause();
+                  } else {
+                    videoRef.current.play();
+                  }
                   setIsPlaying(!isPlaying);
                 }
               }}
@@ -145,7 +161,7 @@ export default function NewsCard({
           article.imageUrls?.length &&
           article.imageUrls?.length > 1 && (
             <Swiper
-              modules={[Pagination, Autoplay]}
+              modules={[Pagination, Autoplay, Navigation]}
               slidesPerView={1}
               centeredSlides
               loop
@@ -259,12 +275,29 @@ export default function NewsCard({
       </div>
 
       {/* SOCIAL ACTIONS */}
-      <div className="px-4 py-2 flex items-center justify-between border-b border-gray-700">
+      <div
+        className={twMerge(
+          "px-4 py-2 flex items-center justify-between border-b border-gray-700",
+          isPreview ? "pointer-events-none cursor-not-allowed" : ""
+        )}
+      >
         <div className="flex space-x-4">
-          <button onClick={() => setIsLiked(!isLiked)}>
-            {isLiked ? "❤️" : "🤍"}
+          <button
+            onClick={() => setIsLiked(!isLiked)}
+            className="cursor-pointer"
+          >
+            {isLiked ? (
+              <Heart size={18} className="fill-red-500 text-red-500" />
+            ) : (
+              <Heart size={18} className="text-gray-700" />
+            )}
           </button>
-          <button onClick={() => setIsCommentModalOpen(true)}>💬</button>
+          <button
+            onClick={() => setIsCommentModalOpen(true)}
+            className="cursor-pointer"
+          >
+            <MessageSquareMore size={18} className="text-gray-700" />
+          </button>
           <button
             onClick={() =>
               window.open(
@@ -274,46 +307,49 @@ export default function NewsCard({
                 "_blank"
               )
             }
-            className="text-gray-700"
+            className="text-gray-700 cursor-pointer"
           >
-            <Share2 />
+            <Share2 size={18} className="text-gray-700" />
           </button>
         </div>
         <button
           onClick={() => setIsSaved(!isSaved)}
-          className=" text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
+          className="p-1 rounded-full transition-colors cursor-pointer"
           aria-label="Save"
         >
-          {isSaved ? (
-            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
-            </svg>
-          ) : (
-            <svg
-              className="w-7 h-7"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-              />
-            </svg>
-          )}
+          {
+            isSaved ? (
+              <Bookmark size={18} className="fill-black text-black" />
+            ) : (
+              <Bookmark size={18} className="text-gray-700" />
+            )
+            // (
+            //   <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+            //     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
+            //   </svg>
+            // ) : (
+            //   <svg
+            //     className="w-7 h-7"
+            //     fill="none"
+            //     stroke="currentColor"
+            //     viewBox="0 0 24 24"
+            //   >
+            //     <path
+            //       strokeLinecap="round"
+            //       strokeLinejoin="round"
+            //       strokeWidth="2"
+            //       d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+            //     />
+            //   </svg>
+            // )
+          }
         </button>
       </div>
 
       {/* TEXT CONTENT */}
       <div className="p-4 flex-1 flex flex-col">
-        <h2 className="font-bold text-xl mb-2">
-          {isHindi ? translatedHeadline : article.title}
-        </h2>
-        <p className="flex-1 text-gray-700">
-          {isHindi ? translatedSummary : article.content}
-        </p>
+        <h2 className="font-bold text-xl mb-2">{article.title}</h2>
+        <p className="flex-1 text-gray-700">{article.content}</p>
       </div>
 
       {/* COMMENTS */}

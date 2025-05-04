@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/db/db";
-import { ArticleType } from "@prisma/client";
+import { ArticleType } from "@prisma/client/index.js";
 import { sampleArticles } from "@/lib/data";
 
 export async function seed() {
