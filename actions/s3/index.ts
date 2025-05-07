@@ -16,7 +16,7 @@ export const storeFileInS3 = async (
 ): Promise<string | undefined> => {
   if (!file) return;
 
-  const fileKey = uuid() + "_" + file.name;
+  const fileKey = uuid() + "_" + file.name.replace(/[^a-zA-Z0-9]/g, "");
 
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);

@@ -10,6 +10,7 @@ import { CreateArticle } from "@/db/schema/news";
 
 interface FetchParams {
   categoryId?: number; // optional now
+  articleSlug?: string;
   limit: number;
   offset: number;
 }
@@ -47,15 +48,34 @@ async function generateUniqueSlug(title: string): Promise<string> {
 }
 
 export const fetchArticles = async (fetchParams: FetchParams) => {
-  const { categoryId, limit, offset } = fetchParams;
-  const articles = await prisma.article.findMany({
-    where: categoryId ? { categoryId } : undefined,
+  const { categoryId, limit, offset, articleSlug } = fetchParams;
+
+  let mainArticle = null;
+  if (articleSlug) {
+    mainArticle = await prisma.article.findFirst({
+      where: {
+        slug: articleSlug,
+        ...(categoryId ? { categoryId } : {}),
+      },
+    });
+  }
+
+  // Fetch other articles (excluding the main one by ID or slug)
+  const otherArticles = await prisma.article.findMany({
+    where: {
+      ...(categoryId ? { categoryId } : {}),
+      ...(mainArticle ? { slug: { not: articleSlug } } : {}),
+    },
     orderBy: {
       id: "desc",
     },
     take: limit,
     skip: offset,
   });
+
+  const articles = mainArticle
+    ? [mainArticle, ...otherArticles]
+    : otherArticles;
 
   // await seed();
 
@@ -101,7 +121,7 @@ export const createArticle = async (article: CreateArticle) => {
       },
     });
 
-    return { success: true, data: res };
+    return { success: true, data: res, routeParam: res.slug };
   } catch (e) {
     console.log("Error occured while creating article", e);
     return { success: false, error: "Error occured while creating article" };

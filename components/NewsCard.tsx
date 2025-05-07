@@ -109,7 +109,7 @@ export default function NewsCard({
   //   setSlideWidths((w) => ({ ...w, [url]: computedWidth }));
   // };
 
-  if (isPreview && !isPreviewActive) return <div>dead</div>; // don't render if not active
+  if (isPreview && !isPreviewActive) return null; // don't render if not active
   const articleIdForPreview = uuid();
   // --- RENDERS ---
   return (

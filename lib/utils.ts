@@ -34,3 +34,8 @@ export const areFileMapsEqual = (
 
   return true;
 };
+
+export const checkValidImageExtension = (str: string) => {
+  const STR = str.toUpperCase();
+  return STR === "PNG" || STR === "JPG" || STR === "GIF" || STR === "JPEG";
+};

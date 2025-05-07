@@ -11,7 +11,7 @@ export interface appSession extends Session {
       name?: string | null;
       email?: string | null;
       role?: Role;
-      profilePic?: string | null;
+      image?: string | null;
     };
   };
 }

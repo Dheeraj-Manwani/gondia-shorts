@@ -34,10 +34,8 @@ export function ArticleAttachment({
   }, []);
 
   React.useEffect(() => {
-    console.log("fileMap inside attach ========", fileMap);
     if (!areFileMapsEqual(fileMapState, fileMap)) {
-      console.log("maps are not equal inside attach ========", fileMapState);
-      setFileMapState(fileMap);
+      setFileMapState(new Map(fileMap)); // ✅ new Map instance = new reference
     }
   }, [fileMap]);
 

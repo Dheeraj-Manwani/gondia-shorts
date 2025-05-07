@@ -25,11 +25,10 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { Textarea } from "@/components/ui/textarea";
-import { ArticleAttachment } from "./ArticleAttachment";
 import { CreateArticle, createArticleSchema } from "@/db/schema/news";
 import { ArticleType } from "@prisma/client/index.js";
 import { isAttachmentRequired } from "@/lib/utils";
-import { storeFileInS3 } from "@/actions/s3";
+import { MultiFilepnd } from "./Attachment";
 
 export default function NewArticle({
   article,
@@ -41,6 +40,8 @@ export default function NewArticle({
   togglePreviewMode: (isPreviewMode: boolean) => void;
 }) {
   const [fileMap, setFileMap] = React.useState<Map<string, File>>(new Map());
+  console.log("fileMap", fileMap);
+  const [files, setFiles] = React.useState<string[]>([]);
 
   const form = useForm<z.infer<typeof createArticleSchema>>({
     resolver: zodResolver(createArticleSchema),
@@ -56,6 +57,7 @@ export default function NewArticle({
       form.setValue("content", article.content);
 
       if (article.imageUrls && article.imageUrls.length > 0) {
+        setFiles(article.imageUrls);
         console.log(
           "article.imageUrls inside useefffff ========== ",
           article.imageUrls
@@ -80,41 +82,46 @@ export default function NewArticle({
     return () => subscription.unsubscribe();
   }, [form]);
 
-  const handleSetFiles = async (newFiles: File[]) => {
-    const toastId = toast.loading("Uploading files...");
-    const newFileMap = new Map(fileMap);
+  // const handleSetFiles = async (newFiles: File[]) => {
+  //   const toastId = toast.loading("Uploading files...");
+  //   const newFileMap = new Map(fileMap);
 
-    try {
-      for (const file of newFiles) {
-        const alreadyExists = Object.values(fileMap).some(
-          (existingFile) => existingFile.name === file.name
-        );
+  //   try {
+  //     for (const file of newFiles) {
+  //       const alreadyExists = Object.values(fileMap).some(
+  //         (existingFile) => existingFile.name === file.name
+  //       );
 
-        if (alreadyExists) continue;
+  //       if (alreadyExists) continue;
 
-        const result = await storeFileInS3(file);
-        console.log("Uploaded", file.name, "->", result);
+  //       const result = await storeFileInS3(file);
+  //       console.log("Uploaded", file.name, "->", result);
 
-        if (result) {
-          newFileMap.set(
-            `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${result}`,
-            file
-          );
-        }
-      }
-      setFileMap(newFileMap);
-      const filesArray = Array.from(newFileMap.keys());
+  //       if (result) {
+  //         newFileMap.set(
+  //           `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${result}`,
+  //           file
+  //         );
+  //       }
+  //     }
+  //     setFileMap(newFileMap);
+  //     const filesArray = Array.from(newFileMap.keys());
 
-      form.setValue("imageUrls", filesArray);
-      toast.success("Files uploaded successfully", { id: toastId });
-    } catch (error) {
-      console.error("Error uploading files", error);
-      toast.error("Failed to upload files. Please try again.", { id: toastId });
-    }
+  //     form.setValue("imageUrls", filesArray);
+  //     toast.success("Files uploaded successfully", { id: toastId });
+  //   } catch (error) {
+  //     console.error("Error uploading files", error);
+  //     toast.error("Failed to upload files. Please try again.", { id: toastId });
+  //   }
 
-    console.log(form.getValues("imageUrls"));
-    console.log(form.getValues("title"));
-    console.log(form.getValues("content"));
+  //   console.log(form.getValues("imageUrls"));
+  //   console.log(form.getValues("title"));
+  //   console.log(form.getValues("content"));
+  // };
+
+  const handleSetFiles = async (newFiles: string[]) => {
+    setFiles(newFiles);
+    form.setValue("imageUrls", newFiles);
   };
 
   function onSubmit(values: z.infer<typeof createArticleSchema>) {
@@ -126,10 +133,11 @@ export default function NewArticle({
       //   });
       //   return;
       // }
+      const finalValues = { ...values, imageUrls: files };
+      console.log("finalValues", finalValues);
 
-      setArticle(values);
+      setArticle(finalValues);
       togglePreviewMode(true);
-      console.log(values);
       // toast(
       //   <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
       //     <code className="text-white">{JSON.stringify(values, null, 2)}</code>
@@ -197,8 +205,13 @@ export default function NewArticle({
 
         {isAttachmentRequired(selectedType) && (
           <FormItem>
-            <FormLabel>Images</FormLabel>
-            <ArticleAttachment fileMap={fileMap} setFileMap={handleSetFiles} />
+            {/* <ArticleAttachment fileMap={fileMap} setFileMap={handleSetFiles} /> */}
+            {/* <FormLabel>Images</FormLabel> */}
+            <MultiFilepnd
+              label="Add Images (max 6 files, up to 5MB each)"
+              src={files}
+              setSrc={handleSetFiles}
+            />
           </FormItem>
         )}
 

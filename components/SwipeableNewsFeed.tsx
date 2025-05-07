@@ -20,10 +20,12 @@ import { NewsCardSkeleton } from "./Skeletons";
 
 interface SwipeableNewsFeedProps {
   categoryId: number;
+  articleSlug?: string | null;
 }
 
 const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   categoryId,
+  articleSlug,
 }) => {
   const [page, setPage] = useState(0);
   const [articles, setArticles] = useState<Article[]>([]);
@@ -59,7 +61,12 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   useEffect(() => {
     setArticles([]);
     setPage(0);
-    if (!isLoading) execute({ limit: limit, offset: 0 });
+    if (!isLoading)
+      execute({
+        limit: limit,
+        offset: 0,
+        articleSlug: articleSlug ?? undefined,
+      });
     // Reset swiper to first slide when category changes
     if (swiperRef.current) {
       swiperRef.current.slideTo(0, 0);

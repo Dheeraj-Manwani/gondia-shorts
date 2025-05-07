@@ -11,9 +11,11 @@ import { createArticle } from "@/actions/articles/articles";
 import { twMerge } from "tailwind-merge";
 import { useSession } from "next-auth/react";
 import { appSession } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const session = useSession() as unknown as appSession;
+  const router = useRouter();
   const [isPreviewMode, setIsPreviewMode] = React.useState<boolean>(false);
   const [currentArticle, setCurrentArticle] =
     React.useState<null | CreateArticle>(null);
@@ -30,7 +32,11 @@ export default function Page() {
   );
 
   const handleSubmit = async () => {
-    if (currentArticle) await execute(currentArticle);
+    if (currentArticle) {
+      const res = await execute(currentArticle);
+      console.log("routing to ", "/feed?article=" + res.routeParam);
+      router.push("/feed?article=" + res.routeParam);
+    }
   };
   const articleId = uuid();
 

@@ -1,3 +1,7 @@
+"use client";
+
+import { appSession } from "@/lib/auth";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
 
@@ -6,6 +10,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+  const session = useSession() as unknown as appSession;
   return (
     <header className="fixed top-0 left-0 right-0 z-20 bg-white/90 backdrop-blur-sm shadow-sm">
       <div className="px-4 py-3 flex justify-between items-center">
@@ -14,6 +19,17 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             <span className="text-black text-xl font-bold tracking-tight cursor-pointer">
               Gondia<span className="text-blue-600">Shorts</span>
             </span>
+            {session.data?.user && session.data.user.role !== "USER" && (
+              // <Badge
+              //   className="text-[10px] font-medium relative bottom-3 py-0 px-0.5"
+              //   variant={"default"}
+              // >
+              //   {session.data.user.role}
+              // </Badge>
+              <span className="bg-yellow-100 text-yellow-800 text-[10px] font-semibold me-2 px-1.5 py-[1px] rounded-sm border border-yellow-300 relative bottom-3 left-1">
+                {session.data.user.role}
+              </span>
+            )}
           </Link>
         </div>
 
