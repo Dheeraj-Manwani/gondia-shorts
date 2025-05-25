@@ -1,4 +1,4 @@
-import { Article } from "@/db/schema/news";
+import { Article } from "@/db/schema/article";
 import React, { useState, useEffect } from "react";
 
 interface ShareModalProps {

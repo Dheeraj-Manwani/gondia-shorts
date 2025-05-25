@@ -3,10 +3,10 @@
 import React, { useEffect, useRef, useState } from "react";
 // import { useQuery } from '@tanstack/react-query';
 // import { Article } from '@shared/schema';
-import NewsCard from "./NewsCard";
+import NewsCard from "./news-card/NewsCard";
 import { useAction } from "@/hooks/use-action";
-import { fetchArticles } from "@/actions/articles/articles";
-import { Article } from "@/db/schema/news";
+import { fetchArticles } from "@/actions/articles";
+import { Article } from "@/db/schema/article";
 
 interface NewsFeedProps {
   categoryId: number;

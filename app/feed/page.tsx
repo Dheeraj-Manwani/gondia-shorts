@@ -5,8 +5,12 @@ import React from "react";
 // import Sidebar from "@/components/Sidebar";
 import SwipeableNewsFeed from "@/components/SwipeableNewsFeed";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { appSession } from "@/lib/auth";
 
 const Home: React.FC = () => {
+  const session = useSession() as unknown as appSession;
+
   // const [selectedCategoryId, setSelectedCategoryId] = useState(1); // Default to "All" category
   // const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -33,7 +37,11 @@ const Home: React.FC = () => {
 
     // <SwipeableNewsFeed categoryId={selectedCategoryId} />
     // </div>
-    <SwipeableNewsFeed categoryId={0} articleSlug={articleSlug} />
+    <SwipeableNewsFeed
+      categoryId={0}
+      articleSlug={articleSlug}
+      session={session}
+    />
   );
 };
 

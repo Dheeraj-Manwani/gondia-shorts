@@ -6,29 +6,35 @@ import React, { useEffect, useState, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
-import NewsCard from "./NewsCard";
+import NewsCard from "./news-card/NewsCard";
 import { v4 as uuid } from "uuid";
 
 // Import required modules from swiper
 import { Virtual, Mousewheel, Keyboard, Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 // import { translateToHindi } from "@/lib/translateService";
-import { Article } from "@/db/schema/news";
+import { Article } from "@/db/schema/article";
 import { useAction } from "@/hooks/use-action";
-import { fetchArticles } from "@/actions/articles/articles";
+import { fetchArticles } from "@/actions/articles";
 import { NewsCardSkeleton } from "./Skeletons";
+import { appSession } from "@/lib/auth";
+import { useArticles } from "@/store/articles";
 
 interface SwipeableNewsFeedProps {
+  session: appSession;
   categoryId: number;
   articleSlug?: string | null;
 }
 
 const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
+  session,
   categoryId,
   articleSlug,
 }) => {
   const [page, setPage] = useState(0);
-  const [articles, setArticles] = useState<Article[]>([]);
+  // const [articles, setArticles] = useState<Article[]>([]);
+  const articles = useArticles((state) => state.articles);
+  const setArticles = useArticles((state) => state.setArticles);
   // const [isHindi, setIsHindi] = useState(false);
   const limit = Number(process.env.NEXT_PUBLIC_FETCH_LIMIT); // Number of articles to fetch at once
   const swiperRef = useRef<SwiperType | null>(null);
@@ -53,7 +59,9 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   useEffect(() => {
     if (data && data.length > 0) {
       const articleData = data as Article[];
-      setArticles((prev) => [...prev, ...articleData]);
+      // setArticles((prev) => [...prev, ...articleData]);
+      const newArticles = [...articles, ...articleData];
+      setArticles(newArticles);
     }
   }, [data]);
 
@@ -61,17 +69,22 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   useEffect(() => {
     setArticles([]);
     setPage(0);
-    if (!isLoading)
+    if (
+      !isLoading &&
+      (session.status === "unauthenticated" ||
+        session.status === "authenticated")
+    )
       execute({
-        limit: limit,
+        limit,
         offset: 0,
         articleSlug: articleSlug ?? undefined,
+        session,
       });
     // Reset swiper to first slide when category changes
     if (swiperRef.current) {
       swiperRef.current.slideTo(0, 0);
     }
-  }, [categoryId]);
+  }, [categoryId, session.status]);
 
   // Load more articles when reaching the end
   const handleReachEnd = () => {
@@ -95,7 +108,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
       articles.length - (Number(process.env.NEXT_PUBLIC_FETCH_BEFORE) || 4)
     ) {
       console.log("Fetching more articles...");
-      await execute({ limit: limit, offset: articles.length });
+      await execute({ limit: limit, offset: articles.length, session });
     }
 
     // if (swiper.realIndex === page) {
@@ -166,6 +179,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
               article={article}
               isCurrentActive={page === index}
               key={uuid()}
+              session={session}
             />
           </SwiperSlide>
         ))}

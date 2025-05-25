@@ -22,18 +22,21 @@ enum ArticleType {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
-  number     String?   @unique
+  id         Int     @id @default(autoincrement())
+  email      String  @unique
+  number     String? @unique
   name       String
   password   String
-  role       Role     @default(USER)
+  role       Role    @default(USER)
   profilePic String?
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  articles  Article[]
+  articles     Article[]
+  comments     Comment[]
+  interactions Interaction[]
+  reports      Report[]
 }
 
 model Category {
@@ -46,24 +49,111 @@ model Category {
 }
 
 model Article {
-  id            Int      @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   title         String
-  slug          String   @unique
-  type          ArticleType 
-  
+  slug          String      @unique
+  type          ArticleType
   content       String
   imageUrls     String[]
   videoUrl      String?
   source        String
   sourceLogoUrl String?
   author        String
-  publishedAt   DateTime @default(now())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  publishedAt   DateTime    @default(now())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
 
   submittedById Int
   submittedBy   User @relation(fields: [submittedById], references: [id])
+
+  likeCount Int @default(0)
+  saveCount Int @default(0)
+
+  comments     Comment[]
+  interactions Interaction[]
+  reports      Report[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articleId Int
+  article   Article @relation(fields: [articleId], references: [id])
+
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id])
+
+  parentId Int? // for nested replies
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentReplies")
+
+  likeCount    Int @default(0)
+  dislikeCount Int @default(0)
+
+  interactions Interaction[]
+  reports      Report[]
+}
+
+model Interaction {
+  id   Int             @id @default(autoincrement())
+  type InteractionType
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  articleId Int?
+  article   Article? @relation(fields: [articleId], references: [id])
+
+  commentId Int?
+  comment   Comment? @relation(fields: [commentId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, articleId])
+  @@unique([userId, commentId])
+}
+
+enum InteractionType {
+  LIKE
+  DISLIKE
+  SAVE
+}
+
+enum ReportReason {
+  SPAM
+  HARASSMENT
+  HATE_SPEECH
+  MISINFORMATION
+  VIOLENCE
+  SEXUAL_CONTENT
+  PRIVACY_VIOLATION
+  COPYRIGHT
+  OFF_TOPIC
+  OTHER
+}
+
+model Report {
+  id          Int          @id @default(autoincrement())
+  reason      ReportReason
+  description String?
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  articleId Int?
+  article   Article? @relation(fields: [articleId], references: [id])
+
+  commentId Int?
+  comment   Comment? @relation(fields: [commentId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, articleId])
+  @@unique([userId, commentId])
 }

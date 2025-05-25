@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { Textarea } from "@/components/ui/textarea";
-import { CreateArticle, createArticleSchema } from "@/db/schema/news";
+import { CreateArticle, createArticleSchema } from "@/db/schema/article";
 import { ArticleType } from "@prisma/client/index.js";
 import { isAttachmentRequired } from "@/lib/utils";
 import { MultiFilepnd } from "./Attachment";

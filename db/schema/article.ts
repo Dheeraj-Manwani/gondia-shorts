@@ -24,18 +24,24 @@ export const ArticleTypeEnum = z.enum([
 export type ArticleType = z.infer<typeof ArticleTypeEnum>;
 
 export const articleSchema = z.object({
-  id: z.string().min(1),
+  id: z.number(),
   title: z.string().min(1),
   content: z.string().min(1),
   imageUrls: z.array(z.string().url()).default([]).optional(),
-  videoUrl: z.string().url().optional(),
+  videoUrl: z.string().url().optional().nullable(),
   type: ArticleTypeEnum,
-  sourceText: z.string().min(1),
-  sourceLogoUrl: z.string().url().optional(),
+  sourceText: z.string().optional(),
+  sourceLogoUrl: z.string().url().optional().nullable(),
   author: z.string().optional(),
   publishedAt: z.date().optional(),
   categoryId: z.number(),
   submittedById: z.number(),
+
+  isLiked: z.boolean().optional(),
+  isSaved: z.boolean().optional(),
+
+  likeCount: z.number().optional(),
+  saveCount: z.number().optional(),
 });
 export type Article = z.infer<typeof articleSchema>;
 

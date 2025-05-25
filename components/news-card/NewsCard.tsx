@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { debounce } from "lodash";
 import { v4 as uuid } from "uuid";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay, Navigation } from "swiper/modules";
@@ -8,19 +9,24 @@ import "swiper/css";
 import "swiper/css/pagination";
 import Image from "next/image";
 import { ArticleType } from "@prisma/client/index.js";
-import { Article } from "@/db/schema/news";
+import { Article } from "@/db/schema/article";
 import CommentModal from "@/components/comments/CommentModal";
 // import { useTranslate } from "@/hooks/use-translate";
 // import { translateToHindi } from "@/lib/translateService";
 import ReactPlayer from "react-player/youtube";
 import { Bookmark, Heart, MessageSquareMore, Share2 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
+import { appSession } from "@/lib/auth";
+import { toast } from "sonner";
+import { likeArticle } from "@/actions/interaction";
+import { SocialActions } from "./SocialActions";
 
 interface NewsCardProps {
   isCurrentActive: boolean;
   isPreview?: boolean;
   isPreviewActive?: boolean;
   article: Article;
+  session: appSession;
 }
 
 export default function NewsCard({
@@ -28,12 +34,12 @@ export default function NewsCard({
   isPreview = false,
   isPreviewActive = false,
   article,
+  session,
 }: NewsCardProps) {
   // const { isHindi } = useTranslate();
   // const [translatedHeadline, setTranslatedHeadline] = useState(article.title);
   // const [translatedSummary, setTranslatedSummary] = useState(article.content);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -275,76 +281,11 @@ export default function NewsCard({
       </div>
 
       {/* SOCIAL ACTIONS */}
-      <div
-        className={twMerge(
-          "px-4 py-2 flex items-center justify-between border-b border-gray-700",
-          isPreview ? "pointer-events-none cursor-not-allowed" : ""
-        )}
-      >
-        <div className="flex space-x-4">
-          <button
-            onClick={() => setIsLiked(!isLiked)}
-            className="cursor-pointer"
-          >
-            {isLiked ? (
-              <Heart size={18} className="fill-red-500 text-red-500" />
-            ) : (
-              <Heart size={18} className="text-gray-700" />
-            )}
-          </button>
-          <button
-            onClick={() => setIsCommentModalOpen(true)}
-            className="cursor-pointer"
-          >
-            <MessageSquareMore size={18} className="text-gray-700" />
-          </button>
-          <button
-            onClick={() =>
-              window.open(
-                `https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  article.title + " " + window.location.href
-                )}`,
-                "_blank"
-              )
-            }
-            className="text-gray-700 cursor-pointer"
-          >
-            <Share2 size={18} className="text-gray-700" />
-          </button>
-        </div>
-        <button
-          onClick={() => setIsSaved(!isSaved)}
-          className="p-1 rounded-full transition-colors cursor-pointer"
-          aria-label="Save"
-        >
-          {
-            isSaved ? (
-              <Bookmark size={18} className="fill-black text-black" />
-            ) : (
-              <Bookmark size={18} className="text-gray-700" />
-            )
-            // (
-            //   <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
-            //     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
-            //   </svg>
-            // ) : (
-            //   <svg
-            //     className="w-7 h-7"
-            //     fill="none"
-            //     stroke="currentColor"
-            //     viewBox="0 0 24 24"
-            //   >
-            //     <path
-            //       strokeLinecap="round"
-            //       strokeLinejoin="round"
-            //       strokeWidth="2"
-            //       d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-            //     />
-            //   </svg>
-            // )
-          }
-        </button>
-      </div>
+      <SocialActions
+        article={article}
+        setIsCommentModalOpen={setIsCommentModalOpen}
+        isPreview={isPreview}
+      />
 
       {/* TEXT CONTENT */}
       <div className="p-4 flex-1 flex flex-col">
@@ -358,6 +299,7 @@ export default function NewsCard({
           article={article}
           isOpen={true}
           onClose={() => setIsCommentModalOpen(false)}
+          session={session}
         />
       )}
     </article>

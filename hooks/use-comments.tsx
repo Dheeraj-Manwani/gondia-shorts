@@ -1,88 +1,118 @@
 "use client";
 
+import { createComment, fetchComments } from "@/actions/comments";
 import { Comment, SortOption } from "@/db/schema/comments";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 
-export const useComments = (articleId: string) => {
+export const useComments = (articleId: number, userId: number) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("top");
-  const [nextId, setNextId] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // const [nextId, setNextId] = useState(1);
 
   // Sort comments when sortOption changes
-  useEffect(() => {
-    let sortedComments = [...comments];
+  // useEffect(() => {
+  //   let sortedComments = [...comments];
 
-    switch (sortOption) {
-      case "top":
-        sortedComments.sort((a, b) => b.likes - a.likes);
-        break;
-      case "newest":
-        // Since we don't have actual dates, we'll sort by ID in reverse (assuming higher ID = newer)
-        sortedComments.sort((a, b) => b.id - a.id);
-        break;
-      case "oldest":
-        // Since we don't have actual dates, we'll sort by ID (assuming lower ID = older)
-        sortedComments.sort((a, b) => a.id - b.id);
-        break;
+  //   switch (sortOption) {
+  //     case "top":
+  //       sortedComments.sort((a, b) => b.likes - a.likes);
+  //       break;
+  //     case "newest":
+  //       // Since we don't have actual dates, we'll sort by ID in reverse (assuming higher ID = newer)
+  //       sortedComments.sort((a, b) => b.id - a.id);
+  //       break;
+  //     case "oldest":
+  //       // Since we don't have actual dates, we'll sort by ID (assuming lower ID = older)
+  //       sortedComments.sort((a, b) => a.id - b.id);
+  //       break;
+  //   }
+
+  //   setComments(sortedComments);
+  // }, [sortOption]);
+
+  // Fetch comments when the component mounts
+  // useEffect(() => {
+  const getComments = (parentId: string | undefined) => {
+    if (!isLoading) {
+      setIsLoading((oldstate) => true);
+      const toastId = toast.loading("Fetching comments...");
+      console.log(
+        "Fetching comments for articleId in get comments ========== ",
+        articleId
+      );
+      fetchComments({ articleId, parentId: Number(parentId) ?? undefined })
+        .then((fetchedComments) => {
+          setComments(fetchedComments);
+          toast.success("Comments fetched successfully", { id: toastId });
+        })
+        .catch((error) => {
+          toast.error("Failed to fetch comments", { id: toastId });
+          setError("Failed to fetch comments" + error);
+          console.error("Error fetching comments:", error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
+  };
 
-    setComments(sortedComments);
-  }, [sortOption]);
+  const addComment = async (text: string, parentId: number | undefined) => {
+    let toastId;
+    try {
+      toastId = toast.loading("Adding comment...");
+      const newComment = await createComment(text, articleId, userId, parentId);
+      setComments((prevComments) => [...prevComments, newComment]);
+      toast.success("Comment added successfully", { id: toastId });
+    } catch (e) {
+      toast.error("Failed to add comment", { id: toastId });
+      setError("Failed to add comment" + e);
+      console.error("Error adding comment:", e);
+    }
+    // setComments((prevComments) => {
+    //   let updatedComments;
+    //   if (sortOption === "newest") {
+    //     updatedComments = [newComment, ...prevComments];
+    //   } else {
+    //     updatedComments = [...prevComments, newComment];
+    //   }
+    //   return updatedComments;
+    // });
 
-  const addComment = (text: string) => {
-    const newComment: Comment = {
-      id: nextId,
-      username: "@currentUser",
-      timeAgo: "just now",
-      text,
-      likes: 0,
-      dislikes: 0,
-      liked: false,
-      disliked: false,
-    };
-
-    setComments((prevComments) => {
-      let updatedComments;
-      if (sortOption === "newest") {
-        updatedComments = [newComment, ...prevComments];
-      } else {
-        updatedComments = [...prevComments, newComment];
-      }
-      return updatedComments;
-    });
-
-    setNextId(nextId + 1);
+    // setNextId(nextId + 1);
   };
 
   const likeComment = (id: number) => {
     setComments((prevComments) =>
       prevComments.map((comment) => {
         if (comment.id === id) {
-          // If already liked, unlike it
-          if (comment.liked) {
+          // If already isLiked, unlike it
+          if (comment.isLiked) {
             return {
               ...comment,
-              liked: false,
-              likes: comment.likes - 1,
+              isLiked: false,
+              likes: comment.likeCount - 1,
             };
           }
 
-          // If disliked, remove dislike and add like
-          if (comment.disliked) {
+          // If isDisliked, remove dislike and add like
+          if (comment.isDisliked) {
             return {
               ...comment,
-              liked: true,
-              disliked: false,
-              likes: comment.likes + 1,
-              dislikes: comment.dislikes - 1,
+              isLiked: true,
+              isDisliked: false,
+              likes: comment.likeCount + 1,
+              dislikes: comment.dislikeCount - 1,
             };
           }
 
-          // If neither liked nor disliked, add like
+          // If neither isLiked nor isDisliked, add like
           return {
             ...comment,
-            liked: true,
-            likes: comment.likes + 1,
+            isLiked: true,
+            likes: comment.likeCount + 1,
           };
         }
         return comment;
@@ -94,31 +124,31 @@ export const useComments = (articleId: string) => {
     setComments((prevComments) =>
       prevComments.map((comment) => {
         if (comment.id === id) {
-          // If already disliked, remove dislike
-          if (comment.disliked) {
+          // If already isDisliked, remove dislike
+          if (comment.isDisliked) {
             return {
               ...comment,
-              disliked: false,
-              dislikes: comment.dislikes - 1,
+              isDisliked: false,
+              dislikes: comment.dislikeCount - 1,
             };
           }
 
-          // If liked, remove like and add dislike
-          if (comment.liked) {
+          // If isLiked, remove like and add dislike
+          if (comment.isLiked) {
             return {
               ...comment,
-              liked: false,
-              disliked: true,
-              likes: comment.likes - 1,
-              dislikes: comment.dislikes + 1,
+              isLiked: false,
+              isDisliked: true,
+              likes: comment.likeCount - 1,
+              dislikes: comment.dislikeCount + 1,
             };
           }
 
-          // If neither liked nor disliked, add dislike
+          // If neither isLiked nor isDisliked, add dislike
           return {
             ...comment,
-            disliked: true,
-            dislikes: comment.dislikes + 1,
+            isDisliked: true,
+            dislikes: comment.dislikeCount + 1,
           };
         }
         return comment;
@@ -127,11 +157,14 @@ export const useComments = (articleId: string) => {
   };
 
   return {
+    getComments,
     comments,
     addComment,
     likeComment,
     dislikeComment,
     sortOption,
     setSortOption,
+    isLoading,
+    error,
   };
 };

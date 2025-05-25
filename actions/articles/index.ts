@@ -4,15 +4,17 @@ import prisma from "@/db/db";
 // import { seed } from "../data";
 // import { sampleArticles } from "@/lib/data";
 import { getServerSession } from "next-auth";
-import { authConfig } from "@/lib/auth";
+import { appSession, authConfig } from "@/lib/auth";
 import { Role } from "@prisma/client/index.js";
-import { CreateArticle } from "@/db/schema/news";
+import { CreateArticle, Article } from "@/db/schema/article";
+import { updateCountsFromRedis } from "../interaction/articleInteractions";
 
 interface FetchParams {
   categoryId?: number; // optional now
   articleSlug?: string;
   limit: number;
   offset: number;
+  session: appSession;
 }
 
 async function generateUniqueSlug(title: string): Promise<string> {
@@ -47,12 +49,30 @@ async function generateUniqueSlug(title: string): Promise<string> {
   }
 }
 
-export const fetchArticles = async (fetchParams: FetchParams) => {
-  const { categoryId, limit, offset, articleSlug } = fetchParams;
+async function getCombinedArticles(
+  categoryId: number | undefined,
+  limit: number,
+  offset: number,
+  articleSlug: string | undefined
+) {
+  let mainArticle: Article | null = null;
 
-  let mainArticle = null;
   if (articleSlug) {
     mainArticle = await prisma.article.findFirst({
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        imageUrls: true,
+        videoUrl: true,
+        type: true,
+        sourceLogoUrl: true,
+        categoryId: true,
+        submittedById: true,
+        createdAt: true,
+        likeCount: true,
+        saveCount: true,
+      },
       where: {
         slug: articleSlug,
         ...(categoryId ? { categoryId } : {}),
@@ -62,6 +82,20 @@ export const fetchArticles = async (fetchParams: FetchParams) => {
 
   // Fetch other articles (excluding the main one by ID or slug)
   const otherArticles = await prisma.article.findMany({
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      imageUrls: true,
+      videoUrl: true,
+      type: true,
+      sourceLogoUrl: true,
+      categoryId: true,
+      submittedById: true,
+      createdAt: true,
+      likeCount: true,
+      saveCount: true,
+    },
     where: {
       ...(categoryId ? { categoryId } : {}),
       ...(mainArticle ? { slug: { not: articleSlug } } : {}),
@@ -76,6 +110,67 @@ export const fetchArticles = async (fetchParams: FetchParams) => {
   const articles = mainArticle
     ? [mainArticle, ...otherArticles]
     : otherArticles;
+  return articles;
+}
+
+export const fetchArticles = async (
+  fetchParams: FetchParams
+): Promise<{ success: boolean; data: Article[] }> => {
+  const { categoryId, limit, offset, articleSlug, session } = fetchParams;
+
+  let articles: Article[] = await getCombinedArticles(
+    categoryId,
+    limit,
+    offset,
+    articleSlug
+  );
+
+  if (
+    session.status === "authenticated" &&
+    session.data.user &&
+    session.data.user.id
+  ) {
+    // const articleIds = articles.map((a) => a.id);
+
+    // const userInteractions = await prisma.interaction.findMany({
+    //   where: {
+    //     userId: Number(session.data.user.id) ?? -1,
+    //     articleId: { in: articleIds },
+    //     type: { in: ["LIKE", "SAVE"] },
+    //   },
+    //   select: {
+    //     articleId: true,
+    //     type: true,
+    //   },
+    // });
+
+    // const interactionMap = new Map();
+    // userInteractions.forEach(({ articleId, type }) => {
+    //   if (!interactionMap.has(articleId)) {
+    //     interactionMap.set(articleId, new Set());
+    //   }
+    //   interactionMap.get(articleId).add(type);
+    // });
+
+    // const finalArticles: Article[] = articles.map((article) => {
+    //   const types = interactionMap.get(article.id) || new Set();
+    //   return {
+    //     ...article,
+    //     likeCount: types.has("LIKE"),
+    //     saveCount: types.has("SAVE"),
+    //   };
+    // });
+
+    try {
+      const updatedArticles = await updateCountsFromRedis(
+        articles,
+        Number(session.data.user.id)
+      );
+      articles = updatedArticles;
+    } catch (e) {
+      console.log("Error occured while updating like counts from redis", e);
+    }
+  }
 
   // await seed();
 

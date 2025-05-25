@@ -3,11 +3,11 @@
 import React from "react";
 import { v4 as uuid } from "uuid";
 import NewArticle from "@/components/form/NewArticle";
-import NewsCard from "@/components/NewsCard";
-import { CreateArticle } from "@/db/schema/news";
+import NewsCard from "@/components/news-card/NewsCard";
+import { CreateArticle } from "@/db/schema/article";
 import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
-import { createArticle } from "@/actions/articles/articles";
+import { createArticle } from "@/actions/articles";
 import { twMerge } from "tailwind-merge";
 import { useSession } from "next-auth/react";
 import { appSession } from "@/lib/auth";

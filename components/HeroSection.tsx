@@ -64,7 +64,7 @@ export default function HeroSection() {
           >
             <Button
               onClick={() => router.push("/feed")}
-              className="text-gray-500 bg-white transition-all duration-300 font-bold py-3 px-8 rounded-full shadow-lg hover:scale-105 cursor-pointer"
+              className="text-gray-500 bg-white transition-all duration-300 font-bold py-3 px-8 rounded-full shadow-lg cursor-pointer"
               size="lg"
             >
               Read News Articles <ArrowRight />

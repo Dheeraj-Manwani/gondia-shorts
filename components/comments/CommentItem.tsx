@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+// import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar } from "../Avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Comment } from "@/db/schema/comments";
+import { getTimeDifference } from "@/lib/utils";
 import { ThumbsUp, ThumbsDown, MoreVertical } from "lucide-react";
 import { useState } from "react";
 // import { Comment } from "@/data/comments";
@@ -19,11 +21,11 @@ interface CommentItemProps {
 const CommentItem = ({ comment, onLike, onDislike }: CommentItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const shortText =
-    comment.text.length > 100 && !isExpanded
-      ? comment.text.slice(0, 100) + "..."
-      : comment.text;
+    comment.content.length > 100 && !isExpanded
+      ? comment.content.slice(0, 100) + "..."
+      : comment.content;
 
-  const shouldShowReadMore = comment.text.length > 100;
+  const shouldShowReadMore = comment.content.length > 100;
 
   const getInitial = (username: string) => {
     return username.charAt(1).toUpperCase(); // Skip the @ symbol
@@ -45,22 +47,31 @@ const CommentItem = ({ comment, onLike, onDislike }: CommentItemProps) => {
   };
 
   return (
-    <div className="mb-6">
-      <div className="flex gap-3">
-        <Avatar className={`w-10 h-10 ${getAvatarColor(comment.username)}`}>
+    <div className="mb-6 ml-2">
+      <div className="flex gap-2">
+        {/* <Avatar className={`w-10 h-10 ${getAvatarColor("Someone wiffienv")}`}>
           <AvatarFallback className="text-white">
-            {getInitial(comment.username)}
+            {getInitial("Someone wiffienv")}
           </AvatarFallback>
-        </Avatar>
+        </Avatar> */}
+        <div className="flex">
+          <Avatar
+            profileImage={comment.author.profilePic ?? ""}
+            name={comment.author.name ?? ""}
+            className="w-7 h-7"
+          />
+        </div>
         <div className="flex-1">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-sm">{comment.username}</span>
-              <span className="text-xs text-zinc-400">{comment.timeAgo}</span>
+            <div className="flex items-center gap-1">
+              <span className="font-medium text-sm">{comment.author.name}</span>
+              <span className="text-xs text-zinc-400">
+                {getTimeDifference(comment.createdAt)}
+              </span>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="text-zinc-400 hover:text-white">
+                <button className="text-zinc-400 cursor-pointer">
                   <MoreVertical className="h-5 w-5" />
                 </button>
               </DropdownMenuTrigger>
@@ -78,7 +89,7 @@ const CommentItem = ({ comment, onLike, onDislike }: CommentItemProps) => {
             </DropdownMenu>
           </div>
 
-          <p className="text-sm my-2">{shortText}</p>
+          <p className="text-sm mb-2 mt-0.5">{shortText}</p>
 
           {shouldShowReadMore && (
             <button
@@ -93,28 +104,28 @@ const CommentItem = ({ comment, onLike, onDislike }: CommentItemProps) => {
             <div className="flex items-center gap-1">
               <button
                 className={`p-1 hover:bg-zinc-800 rounded-sm group ${
-                  comment.liked ? "text-primary" : ""
+                  comment.isLiked ? "text-primary" : ""
                 }`}
                 onClick={onLike}
               >
-                <ThumbsUp className="h-4 w-4 text-zinc-400 group-hover:text-white" />
+                <ThumbsUp className="h-4 w-4 text-zinc-400" />
               </button>
               <span className="text-xs text-zinc-400">
-                {comment.likes > 0 ? comment.likes : ""}
+                {comment.likeCount > 0 ? comment.likeCount : ""}
               </span>
             </div>
 
             <div className="flex items-center gap-1">
               <button
                 className={`p-1 hover:bg-zinc-800 rounded-sm group ${
-                  comment.disliked ? "text-primary" : ""
+                  comment.isDisliked ? "text-primary" : ""
                 }`}
                 onClick={onDislike}
               >
-                <ThumbsDown className="h-4 w-4 text-zinc-400 group-hover:text-white" />
+                <ThumbsDown className="h-4 w-4 text-zinc-400" />
               </button>
               <span className="text-xs text-zinc-400">
-                {comment.dislikes > 0 ? comment.dislikes : ""}
+                {comment.dislikeCount > 0 ? comment.dislikeCount : ""}
               </span>
             </div>
 
