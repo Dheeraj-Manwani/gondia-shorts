@@ -18,7 +18,7 @@ import { Bookmark, Heart, MessageSquareMore, Share2 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import { appSession } from "@/lib/auth";
 import { toast } from "sonner";
-import { likeArticle } from "@/actions/interaction";
+// import { likeArticle } from "@/actions/interaction";
 import { SocialActions } from "./SocialActions";
 
 interface NewsCardProps {

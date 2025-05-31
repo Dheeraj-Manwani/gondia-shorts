@@ -26,6 +26,7 @@ export type ArticleType = z.infer<typeof ArticleTypeEnum>;
 export const articleSchema = z.object({
   id: z.number(),
   title: z.string().min(1),
+  slug: z.string().optional(),
   content: z.string().min(1),
   imageUrls: z.array(z.string().url()).default([]).optional(),
   videoUrl: z.string().url().optional().nullable(),
@@ -36,6 +37,7 @@ export const articleSchema = z.object({
   publishedAt: z.date().optional(),
   categoryId: z.number(),
   submittedById: z.number(),
+  source: z.string().optional(),
 
   isLiked: z.boolean().optional(),
   isSaved: z.boolean().optional(),

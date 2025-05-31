@@ -6,6 +6,9 @@ import "swiper/css";
 import "swiper/css/pagination";
 import Image from "next/image";
 import { useState } from "react";
+import NewsCard from "@/components/news-card/NewsCard";
+import { useSession } from "next-auth/react";
+import { appSession } from "@/lib/auth";
 
 const article = {
   imageUrls: [
@@ -22,9 +25,28 @@ export default function NewsSlider() {
     const hPx = window.innerHeight * 0.4;
     setSlideWidths((w) => ({ ...w, [url]: (nw / nh) * hPx }));
   };
+  const session = useSession() as unknown as appSession;
   return (
     <div className="w-full h-screen overflow-hidden">
-      <Swiper
+      <NewsCard
+        article={{
+          title: "Unseasonal Rain Damages Crops in Gondia",
+          slug: "unseasonal-rain-damages-crops-in-gondia",
+          content:
+            "Recent unseasonal rainfall has adversely affected farmers in Gondia, leading to significant crop damage. The unexpected weather patterns have raised concerns among the agricultural community.",
+          type: "YOUTUBE",
+          source: "ChatGPT",
+          videoUrl: "https://www.youtube.com/watch?v=l7wT7IUOqAM",
+          categoryId: 3,
+          id: 45,
+          submittedById: 1,
+        }}
+        isCurrentActive
+        isPreview
+        session={session}
+      />
+
+      {/* <Swiper
         modules={[Pagination, Autoplay]}
         slidesPerView={1}
         centeredSlides
@@ -41,7 +63,6 @@ export default function NewsSlider() {
               key={idx}
               className="relative w-full h-full overflow-hidden flex items-center justify-center"
             >
-              {/* Blurred Background */}
               <div className="absolute inset-0 z-0">
                 <Image
                   src={url}
@@ -59,7 +80,6 @@ export default function NewsSlider() {
                 />
               </div>
 
-              {/* Foreground */}
               <div
                 className="relative z-10 m-auto"
                 style={{
@@ -81,7 +101,7 @@ export default function NewsSlider() {
             </SwiperSlide>
           );
         })}
-      </Swiper>
+      </Swiper> */}
 
       {/* <Swiper
         slidesPerView={1}

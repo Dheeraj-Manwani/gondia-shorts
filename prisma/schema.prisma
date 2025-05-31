@@ -70,7 +70,6 @@ model Article {
   submittedBy   User @relation(fields: [submittedById], references: [id])
 
   likeCount Int @default(0)
-  saveCount Int @default(0)
 
   comments     Comment[]
   interactions Interaction[]
@@ -115,13 +114,13 @@ model Interaction {
 
   createdAt DateTime @default(now())
 
-  @@unique([userId, articleId])
-  @@unique([userId, commentId])
+  // Compound unique constraints
+  @@unique([userId, articleId, type])
+  @@unique([userId, commentId, type])
 }
 
 enum InteractionType {
   LIKE
-  DISLIKE
   SAVE
 }
 

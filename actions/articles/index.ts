@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth";
 import { appSession, authConfig } from "@/lib/auth";
 import { Role } from "@prisma/client/index.js";
 import { CreateArticle, Article } from "@/db/schema/article";
-import { updateCountsFromRedis } from "../interaction/articleInteractions";
+// import { updateCountsFromRedis } from "../interaction/articleInteractions";
 
 interface FetchParams {
   categoryId?: number; // optional now
@@ -118,66 +118,76 @@ export const fetchArticles = async (
 ): Promise<{ success: boolean; data: Article[] }> => {
   const { categoryId, limit, offset, articleSlug, session } = fetchParams;
 
-  let articles: Article[] = await getCombinedArticles(
-    categoryId,
-    limit,
-    offset,
-    articleSlug
-  );
+  try {
+    let articles: Article[] = await getCombinedArticles(
+      categoryId,
+      limit,
+      offset,
+      articleSlug
+    );
 
-  if (
-    session.status === "authenticated" &&
-    session.data.user &&
-    session.data.user.id
-  ) {
-    // const articleIds = articles.map((a) => a.id);
+    const articleIds = articles.map((article) => article.id);
 
-    // const userInteractions = await prisma.interaction.findMany({
-    //   where: {
-    //     userId: Number(session.data.user.id) ?? -1,
-    //     articleId: { in: articleIds },
-    //     type: { in: ["LIKE", "SAVE"] },
-    //   },
-    //   select: {
-    //     articleId: true,
-    //     type: true,
-    //   },
-    // });
+    if (
+      session.status === "authenticated" &&
+      session.data.user &&
+      session.data.user.id
+    ) {
+      const interactions = await prisma.interaction.findMany({
+        select: {
+          id: true,
+          userId: true,
+          articleId: true,
+          type: true,
+        },
+        where: {
+          userId: Number(session.data.user.id),
+          articleId: {
+            in: articleIds,
+          },
+        },
+      });
 
-    // const interactionMap = new Map();
-    // userInteractions.forEach(({ articleId, type }) => {
-    //   if (!interactionMap.has(articleId)) {
-    //     interactionMap.set(articleId, new Set());
-    //   }
-    //   interactionMap.get(articleId).add(type);
-    // });
+      articles = articles.map((article) => {
+        const interaction = interactions.find(
+          (interaction) => interaction.articleId === article.id
+        );
 
-    // const finalArticles: Article[] = articles.map((article) => {
-    //   const types = interactionMap.get(article.id) || new Set();
-    //   return {
-    //     ...article,
-    //     likeCount: types.has("LIKE"),
-    //     saveCount: types.has("SAVE"),
-    //   };
-    // });
-
-    try {
-      const updatedArticles = await updateCountsFromRedis(
-        articles,
-        Number(session.data.user.id)
-      );
-      articles = updatedArticles;
-    } catch (e) {
-      console.log("Error occured while updating like counts from redis", e);
+        return {
+          ...article,
+          isLiked: interaction?.type === "LIKE",
+          isSaved: interaction?.type === "SAVE",
+        };
+      });
     }
+
+    return { success: true, data: articles };
+  } catch (e) {
+    console.log("Error occured while fetching articles", e);
+    return { success: false, data: [] };
   }
+
+  // if (
+  //   session.status === "authenticated" &&
+  //   session.data.user &&
+  //   session.data.user.id
+  // ) {
+  // try {
+  //   const updatedArticles = await updateCountsFromRedis(
+  //     articles,
+  //     Number(session.data.user?.id)
+  //   );
+  //   articles = updatedArticles;
+  // } catch (e) {
+  // }
+  // }
 
   // await seed();
 
   // ! For dev
   // const articles = sampleArticles.slice(offset, offset + limit);
 
-  return { success: true, data: articles };
+  // return { success: true, data: articles };
 };
 
 export const createArticle = async (article: CreateArticle) => {
