@@ -7,12 +7,13 @@ export const fetchComments = async (
   {
     articleId,
     parentId,
-  }: { articleId: number; parentId: number | undefined } = {
+    userId,
+  }: { articleId: number; parentId: number | undefined; userId?: number } = {
     articleId: 0,
     parentId: undefined,
   }
 ): Promise<Comment[]> => {
-  return await prisma.comment.findMany({
+  const comments: Comment[] = await prisma.comment.findMany({
     select: {
       id: true,
       content: true,
@@ -35,7 +36,40 @@ export const fetchComments = async (
       articleId,
       parentId: parentId ?? null,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
+
+  const commentIds = comments.map((comment) => comment.id ?? -1);
+
+  const interactions = await prisma.interaction.findMany({
+    select: {
+      id: true,
+      type: true,
+      userId: true,
+      commentId: true,
+    },
+    where: {
+      commentId: {
+        in: commentIds,
+      },
+      type: "LIKE",
+    },
+  });
+
+  comments.forEach((com) => {
+    com.likeCount = interactions.filter(
+      (interaction) => interaction.commentId === com.id
+    ).length;
+    com.isLiked =
+      interactions.some(
+        (interaction) =>
+          interaction.userId === userId && interaction.commentId === com.id
+      ) ?? false;
+  });
+
+  return comments;
 };
 
 export const createComment = async (
