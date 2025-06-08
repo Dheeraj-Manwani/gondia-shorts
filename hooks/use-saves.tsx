@@ -4,72 +4,57 @@ import { useEffect, useRef, useState } from "react";
 import { useAuthGuard } from "./use-auth-guard";
 import { debounce, DebouncedFunc } from "lodash";
 import { toast } from "sonner";
+import { debouncedSave } from "./hook-actions";
+import chalk from "chalk";
 
-export const useSave = (article: Article) => {
+export const useSave = (articleId: number, isArticleSaved?: boolean) => {
   const [isSaved, setIsSaved] = useState(false);
-  const { session, guard } = useAuthGuard();
+  const { session, guardAsync } = useAuthGuard();
 
-  const debouncedSaveRef = useRef<DebouncedFunc<
-    (
-      shouldSave: boolean,
-      isArticleSaved: boolean,
-      articleId: number,
-      userId: number
-    ) => void
-  > | null>(null);
+  // const debouncedSaveRef = useRef<DebouncedFunc<
+  //   (
+  //     shouldSave: boolean,
+  //     isArticleSaved: boolean,
+  //     articleId: number,
+  //     userId: number
+  //   ) => void
+  // > | null>(null);
 
   useEffect(() => {
-    if (typeof article.isSaved === "boolean") setIsSaved(article.isSaved);
+    // console.log(
+    //   "Syncing save state with article data in hook use effect",
+    //   isArticleSaved,
+    //   isSaved
+    // );
+    if (typeof isArticleSaved === "boolean") setIsSaved(isArticleSaved);
 
-    if (!debouncedSaveRef.current) {
-      debouncedSaveRef.current = debounce(
-        (
-          shouldSave: boolean,
-          isArticleSaved: boolean,
-          articleId: number,
-          userId: number
-        ) => {
-          if (shouldSave === isArticleSaved) return;
-          const id = toast.loading(
-            shouldSave ? "Saving article..." : "Removing from saved..."
-          );
+    // if (!debouncedSaveRef.current) {
+    //   // debouncedSaveRef.current =
 
-          saveArticle(articleId, userId, shouldSave)
-            .then((res: boolean) => {
-              toast.success(
-                shouldSave ? "Article saved!" : "Removed from saved!",
-                { id }
-              );
-              console.log(res ? "Actually saved" : "Already saved");
-            })
-            .catch((err) => {
-              setIsSaved(!shouldSave); // rollback
-              console.error("Save toggle error:", err);
-              toast.error("Could not update saved status", { id });
-            });
-        },
-        1000
-      );
-    }
-
-    return () => {
-      debouncedSaveRef.current?.cancel();
-    };
+    // return () => {
+    //   debouncedSaveRef.current?.cancel();
+    // };
   }, []);
 
-  const handleSave = guard(() => {
-    if (!debouncedSaveRef.current) return;
-
+  const handleSave = guardAsync(async () => {
     const newSavedState = !isSaved;
 
+    // Optimistically update the UI
     setIsSaved(newSavedState);
 
-    debouncedSaveRef.current?.(
+    const res = await debouncedSave(
       newSavedState,
-      article.isSaved ?? false,
-      article.id,
+      isArticleSaved ?? false,
+      articleId,
       Number(session.data?.user?.id)
     );
+
+    // if (!res) {
+    //   // reverting optimistic update
+    //   console.log(chalk.blueBright("Reverted optimistic save", res));
+
+    //   setIsSaved(!newSavedState);
+    // }
   });
 
   return { isSaved, handleSave };

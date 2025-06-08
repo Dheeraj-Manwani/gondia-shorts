@@ -87,17 +87,17 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
   }, [categoryId, session.status]);
 
   // Load more articles when reaching the end
-  const handleReachEnd = () => {
-    console.log(
-      "handleReachEnd called ::::::: 🔚🔚🔚🔚🔚🔚🔚🔚",
-      isLoading,
-      data,
-      page
-    );
-    if (!isLoading && data && data.length >= limit) {
-      // setPage((prevPage) => prevPage + 1);
-    }
-  };
+  // const handleReachEnd = () => {
+  //   console.log(
+  //     "handleReachEnd called ::::::: 🔚🔚🔚🔚🔚🔚🔚🔚",
+  //     isLoading,
+  //     data,
+  //     page
+  //   );
+  //   if (!isLoading && data && data.length >= limit) {
+  // setPage((prevPage) => prevPage + 1);
+  //   }
+  // };
 
   const handleSwipe = async (swiper: SwiperType) => {
     setPage(() => swiper.realIndex);
@@ -162,7 +162,7 @@ const SwipeableNewsFeed: React.FC<SwipeableNewsFeedProps> = ({
         virtual
         mousewheel
         keyboard
-        onReachEnd={handleReachEnd}
+        // onReachEnd={handleReachEnd}
         className="h-full"
         onSwiper={(swiper) => (swiperRef.current = swiper)}
         onSlideChange={(swiper) => {

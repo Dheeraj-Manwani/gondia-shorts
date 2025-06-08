@@ -43,7 +43,6 @@ export const articleSchema = z.object({
   isSaved: z.boolean().optional(),
 
   likeCount: z.number().optional(),
-  saveCount: z.number().optional(),
 });
 export type Article = z.infer<typeof articleSchema>;
 

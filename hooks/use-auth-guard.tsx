@@ -18,15 +18,15 @@ export const useAuthGuard = () => {
     };
   };
 
-  const guardAsync = (callback: () => Promise<void>) => {
-    return async () => {
+  const guardAsync = (callback: (param?: any) => Promise<void>) => {
+    return async (param?: any) => {
       if (!session || !session.data || !session.data.user?.id) {
         toast.error("Please login to continue.");
-        signIn();
+        // signIn();
         return;
       }
 
-      await callback();
+      await callback(param);
     };
   };
 

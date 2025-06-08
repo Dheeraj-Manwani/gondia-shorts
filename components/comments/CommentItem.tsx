@@ -10,15 +10,22 @@ import { Comment } from "@/db/schema/comments";
 import { getTimeDifference } from "@/lib/utils";
 import { ThumbsUp, ThumbsDown, MoreVertical } from "lucide-react";
 import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 // import { Comment } from "@/data/comments";
 
 interface CommentItemProps {
   comment: Comment;
+  isLiked: boolean;
+  likeCount: number;
   onLike: () => void;
-  onDislike: () => void;
 }
 
-const CommentItem = ({ comment, onLike, onDislike }: CommentItemProps) => {
+const CommentItem = ({
+  comment,
+  isLiked,
+  likeCount,
+  onLike,
+}: CommentItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const shortText =
     comment.content.length > 100 && !isExpanded
@@ -103,19 +110,32 @@ const CommentItem = ({ comment, onLike, onDislike }: CommentItemProps) => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
               <button
-                className={`p-1 hover:bg-zinc-800 rounded-sm group ${
+                className={`p-1 hover:text-gray-800 rounded-sm group ${
                   comment.isLiked ? "text-primary" : ""
                 }`}
                 onClick={onLike}
               >
-                <ThumbsUp className="h-4 w-4 text-zinc-400" />
+                <ThumbsUp
+                  className={twMerge(
+                    "h-4 w-4 text-zinc-400",
+                    isLiked && "text-gray-800"
+                  )}
+                />
+                <span
+                  className={twMerge(
+                    "text-zinc-400 text-sm",
+                    isLiked && "text-gray-800"
+                  )}
+                >
+                  {likeCount}
+                </span>
               </button>
               <span className="text-xs text-zinc-400">
                 {comment.likeCount > 0 ? comment.likeCount : ""}
               </span>
             </div>
 
-            <div className="flex items-center gap-1">
+            {/* <div className="flex items-center gap-1">
               <button
                 className={`p-1 hover:bg-zinc-800 rounded-sm group ${
                   comment.isDisliked ? "text-primary" : ""
@@ -127,7 +147,7 @@ const CommentItem = ({ comment, onLike, onDislike }: CommentItemProps) => {
               <span className="text-xs text-zinc-400">
                 {comment.dislikeCount > 0 ? comment.dislikeCount : ""}
               </span>
-            </div>
+            </div> */}
 
             <button className="text-xs text-zinc-400 hover:text-white">
               Reply

@@ -4,8 +4,12 @@ import { createComment, fetchComments } from "@/actions/comments";
 import { Comment, SortOption } from "@/db/schema/comments";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuthGuard } from "./use-auth-guard";
+import chalk from "chalk";
+import { debouncedCommentLike } from "./hook-actions";
 
 export const useComments = (articleId: number, userId: number) => {
+  const { session, guardAsync } = useAuthGuard();
   const [comments, setComments] = useState<Comment[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("top");
   const [isLoading, setIsLoading] = useState(false);
@@ -84,87 +88,112 @@ export const useComments = (articleId: number, userId: number) => {
     // setNextId(nextId + 1);
   };
 
-  const likeComment = (id: number) => {
-    setComments((prevComments) =>
-      prevComments.map((comment) => {
-        if (comment.id === id) {
-          // If already isLiked, unlike it
-          if (comment.isLiked) {
-            return {
-              ...comment,
-              isLiked: false,
-              likes: comment.likeCount - 1,
-            };
-          }
+  const handleCommentLike = guardAsync(async (param: { commentId: number }) => {
+    const existingComment = comments.find((com) => com.id == param.commentId);
+    const newLikedState = !!!existingComment?.isLiked;
 
-          // If isDisliked, remove dislike and add like
-          if (comment.isDisliked) {
-            return {
-              ...comment,
-              isLiked: true,
-              isDisliked: false,
-              likes: comment.likeCount + 1,
-              dislikes: comment.dislikeCount - 1,
-            };
-          }
+    // Optimistically update the UI
+    const newComments = comments.map((comm) => {
+      if (comm.id === param.commentId)
+        return {
+          ...comm,
+          isLiked: newLikedState,
+          likes: comm.likeCount + (newLikedState ? 1 : -1),
+        };
+      return comm;
+    });
+    setComments(newComments);
+    console.log(chalk.blueBright("Optimistically updated like state"));
 
-          // If neither isLiked nor isDisliked, add like
-          return {
-            ...comment,
-            isLiked: true,
-            likes: comment.likeCount + 1,
-          };
-        }
-        return comment;
-      })
+    const res = await debouncedCommentLike(
+      newLikedState,
+      existingComment?.isLiked ?? false,
+      articleId,
+      param.commentId,
+      Number(session.data?.user?.id)
     );
-  };
+  });
 
-  const dislikeComment = (id: number) => {
-    setComments((prevComments) =>
-      prevComments.map((comment) => {
-        if (comment.id === id) {
-          // If already isDisliked, remove dislike
-          if (comment.isDisliked) {
-            return {
-              ...comment,
-              isDisliked: false,
-              dislikes: comment.dislikeCount - 1,
-            };
-          }
+  // const likeComment = (id: number) => {
+  //   setComments((prevComments) =>
+  //     prevComments.map((comment) => {
+  //       if (comment.id === id) {
+  //         // If already isLiked, unlike it
+  //         if (comment.isLiked) {
+  //           return {
+  //             ...comment,
+  //             isLiked: false,
+  //             likes: comment.likeCount - 1,
+  //           };
+  //         }
 
-          // If isLiked, remove like and add dislike
-          if (comment.isLiked) {
-            return {
-              ...comment,
-              isLiked: false,
-              isDisliked: true,
-              likes: comment.likeCount - 1,
-              dislikes: comment.dislikeCount + 1,
-            };
-          }
+  //         // If isDisliked, remove dislike and add like
+  //         if (comment.isDisliked) {
+  //           return {
+  //             ...comment,
+  //             isLiked: true,
+  //             isDisliked: false,
+  //             likes: comment.likeCount + 1,
+  //             dislikes: comment.dislikeCount - 1,
+  //           };
+  //         }
 
-          // If neither isLiked nor isDisliked, add dislike
-          return {
-            ...comment,
-            isDisliked: true,
-            dislikes: comment.dislikeCount + 1,
-          };
-        }
-        return comment;
-      })
-    );
-  };
+  //         // If neither isLiked nor isDisliked, add like
+  //         return {
+  //           ...comment,
+  //           isLiked: true,
+  //           likes: comment.likeCount + 1,
+  //         };
+  //       }
+  //       return comment;
+  //     })
+  //   );
+  // };
+
+  // const dislikeComment = (id: number) => {
+  //   setComments((prevComments) =>
+  //     prevComments.map((comment) => {
+  //       if (comment.id === id) {
+  //         // If already isDisliked, remove dislike
+  //         if (comment.isDisliked) {
+  //           return {
+  //             ...comment,
+  //             isDisliked: false,
+  //             dislikes: comment.dislikeCount - 1,
+  //           };
+  //         }
+
+  //         // If isLiked, remove like and add dislike
+  //         if (comment.isLiked) {
+  //           return {
+  //             ...comment,
+  //             isLiked: false,
+  //             isDisliked: true,
+  //             likes: comment.likeCount - 1,
+  //             dislikes: comment.dislikeCount + 1,
+  //           };
+  //         }
+
+  //         // If neither isLiked nor isDisliked, add dislike
+  //         return {
+  //           ...comment,
+  //           isDisliked: true,
+  //           dislikes: comment.dislikeCount + 1,
+  //         };
+  //       }
+  //       return comment;
+  //     })
+  //   );
+  // };
 
   return {
+    isLoading,
+    error,
     getComments,
     comments,
     addComment,
     likeComment,
-    dislikeComment,
     sortOption,
     setSortOption,
-    isLoading,
-    error,
   };
 };

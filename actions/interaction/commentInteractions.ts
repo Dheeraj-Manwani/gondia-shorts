@@ -1,13 +1,9 @@
-"use server";
-
 import prisma from "@/db/db";
-import { Article } from "@/db/schema/article";
-import { redis } from "@/lib/redis";
-import chalk from "chalk";
 
-export const likeArticle = async (
+export const likeComment = async (
   articleId: number,
   userId: number,
+  commentId: number,
   shouldLike: boolean
 ): Promise<boolean> => {
   try {
@@ -16,6 +12,7 @@ export const likeArticle = async (
         where: {
           userId,
           articleId,
+          commentId,
           type: "LIKE",
         },
       });
@@ -24,21 +21,21 @@ export const likeArticle = async (
         const trx = await prisma.$transaction([
           prisma.interaction.upsert({
             where: {
-              userId_articleId_type: {
+              userId_commentId_type: {
                 userId,
-                articleId,
+                commentId,
                 type: "LIKE",
               },
             },
             update: {},
             create: {
               userId,
-              articleId,
+              commentId,
               type: "LIKE",
             },
           }),
-          prisma.article.update({
-            where: { id: articleId },
+          prisma.comment.update({
+            where: { id: commentId },
             data: {
               likeCount: {
                 increment: 1,
@@ -73,58 +70,6 @@ export const likeArticle = async (
       } else {
         return false;
       }
-    }
-  } catch (e) {
-    console.log("error occured == ", e);
-    return false;
-  }
-};
-
-export const saveArticle = async (
-  articleId: number,
-  userId: number,
-  shouldSave: boolean
-): Promise<boolean> => {
-  try {
-    if (shouldSave) {
-      const existing = await prisma.interaction.findFirst({
-        where: {
-          userId,
-          articleId,
-          type: "SAVE",
-        },
-      });
-
-      if (!existing) {
-        await prisma.interaction.upsert({
-          where: {
-            userId_articleId_type: {
-              userId,
-              articleId,
-              type: "SAVE",
-            },
-          },
-          update: {},
-          create: {
-            userId,
-            articleId,
-            type: "SAVE",
-          },
-        });
-
-        return true;
-      }
-      return false;
-    } else {
-      const { count } = await prisma.interaction.deleteMany({
-        where: {
-          userId,
-          articleId,
-          type: "SAVE",
-        },
-      });
-
-      return count > 0;
     }
   } catch (e) {
     console.log("error occured == ", e);

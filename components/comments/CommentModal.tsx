@@ -21,15 +21,9 @@ interface CommentModalProps {
   article: Article;
   isOpen: boolean;
   onClose: () => void;
-  session: appSession;
 }
 
-const CommentModal = ({
-  article,
-  isOpen,
-  onClose,
-  session,
-}: CommentModalProps) => {
+const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
   const {
     comments,
     addComment,
@@ -91,8 +85,9 @@ const CommentModal = ({
                     <CommentItem
                       key={comment.id}
                       comment={comment}
+                      isLiked={comment.isLiked ?? false}
+                      likeCount={comment.likeCount}
                       onLike={() => likeComment(Number(comment.id))}
-                      onDislike={() => dislikeComment(Number(comment.id))}
                     />
                   ))}
             </>

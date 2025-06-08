@@ -1,46 +1,33 @@
-import { Article } from "@/db/schema/article";
-import { useAuthGuard } from "@/hooks/use-auth-guard";
 import { useLikes } from "@/hooks/use-likes";
 import { useSave } from "@/hooks/use-saves";
 import { useArticles } from "@/store/articles";
-import { debounce } from "lodash";
+
 import { Bookmark, Heart, MessageSquareMore, Share2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
+import React from "react";
+
 import { twMerge } from "tailwind-merge";
 
 interface SocialActionsProps {
-  article: Article;
+  articleId: number;
   setIsCommentModalOpen: (open: boolean) => void;
   isPreview: boolean;
 }
 
-export const SocialActions = ({
-  article,
+const socialActions = ({
+  articleId,
   setIsCommentModalOpen,
   isPreview,
 }: SocialActionsProps) => {
   const articles = useArticles((state) => state.articles);
   const setArticles = useArticles((state) => state.setArticles);
-  const { session } = useAuthGuard();
 
-  // const [isSaved, setIsSaved] = useState(false);
-  // const [saveCount, setSaveCount] = useState(0);
-
-  const { isLiked, likeCount, handleLike } = useLikes(article);
-  const { isSaved, handleSave } = useSave(article);
-
-  // const handleSave = useCallback((e) => {
-  //   e.preventDefault();
-  //   // if (session.status === "authenticated") {
-  //   setIsSaved((prev) => !prev);
-  //   debounce(async () => {
-  //     toast.success(isSaved ? "Article saved!" : "Removed from saved!");
-  //   }, 500)();
-  //   // } else {
-  //   //   toast.error("Please login to like the article.");
-  //   // }
-  // }, []);
+  const article = articles.find((art) => art.id === articleId);
+  const { isLiked, likeCount, handleLike } = useLikes(
+    article?.id ?? 0,
+    article?.isLiked,
+    article?.likeCount
+  );
+  const { isSaved, handleSave } = useSave(article?.id ?? 0, article?.isSaved);
 
   const handleLikeButton = (
     e: React.MouseEvent<HTMLButtonElement> | undefined
@@ -54,18 +41,27 @@ export const SocialActions = ({
     const newLikedState = !isLiked;
 
     const updatedArticles = articles.map((art) => {
-      if (art.id === article.id) {
+      if (art.id === articleId) {
+        // console.log("Updating article state for article => ", art);
+        // console.log("new article => ", {
+        //   ...art,
+        //   isLiked: newLikedState,
+        //   likeCount: newLikedState
+        //     ? (art.likeCount ?? 0) + 1
+        //     : Math.max((art.likeCount ?? 0) - 1, 0),
+        // });
         return {
           ...art,
           isLiked: newLikedState,
           likeCount: newLikedState
-            ? art.likeCount ?? 0 + 1
-            : Math.max(art.likeCount ?? 0 - 1, 0),
+            ? (art.likeCount ?? 0) + 1
+            : Math.max((art.likeCount ?? 0) - 1, 0),
         };
       }
       return art;
     });
     setArticles(updatedArticles);
+    // console.log("Updating article state ", updatedArticles);
   };
 
   const handleSaveButton = (
@@ -80,7 +76,7 @@ export const SocialActions = ({
     const newSaveState = !isSaved;
 
     const updatedArticles = articles.map((art) => {
-      if (art.id === article.id) {
+      if (art.id === article?.id) {
         return {
           ...art,
           isSaved: newSaveState,
@@ -89,12 +85,15 @@ export const SocialActions = ({
       return art;
     });
     setArticles(updatedArticles);
+    // console.log("Updating article state ", updatedArticles);
   };
 
   // useEffect(() => {
-  //   if (typeof article.isSaved === "boolean") setIsSaved(article.isSaved);
-  //   if (typeof article.saveCount === "number") setSaveCount(article.saveCount);
+  //   console.log(chalk.bgBlack("SocialActions component mounted"));
   // }, []);
+
+  if (!article)
+    return <div className="p-4 text-gray-500">Article not found</div>;
 
   return (
     <div
@@ -122,8 +121,6 @@ export const SocialActions = ({
         <button
           onClick={() => setIsCommentModalOpen(true)}
           className="cursor-pointer"
-          aria-pressed={isSaved}
-          aria-label={isSaved ? "Unsave this post" : "Save this post"}
         >
           <MessageSquareMore size={18} className="text-gray-700" />
         </button>
@@ -155,3 +152,16 @@ export const SocialActions = ({
     </div>
   );
 };
+
+export const SocialActions = React.memo(
+  socialActions,
+  (prevProps, nextProps) => {
+    // Prevent re-render if article id is the same
+    return (
+      prevProps.articleId === nextProps.articleId &&
+      prevProps.isPreview === nextProps.isPreview &&
+      prevProps.setIsCommentModalOpen === nextProps.setIsCommentModalOpen
+    );
+  }
+);
+SocialActions.displayName = "SocialActions";

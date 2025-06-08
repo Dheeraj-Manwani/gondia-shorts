@@ -1,92 +1,58 @@
-import { likeArticle } from "@/actions/interaction/articleInteractions";
-import { Article } from "@/db/schema/article";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuthGuard } from "./use-auth-guard";
-import { debounce, DebouncedFunc } from "lodash";
-import { toast } from "sonner";
 import chalk from "chalk";
+import { debouncedLike } from "./hook-actions";
 
-export const useLikes = (article: Article) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const { session, guard } = useAuthGuard();
-
-  const debouncedLikeRef = useRef<DebouncedFunc<
-    (
-      shouldLike: boolean,
-      isArticleLiked: boolean,
-      articleId: number,
-      userId: number
-    ) => void
-  > | null>(null);
+export const useLikes = (
+  articleId: number,
+  isArticleLiked?: boolean,
+  articleLikeCount?: number
+) => {
+  const [isLiked, setIsLiked] = useState<undefined | boolean>(undefined);
+  const [likeCount, setLikeCount] = useState<undefined | number>(undefined);
+  const { session, guardAsync } = useAuthGuard();
 
   useEffect(() => {
-    if (typeof article.isLiked === "boolean") setIsLiked(article.isLiked);
-    if (typeof article.likeCount === "number") setLikeCount(article.likeCount);
-
-    if (!debouncedLikeRef.current) {
-      console.log("Initializing debouncedLikeRef");
-      debouncedLikeRef.current = debounce(
-        (
-          shouldLike: boolean,
-          isArticleLiked: boolean,
-          givenArticleId: number,
-          userId: number
-        ) => {
-          if (shouldLike === isArticleLiked) return;
-          const id = toast.loading(
-            shouldLike ? "Linking article async" : "Unlinking article async"
-          );
-
-          likeArticle(givenArticleId, userId, shouldLike)
-            .then((res: boolean) => {
-              if (res)
-                toast.success(
-                  shouldLike ? "Article liked!" : "Removed from liked!",
-                  {
-                    id,
-                  }
-                );
-              else {
-                // setIsLiked(!shouldLike);
-                setLikeCount((count) => (shouldLike ? count - 1 : count + 1));
-                console.log(
-                  chalk.redBright("Error liking article, reverting state")
-                );
-              }
-            })
-            .catch((err) => {
-              setIsLiked(!shouldLike);
-              setLikeCount((count) => (shouldLike ? count - 1 : count + 1));
-              //   updateArticleLikeState(givenArticleId, !shouldLike);
-              console.log("Error occurred while liking the article:", err);
-              toast.error("Error occured while liking the article", { id });
-            });
-        },
-        1000
-      );
-    }
-    return () => {
-      // Only runs on unmount
-      console.log("Cleaning up debouncedLikeRef");
-      debouncedLikeRef.current?.cancel();
-    };
+    // console.log(
+    //   "Syncing like state with article data in hook use effect",
+    //   isArticleLiked,
+    //   articleLikeCount,
+    //   isLiked,
+    //   likeCount
+    // );
+    if (typeof isArticleLiked === "boolean" && isLiked === undefined)
+      setIsLiked(isArticleLiked);
+    if (typeof articleLikeCount === "number" && likeCount === undefined)
+      setLikeCount(articleLikeCount);
   }, []);
 
-  const handleLike = guard(() => {
-    if (!debouncedLikeRef.current) return;
-
+  const handleLike = guardAsync(async () => {
     const newLikedState = !isLiked;
 
+    // Optimistically update the UI
     setIsLiked(newLikedState);
-    setLikeCount((count) => (newLikedState ? count + 1 : count - 1));
+    setLikeCount((count) =>
+      newLikedState ? (count ?? 0) + 1 : (count ?? 0) - 1
+    );
 
-    debouncedLikeRef.current?.(
+    console.log(chalk.blueBright("Optimistically updated like state"));
+
+    const res = await debouncedLike(
       newLikedState,
-      article.isLiked ?? false,
-      article.id,
+      isArticleLiked ?? false,
+      articleId,
       Number(session.data?.user?.id)
     );
+
+    // if (!res) {
+    //   // reverting optimistic update
+    //   console.log(chalk.blueBright("Reverted optimistic updates", res));
+
+    //   setIsLiked(!newLikedState);
+    //   setLikeCount((count) =>
+    //     newLikedState ? (count ?? 0) - 1 : (count ?? 0) + 1
+    //   );
+    // }
   });
 
   return { handleLike, isLiked, likeCount };

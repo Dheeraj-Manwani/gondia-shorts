@@ -282,7 +282,7 @@ export default function NewsCard({
 
       {/* SOCIAL ACTIONS */}
       <SocialActions
-        article={article}
+        articleId={article.id}
         setIsCommentModalOpen={setIsCommentModalOpen}
         isPreview={isPreview}
       />

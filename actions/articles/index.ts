@@ -71,7 +71,6 @@ async function getCombinedArticles(
         submittedById: true,
         createdAt: true,
         likeCount: true,
-        saveCount: true,
       },
       where: {
         slug: articleSlug,
@@ -94,7 +93,6 @@ async function getCombinedArticles(
       submittedById: true,
       createdAt: true,
       likeCount: true,
-      saveCount: true,
     },
     where: {
       ...(categoryId ? { categoryId } : {}),
@@ -149,14 +147,25 @@ export const fetchArticles = async (
       });
 
       articles = articles.map((article) => {
-        const interaction = interactions.find(
-          (interaction) => interaction.articleId === article.id
+        const interactionTypes = new Set(["LIKE", "SAVE"]);
+
+        const interactionMap = interactions.reduce<Record<string, boolean>>(
+          (acc, interaction) => {
+            if (
+              interaction.articleId === article.id &&
+              interactionTypes.has(interaction.type)
+            ) {
+              acc[interaction.type] = true;
+            }
+            return acc;
+          },
+          {}
         );
 
         return {
           ...article,
-          isLiked: interaction?.type === "LIKE",
-          isSaved: interaction?.type === "SAVE",
+          isLiked: !!interactionMap["LIKE"],
+          isSaved: !!interactionMap["SAVE"],
         };
       });
     }
