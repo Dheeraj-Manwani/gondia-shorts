@@ -3,131 +3,81 @@
 import prisma from "@/db/db";
 import { deleteInteractions, getExistingInteractions } from ".";
 
-const performCommentDislike = async (
+const performCommentInteraction = async (
   userId: number,
   commentId: number,
-  isPositive: boolean
-) => {
-  const trx = await prisma.$transaction([
-    isPositive
-      ? prisma.interaction.upsert({
-          where: {
-            userId_commentId_type: {
-              userId,
-              commentId,
-              type: "DISLIKE",
-            },
-          },
-          update: {},
-          create: {
-            userId,
-            commentId,
-            type: "DISLIKE",
-          },
-        })
-      : prisma.interaction.deleteMany({
-          where: {
-            userId,
-            commentId,
-            type: "DISLIKE",
-          },
-        }),
-    prisma.comment.update({
-      where: { id: commentId },
-      data: {
-        dislikeCount: {
-          increment: 1,
-        },
-      },
-    }),
-  ]);
-};
-
-export const likeComment = async (
-  articleId: number,
-  userId: number,
-  commentId: number,
-  shouldLike: boolean
+  isPositive: boolean,
+  interactionType: "LIKE" | "DISLIKE"
 ): Promise<boolean> => {
-  try {
-    if (shouldLike) {
-      const existing = await prisma.interaction.findFirst({
+  const countField = interactionType === "LIKE" ? "likeCount" : "dislikeCount";
+  let interactionActuallyPerformed = false;
+
+  await prisma.$transaction(async (prisma) => {
+    if (isPositive) {
+      interactionActuallyPerformed = true;
+
+      await prisma.interaction.upsert({
         where: {
+          userId_commentId_type: {
+            userId,
+            commentId,
+            type: interactionType,
+          },
+        },
+        update: {},
+        create: {
           userId,
-          articleId,
           commentId,
-          type: "LIKE",
+          type: interactionType,
         },
       });
 
-      if (!existing) {
-        const trx = await prisma.$transaction([
-          prisma.interaction.upsert({
-            where: {
-              userId_commentId_type: {
-                userId,
-                commentId,
-                type: "LIKE",
-              },
-            },
-            update: {},
-            create: {
-              userId,
-              commentId,
-              type: "LIKE",
-            },
-          }),
-          prisma.comment.update({
-            where: { id: commentId },
-            data: {
-              likeCount: {
-                increment: 1,
-              },
-            },
-          }),
-        ]);
-        return true;
-      }
-      return false;
+      await prisma.comment.update({
+        where: { id: commentId },
+        data: {
+          [countField]: {
+            increment: 1,
+          },
+        },
+      });
     } else {
-      // Remove user from set (returns 1 if user was in set)
-
-      const { count } = await prisma.interaction.deleteMany({
+      const deleted = await prisma.interaction.deleteMany({
         where: {
           userId,
-          articleId,
-          type: "LIKE",
+          commentId,
+          type: interactionType,
         },
       });
 
-      if (count > 0) {
-        await prisma.article.update({
-          where: { id: articleId },
+      if (deleted.count > 0) {
+        interactionActuallyPerformed = true;
+
+        await prisma.comment.update({
+          where: { id: commentId },
           data: {
-            likeCount: {
+            [countField]: {
               decrement: 1,
             },
           },
         });
-        return true;
-      } else {
-        return false;
       }
     }
-  } catch (e) {
-    console.log("error occured == ", e);
-    return false;
-  }
+  });
+
+  return interactionActuallyPerformed;
 };
 
-export const dislikeComment = async (
+export const handleInteraction = async (
   articleId: number,
   userId: number,
   commentId: number,
-  shouldDislike: boolean
+  type: "LIKE" | "DISLIKE",
+  isPositive: boolean
 ): Promise<boolean> => {
   try {
-    if (shouldDislike) {
+    const currentType = type;
+    const otherType = currentType == "LIKE" ? "DISLIKE" : "LIKE";
+    if (isPositive) {
       const existing = await getExistingInteractions(
         userId,
         articleId,
@@ -135,70 +85,30 @@ export const dislikeComment = async (
         ["LIKE", "DISLIKE"]
       );
 
-      const isLikedExists = existing.some(
-        (interaction) => interaction.type === "LIKE"
+      const isCurrentExists = existing.some(
+        (interaction) => interaction.type === currentType
       );
-      const isDislikedExists = existing.some(
-        (interaction) => interaction.type === "DISLIKE"
+      const isOtherExists = existing.some(
+        (interaction) => interaction.type === otherType
       );
 
-      if (isLikedExists) {
-        await deleteInteractions(userId, articleId, commentId, ["LIKE"]);
+      if (isOtherExists) {
+        await performCommentInteraction(userId, commentId, false, otherType);
       }
 
-      if (!isDislikedExists) {
-        const trx = await prisma.$transaction([
-          prisma.interaction.upsert({
-            where: {
-              userId_commentId_type: {
-                userId,
-                commentId,
-                type: "DISLIKE",
-              },
-            },
-            update: {},
-            create: {
-              userId,
-              commentId,
-              type: "DISLIKE",
-            },
-          }),
-          prisma.comment.update({
-            where: { id: commentId },
-            data: {
-              dislikeCount: {
-                increment: 1,
-              },
-            },
-          }),
-        ]);
+      if (!isCurrentExists) {
+        await performCommentInteraction(userId, commentId, true, currentType);
+
         return true;
       }
       return false;
     } else {
-      // Remove user from set (returns 1 if user was in set)
-
-      const { count } = await prisma.interaction.deleteMany({
-        where: {
-          userId,
-          articleId,
-          type: "LIKE",
-        },
-      });
-
-      if (count > 0) {
-        await prisma.article.update({
-          where: { id: articleId },
-          data: {
-            likeCount: {
-              decrement: 1,
-            },
-          },
-        });
-        return true;
-      } else {
-        return false;
-      }
+      return await performCommentInteraction(
+        userId,
+        commentId,
+        false,
+        currentType
+      );
     }
   } catch (e) {
     console.log("error occured == ", e);
