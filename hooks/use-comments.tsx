@@ -2,19 +2,23 @@
 
 import { createComment, fetchComments } from "@/actions/comments";
 import { Comment, SortOption } from "@/db/schema/comments";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuthGuard } from "./use-auth-guard";
 import chalk from "chalk";
-import { debouncedCommentLike } from "./hook-actions";
+import { debouncedCommentInteraction } from "./hook-actions";
 
-export const useComments = (articleId: number, userId: number) => {
+export const useComments = (articleId: number) => {
   const { session, guardAsync } = useAuthGuard();
   const [comments, setComments] = useState<Comment[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("top");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // const [nextId, setNextId] = useState(1);
+
+  useEffect(() => {
+    console.log(chalk.redBright("Use Comments Hook Initialized"));
+  }, []);
 
   // Sort comments when sortOption changes
   // useEffect(() => {
@@ -47,8 +51,36 @@ export const useComments = (articleId: number, userId: number) => {
         "Fetching comments for articleId in get comments ========== ",
         articleId
       );
-      fetchComments({ articleId, parentId: Number(parentId) ?? undefined })
+      fetchComments({
+        articleId,
+        parentId: Number(parentId) ?? undefined,
+        userId: Number(session.data?.user?.id),
+      })
         .then((fetchedComments) => {
+          // setComments([
+          //   {
+          //     id: 1,
+          //     content: "dcvfsd",
+          //     createdAt: new Date("2025-06-08T08:26:38.159Z"),
+          //     updatedAt: new Date("2025-06-12T08:40:19.907Z"),
+          //     articleId: 36,
+          //     authorId: 4,
+          //     parentId: null,
+          //     likeCount: 1,
+          //     dislikeCount: 0,
+          //     author: {
+          //       id: 4,
+          //       name: "Dheeraj Manwani",
+          //       profilePic:
+          //         "https://lh3.googleusercontent.com/a/ACg8ocJ0vh6A_VHuszJ_LaA3y1iN4C5jdY0aJgJOvJqYAniQ2OQRhg=s96-c",
+          //     },
+          //     isLiked: true,
+          //   },
+          // ]);
+          console.log(
+            chalk.greenBright("Fetched comments successfully:"),
+            fetchedComments
+          );
           setComments(fetchedComments);
           toast.success("Comments fetched successfully", { id: toastId });
         })
@@ -63,11 +95,51 @@ export const useComments = (articleId: number, userId: number) => {
     }
   };
 
+  // Get replies for a comment
+  const getReplies = (parentId: number) => {
+    const toastId = toast.loading("Fetching comment replies...");
+    fetchComments({
+      articleId,
+      parentId: Number(parentId),
+      userId: Number(session.data?.user?.id),
+    })
+      .then((fetchedComments) => {
+        setComments((prevComments) => {
+          // Find the parent comment and update its replies
+          const updatedComments = prevComments.map((comment) => {
+            if (comment.id === parentId) {
+              return {
+                ...comment,
+                replies: fetchedComments,
+              };
+            }
+            return comment;
+          });
+          return updatedComments;
+        });
+        console.log(
+          chalk.greenBright("Fetched replies successfully:"),
+          fetchedComments
+        );
+
+        toast.success("Replies fetched successfully", { id: toastId });
+      })
+      .catch((error) => {
+        toast.error("Failed to fetch replies", { id: toastId });
+      });
+  };
+
+  // Create a new comment
   const addComment = async (text: string, parentId: number | undefined) => {
     let toastId;
     try {
       toastId = toast.loading("Adding comment...");
-      const newComment = await createComment(text, articleId, userId, parentId);
+      const newComment = await createComment(
+        text,
+        articleId,
+        Number(session.data?.user?.id),
+        parentId
+      );
       setComments((prevComments) => [...prevComments, newComment]);
       toast.success("Comment added successfully", { id: toastId });
     } catch (e) {
@@ -88,111 +160,74 @@ export const useComments = (articleId: number, userId: number) => {
     // setNextId(nextId + 1);
   };
 
-  const handleCommentLike = guardAsync(async (param: { commentId: number }) => {
-    const existingComment = comments.find((com) => com.id == param.commentId);
-    const newLikedState = !!!existingComment?.isLiked;
+  const toggleCommentInteraction = guardAsync(
+    async ({
+      commentId,
+      type,
+    }: {
+      commentId: number;
+      type: "LIKE" | "DISLIKE";
+    }) => {
+      const existingComment = comments.find((com) => com.id === commentId);
+      if (!existingComment) return;
 
-    // Optimistically update the UI
-    const newComments = comments.map((comm) => {
-      if (comm.id === param.commentId)
-        return {
-          ...comm,
-          isLiked: newLikedState,
-          likes: comm.likeCount + (newLikedState ? 1 : -1),
-        };
-      return comm;
-    });
-    setComments(newComments);
-    console.log(chalk.blueBright("Optimistically updated like state"));
+      const isLikedField = type === "LIKE" ? "isLiked" : "isDisliked";
+      const countField = type === "LIKE" ? "likeCount" : "dislikeCount";
+      const otherIsLikedField = type === "LIKE" ? "isDisliked" : "isLiked";
+      const otherCountField = type === "LIKE" ? "dislikeCount" : "likeCount";
 
-    const res = await debouncedCommentLike(
-      newLikedState,
-      existingComment?.isLiked ?? false,
-      articleId,
-      param.commentId,
-      Number(session.data?.user?.id)
-    );
-  });
+      const currentState: boolean | undefined = existingComment[isLikedField];
+      const newState = !currentState;
 
-  // const likeComment = (id: number) => {
-  //   setComments((prevComments) =>
-  //     prevComments.map((comment) => {
-  //       if (comment.id === id) {
-  //         // If already isLiked, unlike it
-  //         if (comment.isLiked) {
-  //           return {
-  //             ...comment,
-  //             isLiked: false,
-  //             likes: comment.likeCount - 1,
-  //           };
-  //         }
+      const updatedComments = comments.map((comm) => {
+        if (comm.id === commentId) {
+          const newComm = { ...comm };
+          if (newState && comm[otherIsLikedField]) {
+            newComm[otherIsLikedField] = false;
+            newComm[otherCountField] =
+              newComm[otherCountField] > 1 ? newComm[otherCountField] - 1 : 0;
+          }
+          return {
+            ...newComm,
+            [isLikedField]: newState,
+            [countField]: comm[countField] + (newState ? 1 : -1),
+          };
+        }
+        return comm;
+      });
 
-  //         // If isDisliked, remove dislike and add like
-  //         if (comment.isDisliked) {
-  //           return {
-  //             ...comment,
-  //             isLiked: true,
-  //             isDisliked: false,
-  //             likes: comment.likeCount + 1,
-  //             dislikes: comment.dislikeCount - 1,
-  //           };
-  //         }
+      setComments(updatedComments);
+      console.log(
+        chalk.blueBright(`Optimistically updated ${type.toLowerCase()} state`)
+      );
 
-  //         // If neither isLiked nor isDisliked, add like
-  //         return {
-  //           ...comment,
-  //           isLiked: true,
-  //           likes: comment.likeCount + 1,
-  //         };
-  //       }
-  //       return comment;
-  //     })
-  //   );
-  // };
-
-  // const dislikeComment = (id: number) => {
-  //   setComments((prevComments) =>
-  //     prevComments.map((comment) => {
-  //       if (comment.id === id) {
-  //         // If already isDisliked, remove dislike
-  //         if (comment.isDisliked) {
-  //           return {
-  //             ...comment,
-  //             isDisliked: false,
-  //             dislikes: comment.dislikeCount - 1,
-  //           };
-  //         }
-
-  //         // If isLiked, remove like and add dislike
-  //         if (comment.isLiked) {
-  //           return {
-  //             ...comment,
-  //             isLiked: false,
-  //             isDisliked: true,
-  //             likes: comment.likeCount - 1,
-  //             dislikes: comment.dislikeCount + 1,
-  //           };
-  //         }
-
-  //         // If neither isLiked nor isDisliked, add dislike
-  //         return {
-  //           ...comment,
-  //           isDisliked: true,
-  //           dislikes: comment.dislikeCount + 1,
-  //         };
-  //       }
-  //       return comment;
-  //     })
-  //   );
-  // };
+      try {
+        await debouncedCommentInteraction(
+          newState,
+          !!currentState,
+          articleId,
+          commentId,
+          Number(session.data?.user?.id),
+          type
+        );
+      } catch (error) {
+        console.error(`Failed to sync comment ${type.toLowerCase()}:`, error);
+        // Optionally revert
+      }
+    }
+  );
 
   return {
+    session,
     isLoading,
     error,
     getComments,
+    getReplies,
     comments,
     addComment,
-    likeComment,
+    toggleCommentInteraction,
+    // likeComment,
+    // dislikeComment,
     sortOption,
     setSortOption,
   };
