@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { BookmarkCheck, Download, Heart, LogOut, Plus } from "lucide-react";
+import {
+  BookmarkCheck,
+  Download,
+  Film,
+  Heart,
+  LogOut,
+  Plus,
+} from "lucide-react";
 // import Image from "next/image";
 // import googleIcon from "@/public/google-icon.svg";
 import { signOut, useSession } from "next-auth/react";
@@ -203,12 +210,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div> */}
 
           {/* Other options */}
-          <div className="p-5">
-            <h3 className="text-sm font-medium text-gray-700 uppercase mb-3">
-              Options
-            </h3>
-            <ul className="space-y-1 text-gray-600">
-              {/* <li>
+
+          {/* <li>
                 <button className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -265,62 +268,78 @@ const Sidebar: React.FC<SidebarProps> = ({
                   Dark Mode
                 </button>
               </li> */}
-
+          <div className="p-5">
+            <h3 className="text-sm font-medium text-gray-700 uppercase mb-3">
+              Options
+            </h3>
+            <ul className="space-y-1 text-gray-600">
               <li>
                 <button
                   className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
                     onClose();
-                    router.push("personal/saved");
+                    router.push("/feed");
                   }}
                 >
-                  <BookmarkCheck />
-                  Saved Articles
+                  <Film />
+                  Feed
                 </button>
               </li>
-
-              <li>
-                <button
-                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onClose();
-                    router.push("personal/liked");
-                  }}
-                >
-                  <Heart />
-                  Liked Articles
-                </button>
-              </li>
-
-              {session.status == "authenticated" &&
-                (session.data.user?.role === "ADMIN" ||
-                  session.data.user?.role === "PUBLISHER") && (
+              {session.status == "authenticated" && (
+                <>
                   <li>
                     <button
                       className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
                       onClick={(e) => {
                         e.preventDefault();
                         onClose();
-                        router.push("/new");
+                        router.push("/personal/saved");
                       }}
                     >
-                      <Plus />
-                      New Article
+                      <BookmarkCheck />
+                      Saved Articles
                     </button>
                   </li>
-                )}
-              {session.status == "authenticated" && (
-                <li>
-                  <button
-                    className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
-                    onClick={() => signOut()}
-                  >
-                    <LogOut />
-                    Log out
-                  </button>
-                </li>
+                  <li>
+                    <button
+                      className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onClose();
+                        router.push("/personal/liked");
+                      }}
+                    >
+                      <Heart />
+                      Liked Articles
+                    </button>
+                  </li>
+                  {(session.data.user?.role === "ADMIN" ||
+                    session.data.user?.role === "PUBLISHER") && (
+                    <li>
+                      <button
+                        className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onClose();
+                          router.push("/new");
+                        }}
+                      >
+                        <Plus />
+                        New Article
+                      </button>
+                    </li>
+                  )}
+                  <li>
+                    <button
+                      className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
+                      onClick={() => signOut()}
+                    >
+                      <LogOut />
+                      Log out
+                    </button>
+                  </li>
+                </>
               )}
 
               {/* Install App button - only shows if installable and not already installed */}

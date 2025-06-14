@@ -33,6 +33,7 @@ const SocialActionsComp = ({
     e: React.MouseEvent<HTMLButtonElement> | undefined
   ) => {
     e?.preventDefault();
+    e?.stopPropagation();
     const res = handleLike();
 
     if (typeof res === "boolean" && !res) return;
@@ -67,6 +68,7 @@ const SocialActionsComp = ({
   const handleSaveButton = (
     e: React.MouseEvent<HTMLButtonElement> | undefined
   ) => {
+    e?.stopPropagation();
     e?.preventDefault();
     const res = handleSave();
 

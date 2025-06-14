@@ -45,7 +45,7 @@ export default function Page() {
   // console.log("session inside new page", session);
   if (session.status === "loading") return null;
   if (session.status === "unauthenticated") return <div>Unauthorized</div>;
-  if (session?.data.user?.role != "ADMIN") return <div>No Access</div>;
+  if (session?.data.user?.role == "USER") return <div>No Access</div>;
   return (
     <div
       className={twMerge("flex flex-col mt-16", isLoading ? "opacity-50" : "")}

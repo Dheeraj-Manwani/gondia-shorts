@@ -44,3 +44,11 @@ export function NewsCardSkeleton() {
     </article>
   );
 }
+
+export const InteractedCardSkeleton = () => {
+  return (
+    <div className="m-3">
+      <NewsCardSkeleton />
+    </div>
+  );
+};
