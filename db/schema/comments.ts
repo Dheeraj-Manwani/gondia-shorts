@@ -1,43 +1,59 @@
-// export type Comment = {
-//   id: number;
-//   username: string;
-//   timeAgo: string; // e.g. "2 hours ago", "just now"
-//   text: string;
-//   likes: number;
-//   dislikes: number;
-//   liked: boolean;
-//   disliked: boolean;
-// };
+import { z } from "zod";
 
 export type SortOption = "top" | "newest" | "oldest";
 
-import { z } from "zod";
+export interface Comment {
+  id?: number;
+  content: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  articleId: number;
+  authorId: number;
+  parentId?: number | null;
 
-export const CommentSchema = z.object({
-  id: z.number().optional(), // usually auto-generated
-  content: z.string().min(1),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
+  likeCount: number;
+  isLiked?: boolean;
 
-  articleId: z.number(),
-  authorId: z.number(),
+  dislikeCount: number;
+  isDisliked?: boolean;
 
-  parentId: z.number().nullable().optional(),
+  author: {
+    id: number;
+    name: string;
+    profilePic?: string | null;
+  };
 
-  likeCount: z.number(),
-  dislikeCount: z.number(),
+  replies?: Comment[];
+  repliesCount: number;
+}
 
-  isLiked: z.boolean().optional(),
-  isDisliked: z.boolean().optional(),
+export const CommentSchema: z.ZodType<Comment> = z.lazy(() =>
+  z.object({
+    id: z.number().optional(),
+    content: z.string().min(1),
+    createdAt: z.date().optional(),
+    updatedAt: z.date().optional(),
 
-  author: z.object({
-    id: z.number(),
-    name: z.string(),
-    profilePic: z.string().optional().nullable(),
-  }),
-});
+    articleId: z.number(),
+    authorId: z.number(),
+    parentId: z.number().nullable().optional(),
 
-export type Comment = z.infer<typeof CommentSchema>;
+    likeCount: z.number(),
+    isLiked: z.boolean().optional(),
+
+    dislikeCount: z.number(),
+    isDisliked: z.boolean().optional(),
+
+    author: z.object({
+      id: z.number(),
+      name: z.string(),
+      profilePic: z.string().optional().nullable(),
+    }),
+
+    replies: z.array(CommentSchema).optional(),
+    repliesCount: z.number(),
+  })
+);
 
 export const InteractionTypeEnum = z.enum(["LIKE", "DISLIKE"]);
 

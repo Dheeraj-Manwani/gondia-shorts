@@ -1,1 +1,1 @@
-export type InteractionType = "LIKE" | "SAVE";
+export type InteractionType = "LIKE" | "SAVE" | "DISLIKE" | "SHARE";

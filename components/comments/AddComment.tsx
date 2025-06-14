@@ -1,6 +1,5 @@
 import { Avatar } from "../Avatar";
 import { Input } from "@/components/ui/input";
-import { profile } from "console";
 import { SendHorizontal } from "lucide-react";
 import { useState } from "react";
 

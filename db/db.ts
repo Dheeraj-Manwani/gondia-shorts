@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client/index.js";
 
 const prismaClientSingleton = () => {
   return new PrismaClient({
-    log: ["query", "info", "warn", "error"], // 👈 enable logs
+    // log: ["query", "info", "warn", "error"], // 👈 enable logs
   });
 };
 

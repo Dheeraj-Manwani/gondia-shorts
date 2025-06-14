@@ -2,18 +2,19 @@
 
 import prisma from "@/db/db";
 import { Comment } from "@/db/schema/comments";
+import { getExistingInteractions } from "../interaction";
 
 export const fetchComments = async (
   {
     articleId,
     parentId,
     userId,
-  }: { articleId: number; parentId: number | undefined; userId?: number } = {
+  }: { articleId: number; parentId?: number; userId?: number } = {
     articleId: 0,
     parentId: undefined,
   }
 ): Promise<Comment[]> => {
-  const comments: Comment[] = await prisma.comment.findMany({
+  const comments = await prisma.comment.findMany({
     select: {
       id: true,
       content: true,
@@ -24,6 +25,7 @@ export const fetchComments = async (
       parentId: true,
       likeCount: true,
       dislikeCount: true,
+      repliesCount: true,
       author: {
         select: {
           id: true,
@@ -41,35 +43,48 @@ export const fetchComments = async (
     },
   });
 
-  const commentIds = comments.map((comment) => comment.id ?? -1);
+  const commentIds = comments.map((comment) => comment.id);
 
   const interactions = await prisma.interaction.findMany({
     select: {
-      id: true,
-      type: true,
       userId: true,
       commentId: true,
+      type: true,
     },
     where: {
-      commentId: {
-        in: commentIds,
+      commentId: { in: commentIds },
+      type: {
+        in: ["LIKE", "DISLIKE"],
       },
-      type: "LIKE",
     },
   });
 
-  comments.forEach((com) => {
-    com.likeCount = interactions.filter(
-      (interaction) => interaction.commentId === com.id
-    ).length;
-    com.isLiked =
-      interactions.some(
-        (interaction) =>
-          interaction.userId === userId && interaction.commentId === com.id
-      ) ?? false;
+  const likeCountMap = new Map<number, number>();
+  const dislikeCountMap = new Map<number, number>();
+  const likedByUserSet = new Set<number>();
+  const dislikedByUserSet = new Set<number>();
+
+  interactions.forEach(({ userId: uid, commentId: cid, type }) => {
+    if (!cid) return;
+
+    if (type === "LIKE") {
+      likeCountMap.set(cid, (likeCountMap.get(cid) ?? 0) + 1);
+      if (userId && uid === userId) likedByUserSet.add(cid);
+    }
+
+    if (type === "DISLIKE") {
+      dislikeCountMap.set(cid, (dislikeCountMap.get(cid) ?? 0) + 1);
+      if (userId && uid === userId) dislikedByUserSet.add(cid);
+    }
   });
 
-  return comments;
+  return comments.map((com) => ({
+    ...com,
+    likeCount: likeCountMap.get(com.id) ?? 0,
+    dislikeCount: dislikeCountMap.get(com.id) ?? 0,
+    isLiked: likedByUserSet.has(com.id),
+    isDisliked: dislikedByUserSet.has(com.id),
+  }));
 };
 
 export const createComment = async (
@@ -86,6 +101,7 @@ export const createComment = async (
       parentId: parentId ?? null,
       likeCount: 0,
       dislikeCount: 0,
+      repliesCount: 0,
     },
     select: {
       id: true,
@@ -97,6 +113,7 @@ export const createComment = async (
       parentId: true,
       likeCount: true,
       dislikeCount: true,
+      repliesCount: true,
       author: {
         select: {
           id: true,

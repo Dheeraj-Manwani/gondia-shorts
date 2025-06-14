@@ -7,7 +7,10 @@ import { cn } from "@/lib/utils";
 import { useAction } from "@/hooks/use-action";
 import { fetchArticles } from "@/actions/articles";
 import { Article } from "@/db/schema/article";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
+import { appSession } from "@/lib/auth";
+import { useSession } from "next-auth/react";
+
 // import { newsItems } from "@/data/sample-news";
 // import { useLocation } from "wouter";
 
@@ -15,6 +18,7 @@ export default function NewsCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const session = useSession() as unknown as appSession;
   //   const [, setLocation] = useLocation();
 
   const {
@@ -22,9 +26,12 @@ export default function NewsCarousel() {
     data: newsItems,
     isLoading,
     error,
-  } = useAction<{ limit: number; offset: number }, Article>(fetchArticles);
+  } = useAction<
+    { limit: number; offset: number; session: appSession },
+    Article
+  >(fetchArticles);
   useEffect(() => {
-    if (!newsItems && !isLoading) execute({ limit: 5, offset: 10 });
+    if (!newsItems && !isLoading) execute({ limit: 5, offset: 10, session });
   }, []);
 
   if (isLoading || !newsItems)

@@ -22,9 +22,7 @@ export const UserProfile = () => {
         )}
         <AvatarFallback>{name[0]}</AvatarFallback>
       </Avatar> */}
-      {session && session.status != "authenticated" && (
-        <Avatar className="w-10 h-10" />
-      )}
+
       {session && session.status == "authenticated" && (
         <Avatar
           profileImage={session.data.user?.image}
@@ -39,10 +37,11 @@ export const UserProfile = () => {
         </div>
       ) : (
         <Button
-          className="cursor-pointer text-gray-600  hover:underline px-1"
+          className="cursor-pointer text-gray-600  hover:underline hover:bg-white px-1"
           onClick={() => signIn("google")}
           variant={"ghost"}
         >
+          <Avatar className="w-10 h-10" />
           Sign In
         </Button>
       )}

@@ -1,10 +1,11 @@
 "use client";
 
 import { ReactNode, FC, useState } from "react";
-import Header from "./Header";
-import Sidebar from "./Sidebar";
+import Header from "../Header";
+import Sidebar from "../Sidebar";
 import { Toaster } from "sonner";
 import { SessionProvider } from "next-auth/react";
+import NextTopLoader from "nextjs-toploader";
 
 type AppWrapperProps = {
   children: ReactNode;
@@ -38,6 +39,7 @@ export const AppWrapper: FC<AppWrapperProps> = ({ children }) => {
           mobileOffset={20}
           position="bottom-center"
         />
+        <NextTopLoader color="#155dfc" showSpinner={false} />
         {children}
       </div>
     </SessionProvider>

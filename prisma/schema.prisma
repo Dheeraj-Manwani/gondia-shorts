@@ -94,6 +94,7 @@ model Comment {
 
   likeCount    Int @default(0)
   dislikeCount Int @default(0)
+  repliesCount Int @default(0)
 
   interactions Interaction[]
   reports      Report[]
@@ -122,6 +123,8 @@ model Interaction {
 enum InteractionType {
   LIKE
   SAVE
+  DISLIKE
+  SHARE
 }
 
 enum ReportReason {

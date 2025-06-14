@@ -1,8 +1,8 @@
 import {
   likeArticle,
   saveArticle,
-} from "@/actions/interaction/articleInteractions";
-import { likeComment } from "@/actions/interaction/commentInteractions";
+} from "@/actions/interaction/article-interactions";
+import { handleInteraction } from "@/actions/interaction/comment-interactions";
 import chalk from "chalk";
 import { debounce } from "lodash";
 import { toast } from "sonner";
@@ -70,29 +70,117 @@ export const debouncedSave = debounce(
   1200
 );
 
-export const debouncedCommentLike = debounce(
+// for dev only
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+// export const debouncedCommentLike = debounce(
+//   async (
+//     shouldLike: boolean,
+//     isCommentLiked: boolean,
+//     articleId: number,
+//     commentId: number,
+//     userId: number
+//   ) => {
+//     if (shouldLike === isCommentLiked) return;
+
+//     console.log(chalk.blueBright("Inside comment debounce function"));
+
+//     const id = toast.loading(
+//       shouldLike ? "Linking comment async" : "Unlinking comment async"
+//     );
+
+//     const res = await handleInteraction(
+//       articleId,
+//       userId,
+//       commentId,
+//       shouldLike
+//     );
+//     console.log(chalk.redBright("Async like call completed"), res);
+
+//     if (res) {
+//       toast.success(shouldLike ? "Article liked!" : "Removed from liked!", {
+//         id,
+//       });
+//     } else {
+//       toast.warning("Already in given state or error occured", { id });
+//     }
+
+//     return res;
+//   },
+//   1200
+// );
+
+// export const debouncedCommentDisike = debounce(
+//   async (
+//     shouldDislike: boolean,
+//     isCommentDisLiked: boolean,
+//     articleId: number,
+//     commentId: number,
+//     userId: number
+//   ) => {
+//     if (shouldDislike === isCommentDisLiked) return;
+
+//     console.log(chalk.blueBright("Inside comment debounce function"));
+
+//     const id = toast.loading(
+//       shouldDislike ? "Linking comment async" : "Unlinking comment async"
+//     );
+
+//     const res = await handleInteraction(
+//       articleId,
+//       userId,
+//       commentId,
+//       shouldDislike
+//     );
+//     console.log(chalk.redBright("Async like call completed"), res);
+
+//     if (res) {
+//       toast.success(shouldDislike ? "Article liked!" : "Removed from liked!", {
+//         id,
+//       });
+//     } else {
+//       toast.warning("Already in given state or error occured", { id });
+//     }
+
+//     return res;
+//   },
+//   1200
+// );
+
+export const debouncedCommentInteraction = debounce(
   async (
-    shouldLike: boolean,
-    isCommentLiked: boolean,
+    shouldPerform: boolean,
+    isPerformed: boolean,
     articleId: number,
     commentId: number,
-    userId: number
+    userId: number,
+    type: "LIKE" | "DISLIKE"
   ) => {
-    if (shouldLike === isCommentLiked) return;
+    if (shouldPerform === isPerformed) return;
 
     console.log(chalk.blueBright("Inside comment debounce function"));
 
     const id = toast.loading(
-      shouldLike ? "Linking comment async" : "Unlinking comment async"
+      shouldPerform ? `${type} comment async` : `Removing ${type} comment async`
     );
 
-    const res = await likeComment(articleId, userId, commentId, shouldLike);
+    const res = await handleInteraction(
+      articleId,
+      userId,
+      commentId,
+      type,
+      shouldPerform
+    );
     console.log(chalk.redBright("Async like call completed"), res);
 
     if (res) {
-      toast.success(shouldLike ? "Article liked!" : "Removed from liked!", {
-        id,
-      });
+      toast.success(
+        shouldPerform ? `Article ${type}!` : `Removed from ${type}!`,
+        {
+          id,
+        }
+      );
     } else {
       toast.warning("Already in given state or error occured", { id });
     }

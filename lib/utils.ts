@@ -1,6 +1,7 @@
 import { ArticleType } from "@prisma/client/index.js";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { appSession } from "./auth";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -73,3 +74,10 @@ export const getTimeDifference = (timestamp: Date | undefined): string => {
   const diffInYears = Math.floor(diffInDays / 365);
   return `${diffInYears} year${diffInYears > 1 ? "s" : ""} ago`;
 };
+
+export const isAuthorised = (session: appSession) =>
+  session.status === "authenticated" &&
+  session.data.user &&
+  session.data.user.id
+    ? true
+    : false;

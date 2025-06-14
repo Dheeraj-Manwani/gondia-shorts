@@ -30,7 +30,9 @@ export const likeArticle = async (
                 type: "LIKE",
               },
             },
-            update: {},
+            update: {
+              createdAt: new Date(),
+            },
             create: {
               userId,
               articleId,

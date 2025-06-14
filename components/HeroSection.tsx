@@ -3,7 +3,8 @@
 // import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
+
 import { WordRotate } from "./WordRotate";
 import { ArrowRight } from "lucide-react";
 

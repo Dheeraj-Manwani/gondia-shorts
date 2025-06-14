@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { debounce } from "lodash";
+import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuid } from "uuid";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay, Navigation } from "swiper/modules";
@@ -14,10 +13,6 @@ import CommentModal from "@/components/comments/CommentModal";
 // import { useTranslate } from "@/hooks/use-translate";
 // import { translateToHindi } from "@/lib/translateService";
 import ReactPlayer from "react-player/youtube";
-import { Bookmark, Heart, MessageSquareMore, Share2 } from "lucide-react";
-import { twMerge } from "tailwind-merge";
-import { appSession } from "@/lib/auth";
-import { toast } from "sonner";
 // import { likeArticle } from "@/actions/interaction";
 import { SocialActions } from "./SocialActions";
 
@@ -26,19 +21,21 @@ interface NewsCardProps {
   isPreview?: boolean;
   isPreviewActive?: boolean;
   article: Article;
-  session: appSession;
 }
 
-export default function NewsCard({
+function NewsCard({
   isCurrentActive,
   isPreview = false,
   isPreviewActive = false,
   article,
-  session,
 }: NewsCardProps) {
   // const { isHindi } = useTranslate();
   // const [translatedHeadline, setTranslatedHeadline] = useState(article.title);
   // const [translatedSummary, setTranslatedSummary] = useState(article.content);
+
+  useEffect(() => {
+    console.log("NewsCard mounted with article:", article.id);
+  }, []);
 
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -299,9 +296,25 @@ export default function NewsCard({
           article={article}
           isOpen={true}
           onClose={() => setIsCommentModalOpen(false)}
-          session={session}
         />
       )}
     </article>
   );
 }
+
+export default React.memo(
+  NewsCard,
+  function areEqual(
+    prev: Readonly<NewsCardProps>,
+    next: Readonly<NewsCardProps>
+  ): boolean {
+    return (
+      prev.isCurrentActive === next.isCurrentActive &&
+      prev.isPreview === next.isPreview &&
+      prev.isPreviewActive === next.isPreviewActive &&
+      prev.article.likeCount === next.article.likeCount &&
+      prev.article.isSaved == next.article.isSaved &&
+      prev.article.isLiked === next.article.isLiked
+    );
+  }
+);

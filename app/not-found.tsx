@@ -1,6 +1,6 @@
 "use client";
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button'; // Assuming Button component is from ShadCN
+import { useRouter } from "nextjs-toploader/app";
+import { Button } from "@/components/ui/button"; // Assuming Button component is from ShadCN
 
 export default function NotFound() {
   const router = useRouter();
@@ -12,7 +12,7 @@ export default function NotFound() {
           The page you are looking for is not available.
         </h1>
         <Button
-          onClick={() => router.push('/feed')}
+          onClick={() => router.push("/feed")}
           className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition"
         >
           Go to Feed

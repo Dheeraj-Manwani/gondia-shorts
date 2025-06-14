@@ -4,8 +4,8 @@ export function NewsCardSkeleton() {
   return (
     <article className="news-card w-full h-full bg-white overflow-hidden relative flex flex-col">
       {/* Skeleton for Media */}
-      <div className="h-[45vh]  w-full relative bg-gray-200 m-auto">
-        <Skeleton className=" w-full h-[45vh]  bg-gray-400" />
+      <div className="h-[48vh]  w-full relative bg-gray-200 m-auto">
+        <Skeleton className=" w-full h-[48vh]  bg-gray-400" />
         {/* <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div> */}
 
         {/* Source Info */}
@@ -19,14 +19,14 @@ export function NewsCardSkeleton() {
       </div>
 
       {/* Social Actions */}
-      <div className="px-4 py-6 border-b">
+      <div className="px-4 py-3.5 border-b">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Skeleton className="h-7 w-7 rounded-full bg-gray-400" />
-            <Skeleton className="h-7 w-7 rounded-full bg-gray-400" />
-            <Skeleton className="h-7 w-7 rounded-full bg-gray-400" />
+            <Skeleton className="h-4 w-4 rounded-full bg-gray-400" />
+            <Skeleton className="h-4 w-4 rounded-full bg-gray-400" />
+            <Skeleton className="h-4 w-4 rounded-full bg-gray-400" />
           </div>
-          <Skeleton className="h-7 w-7 rounded-full bg-gray-400" />
+          <Skeleton className="h-4 w-4 rounded-full bg-gray-400" />
         </div>
       </div>
 

@@ -13,9 +13,8 @@ import AddComment from "@/components/comments/AddComment";
 import CommentItem from "@/components/comments/CommentItem";
 import { Article } from "@/db/schema/article";
 import { signIn } from "next-auth/react";
-import { Button } from "../ui/button";
-import { appSession } from "@/lib/auth";
 import { useEffect } from "react";
+import { BrandLoader } from "../ui/Loaders";
 
 interface CommentModalProps {
   article: Article;
@@ -25,16 +24,19 @@ interface CommentModalProps {
 
 const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
   const {
+    session,
+    isLoading,
+    isReplyLoading,
     comments,
     addComment,
     getComments,
-    likeComment,
-    dislikeComment,
+    getReplies,
+    // likeComment,
+    toggleCommentInteraction,
     sortOption,
     setSortOption,
-    isLoading,
-    error,
-  } = useComments(Number(article.id), Number(session.data?.user?.id ?? 0));
+    // error,
+  } = useComments(Number(article.id));
 
   useEffect(() => {
     console.log("isOpen ===== ", isOpen);
@@ -49,7 +51,7 @@ const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className="bg-[#ffffff] text-gray-500 max-w-[95%] max-h-[90vh] p-0"
+        className="bg-[#ffffff] text-gray-500 max-w-[95%] max-h-[90vh] p-0 rounded-md"
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader className="flex flex-row items-center justify-between p-4 pb-2 border-b border-gray-500">
@@ -69,39 +71,67 @@ const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
             </button>
           </div>
         </DialogHeader>
-
-        <ScrollArea className="p-4 max-h-[70vh]">
+        {/* p-4  */}
+        <ScrollArea className="max-h-[70vh] p-2.5">
           {session.status === "authenticated" && (
-            <>
-              <AddComment
-                onAddComment={addComment}
-                name={session.data.user?.name}
-                profilePic={session.data.user?.image}
-              />
-
-              {isLoading
-                ? "Loading ..."
-                : comments.map((comment) => (
-                    <CommentItem
-                      key={comment.id}
-                      comment={comment}
-                      isLiked={comment.isLiked ?? false}
-                      likeCount={comment.likeCount}
-                      onLike={() => likeComment(Number(comment.id))}
-                    />
-                  ))}
-            </>
+            <AddComment
+              onAddComment={addComment}
+              name={session.data.user?.name}
+              profilePic={session.data.user?.image}
+            />
           )}
           {session.status === "unauthenticated" && (
-            <div className="flex flex-col items-center justify-center h-full">
-              <p className="text-gray-500 text-sm">
-                Please sign in to add comments.
+            <div
+              className="flex items-center justify-center gap-1 border-b border-gray-500 -mt-1.5 pb-5
+            "
+            >
+              <p className="text-gray-500 text-base">
+                Please
+                <button
+                  className="cursor-pointer hover:underline text-blue-700 mx-1"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    signIn("google");
+                  }}
+                >
+                  signin
+                </button>
+                to add comments.
               </p>
-              <Button
-                className="mt-2 cursor-pointer text-gray-600 hover:underline px-1"
-                onClick={() => signIn("google")}
-                variant={"ghost"}
-              />
+            </div>
+          )}
+
+          {isLoading ? (
+            // "Loading ..."
+            <BrandLoader />
+          ) : (
+            <div className="mt-4">
+              {comments.map((comment) => (
+                <CommentItem
+                  key={comment.id}
+                  session={session}
+                  comment={comment}
+                  getReplies={getReplies}
+                  isReplyLoading={isReplyLoading}
+                  isReply={false}
+                  onLike={() =>
+                    toggleCommentInteraction({
+                      commentId: Number(comment.id),
+                      type: "LIKE",
+                    })
+                  }
+                  onDislike={() =>
+                    toggleCommentInteraction({
+                      commentId: Number(comment.id),
+                      type: "DISLIKE",
+                    })
+                  }
+                  onReply={(text: string, parentId: number) =>
+                    addComment(text, parentId)
+                  }
+                />
+              ))}
             </div>
           )}
         </ScrollArea>

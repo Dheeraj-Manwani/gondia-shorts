@@ -7,11 +7,11 @@ import NewsCard from "@/components/news-card/NewsCard";
 import { CreateArticle } from "@/db/schema/article";
 import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
-import { createArticle } from "@/actions/articles";
+import { createArticle } from "@/actions/articles/create-article";
 import { twMerge } from "tailwind-merge";
 import { useSession } from "next-auth/react";
 import { appSession } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 export default function Page() {
   const session = useSession() as unknown as appSession;
@@ -95,13 +95,13 @@ export default function Page() {
             currentArticle
               ? {
                   ...currentArticle,
-                  id: articleId,
+                  id: Number(articleId),
                   categoryId: 1,
                   sourceText: "Gondia ",
                   submittedById: 5,
                 }
               : {
-                  id: articleId,
+                  id: Number(articleId),
                   categoryId: 1,
                   sourceText: "Gondia ",
                   submittedById: 5,

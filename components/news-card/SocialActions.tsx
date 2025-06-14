@@ -13,7 +13,7 @@ interface SocialActionsProps {
   isPreview: boolean;
 }
 
-const socialActions = ({
+const SocialActionsComp = ({
   articleId,
   setIsCommentModalOpen,
   isPreview,
@@ -154,7 +154,7 @@ const socialActions = ({
 };
 
 export const SocialActions = React.memo(
-  socialActions,
+  SocialActionsComp,
   (prevProps, nextProps) => {
     // Prevent re-render if article id is the same
     return (

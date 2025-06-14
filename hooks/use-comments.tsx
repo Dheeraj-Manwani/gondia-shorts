@@ -6,13 +6,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuthGuard } from "./use-auth-guard";
 import chalk from "chalk";
-import { debouncedCommentInteraction } from "./hook-actions";
+import { debouncedCommentInteraction, sleep } from "./hook-actions";
 
 export const useComments = (articleId: number) => {
   const { session, guardAsync } = useAuthGuard();
   const [comments, setComments] = useState<Comment[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("top");
   const [isLoading, setIsLoading] = useState(false);
+  const [isReplyLoading, setIsReplyLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // const [nextId, setNextId] = useState(1);
 
@@ -41,63 +42,93 @@ export const useComments = (articleId: number) => {
   //   setComments(sortedComments);
   // }, [sortOption]);
 
-  // Fetch comments when the component mounts
-  // useEffect(() => {
   const getComments = (parentId: string | undefined) => {
+    // if (!isLoading) {
+    //   setIsLoading((oldstate) => true);
+    //   const toastId = toast.loading("Fetching comments...");
+    //   console.log(
+    //     "Fetching comments for articleId in get comments ========== ",
+    //     articleId
+    //   );
+    //   fetchComments({
+    //     articleId,
+    //     parentId: Number(parentId) ?? undefined,
+    //     userId: Number(session.data?.user?.id),
+    //   })
+    //     .then((fetchedComments) => {
+    //       console.log(
+    //         chalk.greenBright("Fetched comments successfully:"),
+    //         fetchedComments
+    //       );
+    //       setComments(fetchedComments);
+    //       toast.success("Comments fetched successfully", { id: toastId });
+    //     })
+    //     .catch((error) => {
+    //       toast.error("Failed to fetch comments", { id: toastId });
+    //       setError("Failed to fetch comments" + error);
+    //       console.error("Error fetching comments:", error);
+    //     })
+    //     .finally(() => {
+    //       setIsLoading(false);
+    //     });
+    // }
+
     if (!isLoading) {
-      setIsLoading((oldstate) => true);
-      const toastId = toast.loading("Fetching comments...");
-      console.log(
-        "Fetching comments for articleId in get comments ========== ",
-        articleId
-      );
-      fetchComments({
-        articleId,
-        parentId: Number(parentId) ?? undefined,
-        userId: Number(session.data?.user?.id),
-      })
-        .then((fetchedComments) => {
-          // setComments([
-          //   {
-          //     id: 1,
-          //     content: "dcvfsd",
-          //     createdAt: new Date("2025-06-08T08:26:38.159Z"),
-          //     updatedAt: new Date("2025-06-12T08:40:19.907Z"),
-          //     articleId: 36,
-          //     authorId: 4,
-          //     parentId: null,
-          //     likeCount: 1,
-          //     dislikeCount: 0,
-          //     author: {
-          //       id: 4,
-          //       name: "Dheeraj Manwani",
-          //       profilePic:
-          //         "https://lh3.googleusercontent.com/a/ACg8ocJ0vh6A_VHuszJ_LaA3y1iN4C5jdY0aJgJOvJqYAniQ2OQRhg=s96-c",
-          //     },
-          //     isLiked: true,
-          //   },
-          // ]);
-          console.log(
-            chalk.greenBright("Fetched comments successfully:"),
-            fetchedComments
-          );
-          setComments(fetchedComments);
-          toast.success("Comments fetched successfully", { id: toastId });
-        })
-        .catch((error) => {
-          toast.error("Failed to fetch comments", { id: toastId });
-          setError("Failed to fetch comments" + error);
-          console.error("Error fetching comments:", error);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      setIsLoading(true);
+      const id = toast.info("Sleeping.......");
+      sleep(2000).then(() => {
+        setComments([
+          {
+            id: 4,
+            content: "New comment",
+            createdAt: new Date("2025-06-12T14:31:50.755Z"),
+            updatedAt: new Date("2025-06-12T15:18:58.171Z"),
+            articleId: 36,
+            authorId: 4,
+            parentId: null,
+            likeCount: 0,
+            dislikeCount: 1,
+            author: {
+              id: 4,
+              name: "Dheeraj Manwani",
+              profilePic:
+                "https://lh3.googleusercontent.com/a/ACg8ocJ0vh6A_VHuszJ_LaA3y1iN4C5jdY0aJgJOvJqYAniQ2OQRhg=s96-c",
+            },
+            isLiked: false,
+            isDisliked: false,
+            repliesCount: 0,
+          },
+          {
+            id: 1,
+            content: "dcvfsd",
+            createdAt: new Date("2025-06-08T08:26:38.159Z"),
+            updatedAt: new Date("2025-06-12T14:27:59.175Z"),
+            articleId: 36,
+            authorId: 4,
+            parentId: null,
+            likeCount: 0,
+            dislikeCount: 0,
+            author: {
+              id: 4,
+              name: "Dheeraj Manwani",
+              profilePic:
+                "https://lh3.googleusercontent.com/a/ACg8ocJ0vh6A_VHuszJ_LaA3y1iN4C5jdY0aJgJOvJqYAniQ2OQRhg=s96-c",
+            },
+            isLiked: false,
+            isDisliked: false,
+            repliesCount: 2,
+          },
+        ]);
+        setIsLoading(false);
+      });
+      toast.success("Done ", { id });
     }
   };
 
   // Get replies for a comment
   const getReplies = (parentId: number) => {
     const toastId = toast.loading("Fetching comment replies...");
+    setIsReplyLoading(true);
     fetchComments({
       articleId,
       parentId: Number(parentId),
@@ -126,6 +157,9 @@ export const useComments = (articleId: number) => {
       })
       .catch((error) => {
         toast.error("Failed to fetch replies", { id: toastId });
+      })
+      .finally(() => {
+        setIsReplyLoading(false);
       });
   };
 
@@ -180,20 +214,18 @@ export const useComments = (articleId: number) => {
       const newState = !currentState;
 
       const updatedComments = comments.map((comm) => {
-        if (comm.id === commentId) {
-          const newComm = { ...comm };
-          if (newState && comm[otherIsLikedField]) {
-            newComm[otherIsLikedField] = false;
-            newComm[otherCountField] =
-              newComm[otherCountField] > 1 ? newComm[otherCountField] - 1 : 0;
-          }
-          return {
-            ...newComm,
-            [isLikedField]: newState,
-            [countField]: comm[countField] + (newState ? 1 : -1),
-          };
+        if (comm.id !== commentId) return comm;
+
+        const newComm = { ...comm };
+        if (newState && comm[otherIsLikedField]) {
+          newComm[otherIsLikedField] = false;
+          newComm[otherCountField] = Math.max(0, newComm[otherCountField] - 1);
         }
-        return comm;
+
+        newComm[isLikedField] = newState;
+        newComm[countField] += newState ? 1 : -1;
+
+        return newComm;
       });
 
       setComments(updatedComments);
@@ -220,6 +252,7 @@ export const useComments = (articleId: number) => {
   return {
     session,
     isLoading,
+    isReplyLoading,
     error,
     getComments,
     getReplies,

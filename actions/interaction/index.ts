@@ -1,52 +1,42 @@
-// "use server";
+import prisma from "@/db/db";
+import { InteractionType } from "@/db/schema/interaction";
 
-// import { redis } from "@/lib/redis";
-// import prisma from "@/db/db";
-// import chalk from "chalk";
+export const getExistingInteractions = async (
+  userId: number,
+  articleId?: number,
+  commentId?: number,
+  types?: InteractionType[]
+): Promise<{ id: number; type: string }[]> => {
+  const res = await prisma.interaction.findMany({
+    select: {
+      id: true,
+      type: true,
+    },
+    where: {
+      userId,
+      ...(articleId ? { articleId } : {}),
+      ...(commentId ? { commentId } : {}),
+      ...(types ? { type: { in: types } } : {}),
+    },
+  });
 
-// export const likeComment = async (commentId: number, userId: number) => {
-//   const key = `comment:${commentId}:likes`;
-//   return await redis.sadd(key, userId);
-// };
+  return res;
+};
 
-// export const unlikeComment = async (commentId: number, userId: number) => {
-//   const key = `comment:${commentId}:likes`;
-//   return await redis.srem(key, userId);
-// };
+export const deleteInteractions = async (
+  userId: number,
+  articleId?: number,
+  commentId?: number,
+  types?: InteractionType[]
+): Promise<number> => {
+  const res = await prisma.interaction.deleteMany({
+    where: {
+      userId,
+      ...(articleId ? { articleId } : {}),
+      ...(commentId ? { commentId } : {}),
+      ...(types ? { type: { in: types } } : {}),
+    },
+  });
 
-// export const getCommentLikes = async (commentId: number) => {
-//   const key = `comment:${commentId}:likes`;
-//   return await redis.scard(key);
-// };
-
-// export const hasUserLikedComment = async (
-//   commentId: number,
-//   userId: number
-// ) => {
-//   const key = `comment:${commentId}:likes`;
-//   return await redis.sismember(key, userId);
-// };
-
-// export const unlikeArticle = async (articleId: number, userId: number) => {
-//   const key = `article:${articleId}:likes`;
-//   return await redis.srem(key, userId);
-// };
-
-// export const getArticleLikes = async (articleId: number) => {
-//   const key = `article:${articleId}:likes`;
-//   return await redis.scard(key);
-// };
-
-// export const saveArticle = async (articleId: number, userId: number) => {
-//   const key = `user:${userId}:savedArticles`;
-//   return await redis.sadd(key, articleId);
-// };
-// export const unsaveArticle = async (articleId: number, userId: number) => {
-//   const key = `user:${userId}:savedArticles`;
-//   return await redis.srem(key, articleId);
-// };
-
-// export const getArticleSaves = async (articleId: number): Promise<number> => {
-//   const key = `article:${articleId}:saves`;
-//   return await redis.scard(key);
-// };
+  return res.count;
+};

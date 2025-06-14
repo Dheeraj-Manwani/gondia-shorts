@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Download, LogOut, Plus } from "lucide-react";
+import { BookmarkCheck, Download, Heart, LogOut, Plus } from "lucide-react";
 // import Image from "next/image";
 // import googleIcon from "@/public/google-icon.svg";
 import { signOut, useSession } from "next-auth/react";
 // import { Button } from "./ui/button";
 import { UserProfile } from "./UserProfile";
 import { appSession } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -265,6 +265,34 @@ const Sidebar: React.FC<SidebarProps> = ({
                   Dark Mode
                 </button>
               </li> */}
+
+              <li>
+                <button
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onClose();
+                    router.push("personal/saved");
+                  }}
+                >
+                  <BookmarkCheck />
+                  Saved Articles
+                </button>
+              </li>
+
+              <li>
+                <button
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onClose();
+                    router.push("personal/liked");
+                  }}
+                >
+                  <Heart />
+                  Liked Articles
+                </button>
+              </li>
 
               {session.status == "authenticated" &&
                 (session.data.user?.role === "ADMIN" ||

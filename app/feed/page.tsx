@@ -3,7 +3,7 @@
 import React from "react";
 // import Header from "@/components/Header";
 // import Sidebar from "@/components/Sidebar";
-import SwipeableNewsFeed from "@/components/SwipeableNewsFeed";
+import { SwipeableNewsFeed } from "@/components/news-feeds/SwipeableNewsFeed";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { appSession } from "@/lib/auth";

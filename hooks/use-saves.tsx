@@ -1,4 +1,4 @@
-import { saveArticle } from "@/actions/interaction/articleInteractions";
+import { saveArticle } from "@/actions/interaction/article-interactions";
 import { Article } from "@/db/schema/article";
 import { useEffect, useRef, useState } from "react";
 import { useAuthGuard } from "./use-auth-guard";
