@@ -19,24 +19,28 @@ import { fetchArticles } from "@/actions/articles";
 import { NewsCardSkeleton } from "../Skeletons";
 import { appSession } from "@/lib/auth";
 import { useArticles } from "@/store/articles";
+import { useSession } from "next-auth/react";
+import { getInteractionsFromArticles } from "@/lib/converters";
+import { useInteractions } from "@/store/interaction";
 
 interface SwipeableNewsFeedProps {
-  session: appSession;
   categoryId: number;
   articleSlug?: string | null;
 }
 
 const SwipeableNewsFeedComp: React.FC<SwipeableNewsFeedProps> = ({
-  session,
   categoryId,
   articleSlug,
 }) => {
   const [page, setPage] = useState(0);
   const articles = useArticles((state) => state.articles);
   const setArticles = useArticles((state) => state.setArticles);
+  // const interactions = useInteractions((state) => state.interactions);
+  const setInteractions = useInteractions((state) => state.setInteractions);
   // const [isHindi, setIsHindi] = useState(false);
   const limit = Number(process.env.NEXT_PUBLIC_FETCH_LIMIT); // Number of articles to fetch at once
   const swiperRef = useRef<SwiperType | null>(null);
+  const session = useSession() as unknown as appSession;
 
   const { execute, data, isLoading, error } = useAction(fetchArticles, {
     toastMessages: {
@@ -53,9 +57,13 @@ const SwipeableNewsFeedComp: React.FC<SwipeableNewsFeedProps> = ({
   useEffect(() => {
     if (data && data.length > 0) {
       const articleData = data as Article[];
+      const interactionData = getInteractionsFromArticles(articleData);
       // setArticles((prev) => [...prev, ...articleData]);
       const newArticles = [...articles, ...articleData];
       setArticles(newArticles);
+
+      // const newInteractions = [...interactions, ...interactionData];
+      setInteractions(interactionData, true);
       console.log("newArticles ======= ", newArticles);
     }
   }, [data]);
@@ -79,7 +87,7 @@ const SwipeableNewsFeedComp: React.FC<SwipeableNewsFeedProps> = ({
     if (swiperRef.current) {
       swiperRef.current.slideTo(0, 0);
     }
-  }, [categoryId]);
+  }, [categoryId, session.status]);
 
   // Load more articles when reaching the end
   // const handleReachEnd = () => {
@@ -212,38 +220,38 @@ const SwipeableNewsFeedComp: React.FC<SwipeableNewsFeedProps> = ({
         )}
       </Swiper>
       {/* Swipe indicator */}
-      <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center justify-center pointer-events-none z-20">
-        <div className="flex flex-col items-center animate-bounce">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-gray-300 drop-shadow-md"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <p className="text-xs text-zinc-400 font-medium drop-shadow-md">
-            Swipe up for next
-          </p>
+      {articles.length > 0 && (
+        <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center justify-center pointer-events-none z-20">
+          <div className="flex flex-col items-center animate-bounce">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-gray-300 drop-shadow-md"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <p className="text-xs text-zinc-400 font-medium drop-shadow-md">
+              Swipe up for next
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
 
-export default SwipeableNewsFeedComp;
 export const SwipeableNewsFeed = React.memo(
   SwipeableNewsFeedComp,
   (prevProps, nextProps) => {
     // Prevent re-render if article id is the same
     return (
       prevProps.articleSlug === nextProps.articleSlug &&
-      prevProps.categoryId === nextProps.categoryId &&
-      prevProps.session.status === nextProps.session.status
+      prevProps.categoryId === nextProps.categoryId
     );
   }
 );

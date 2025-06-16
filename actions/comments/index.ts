@@ -2,7 +2,6 @@
 
 import prisma from "@/db/db";
 import { Comment } from "@/db/schema/comments";
-import { getExistingInteractions } from "../interaction";
 
 export const fetchComments = async (
   {
@@ -58,6 +57,12 @@ export const fetchComments = async (
       },
     },
   });
+
+  console.log(
+    "interactions for these comments :::::::: ",
+    interactions,
+    commentIds
+  );
 
   const likeCountMap = new Map<number, number>();
   const dislikeCountMap = new Map<number, number>();
@@ -123,6 +128,21 @@ export const createComment = async (
       },
     },
   });
+
+  if (parentId) {
+    const res = await prisma.comment.update({
+      data: {
+        repliesCount: {
+          increment: 1,
+        },
+      },
+      where: {
+        id: parentId,
+      },
+    });
+
+    console.log("update res ====== ", res);
+  }
 
   return newComment;
 };

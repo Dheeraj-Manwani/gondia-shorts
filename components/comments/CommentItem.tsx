@@ -26,8 +26,8 @@ interface CommentItemProps {
   session: appSession;
   comment: Comment;
   isReply: boolean;
-  onLike: () => void;
-  onDislike: () => void;
+  onLike: (id?: number) => void;
+  onDislike: (id?: number) => void;
   onReply: (text: string, parentId: number) => void;
   getReplies?: (parentId: number) => void;
   isReplyLoading: boolean;
@@ -115,12 +115,21 @@ const CommentItem = ({
             </DropdownMenu>
           </div>
 
-          <p className="text-sm mb-2 mt-0.5">{shortText}</p>
+          <p
+            className="text-sm mb-2 mt-0.5"
+            style={{
+              wordBreak: "break-word",
+              overflowWrap: "break-word",
+              marginRight: "18px",
+            }}
+          >
+            {shortText}
+          </p>
 
           {shouldShowReadMore && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-xs text-zinc-400 hover:text-white mb-2"
+              className="text-xs text-zinc-400 hover:text-gray-700 mb-2"
             >
               {isExpanded ? "Read less" : "Read more"}
             </button>
@@ -133,7 +142,7 @@ const CommentItem = ({
                   className={`p-1 hover:text-gray-800 rounded-sm group ${
                     comment.isLiked ? "text-primary" : ""
                   }`}
-                  onClick={onLike}
+                  onClick={() => onLike()}
                 >
                   <ThumbsUp
                     className={twMerge("h-4 w-4 cursor-pointer")}
@@ -156,7 +165,7 @@ const CommentItem = ({
                   className={`p-1 hover:text-gray-800 rounded-sm group ${
                     comment.isDisliked ? "text-primary" : ""
                   }`}
-                  onClick={onDislike}
+                  onClick={() => onDislike()}
                 >
                   <ThumbsDown
                     className={twMerge("h-4 w-4 cursor-pointer")}
@@ -176,9 +185,9 @@ const CommentItem = ({
               </span>
             </div>
 
-            {!isReplyOpen && session.status == "authenticated" && (
+            {!isReplyOpen && !isReply && session.status == "authenticated" && (
               <button
-                className="text-xs text-zinc-400 hover:text-gray-800 cursor-pointer"
+                className="text-xs text-zinc-400 hover:text-gray-700 cursor-pointer"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -195,7 +204,8 @@ const CommentItem = ({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (!comment.replies?.length) getReplies?.(comment.id ?? -1);
+                if (comment.replies?.length != comment.repliesCount)
+                  getReplies?.(comment.id ?? -1);
                 setIsShowReplies(!isShowReplies);
               }}
             >
@@ -222,9 +232,9 @@ const CommentItem = ({
                       isReply={true}
                       onLike={() => {
                         console.log("Liking reply:", reply.id);
-                        onLike();
+                        onLike(reply.id);
                       }}
-                      onDislike={() => onDislike()}
+                      onDislike={() => onDislike(reply.id)}
                       onReply={(text, parentId) => {
                         console.log("Replying to reply:", text, parentId);
                         onReply(text, reply.id ?? -1);

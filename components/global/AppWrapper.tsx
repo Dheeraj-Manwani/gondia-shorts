@@ -6,6 +6,7 @@ import Sidebar from "../Sidebar";
 import { Toaster } from "sonner";
 import { SessionProvider } from "next-auth/react";
 import NextTopLoader from "nextjs-toploader";
+import { GenericModal } from "../modals/GenericModal";
 
 type AppWrapperProps = {
   children: ReactNode;
@@ -40,6 +41,7 @@ export const AppWrapper: FC<AppWrapperProps> = ({ children }) => {
           position="bottom-center"
         />
         <NextTopLoader color="#155dfc" showSpinner={false} />
+        <GenericModal />
         {children}
       </div>
     </SessionProvider>

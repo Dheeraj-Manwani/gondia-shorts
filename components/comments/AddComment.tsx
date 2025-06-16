@@ -22,9 +22,9 @@ const AddComment = ({ onAddComment, name, profilePic }: AddCommentProps) => {
       <Avatar
         profileImage={profilePic ?? ""}
         name={name ?? ""}
-        className="w-10 h-10"
+        className="w-9 h-9"
       />
-      <div className="flex flex-1 items-center gap-2">
+      <div className="flex flex-1 items-center gap-1.5">
         <Input
           type="text"
           placeholder="Add a comment..."

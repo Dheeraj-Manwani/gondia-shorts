@@ -150,19 +150,28 @@ export const sleep = (ms: number) =>
 
 export const debouncedCommentInteraction = debounce(
   async (
-    shouldPerform: boolean,
-    isPerformed: boolean,
+    newState: boolean,
+    oldState: boolean,
     articleId: number,
     commentId: number,
     userId: number,
     type: "LIKE" | "DISLIKE"
   ) => {
-    if (shouldPerform === isPerformed) return;
+    console.log(
+      "params in debounce ==     newState: boolean, oldState: boolean,articleId: number,commentId: number,userId: number,type: LIKE | DISLIKE",
+      newState,
+      oldState,
+      articleId,
+      commentId,
+      userId,
+      type
+    );
+    if (newState === oldState) return;
 
     console.log(chalk.blueBright("Inside comment debounce function"));
 
     const id = toast.loading(
-      shouldPerform ? `${type} comment async` : `Removing ${type} comment async`
+      newState ? `${type} comment async` : `Removing ${type} comment async`
     );
 
     const res = await handleInteraction(
@@ -170,17 +179,14 @@ export const debouncedCommentInteraction = debounce(
       userId,
       commentId,
       type,
-      shouldPerform
+      newState
     );
     console.log(chalk.redBright("Async like call completed"), res);
 
     if (res) {
-      toast.success(
-        shouldPerform ? `Article ${type}!` : `Removed from ${type}!`,
-        {
-          id,
-        }
-      );
+      toast.success(newState ? `Article ${type}!` : `Removed from ${type}!`, {
+        id,
+      });
     } else {
       toast.warning("Already in given state or error occured", { id });
     }

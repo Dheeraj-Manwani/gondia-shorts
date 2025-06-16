@@ -1,9 +1,11 @@
 import { useLikes } from "@/hooks/use-likes";
 import { useSave } from "@/hooks/use-saves";
 import { useArticles } from "@/store/articles";
+import { useInteractions } from "@/store/interaction";
+import chalk from "chalk";
 
 import { Bookmark, Heart, MessageSquareMore, Share2 } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { twMerge } from "tailwind-merge";
 
@@ -19,15 +21,23 @@ const SocialActionsComp = ({
   isPreview,
 }: SocialActionsProps) => {
   const articles = useArticles((state) => state.articles);
-  const setArticles = useArticles((state) => state.setArticles);
-
   const article = articles.find((art) => art.id === articleId);
-  const { isLiked, likeCount, handleLike } = useLikes(
-    article?.id ?? 0,
-    article?.isLiked,
-    article?.likeCount
+  // const setArticles = useArticles((state) => state.setArticles);
+
+  const interactions = useInteractions((state) => state.interactions);
+  const setInteractions = useInteractions((state) => state.setInteractions);
+  const interaction = interactions.find(
+    (inter) => inter.articleId == articleId
   );
-  const { isSaved, handleSave } = useSave(article?.id ?? 0, article?.isSaved);
+  const { isLiked, likeCount, handleLike } = useLikes(
+    interaction?.articleId ?? 0,
+    interaction?.isLiked,
+    interaction?.likeCount
+  );
+  const { isSaved, handleSave } = useSave(
+    interaction?.articleId ?? 0,
+    interaction?.isSaved
+  );
 
   const handleLikeButton = (
     e: React.MouseEvent<HTMLButtonElement> | undefined
@@ -41,28 +51,26 @@ const SocialActionsComp = ({
     // TODO: To check whether this logic is correct
     const newLikedState = !isLiked;
 
-    const updatedArticles = articles.map((art) => {
-      if (art.id === articleId) {
-        // console.log("Updating article state for article => ", art);
-        // console.log("new article => ", {
-        //   ...art,
-        //   isLiked: newLikedState,
-        //   likeCount: newLikedState
-        //     ? (art.likeCount ?? 0) + 1
-        //     : Math.max((art.likeCount ?? 0) - 1, 0),
-        // });
-        return {
-          ...art,
+    const updatedInteractions = interactions.map((inter) => {
+      if (inter.articleId === articleId) {
+        console.log("new interaction state => ", {
+          ...inter,
           isLiked: newLikedState,
           likeCount: newLikedState
-            ? (art.likeCount ?? 0) + 1
-            : Math.max((art.likeCount ?? 0) - 1, 0),
+            ? inter.likeCount + 1
+            : Math.max(inter.likeCount - 1, 0),
+        });
+        return {
+          ...inter,
+          isLiked: newLikedState,
+          likeCount: newLikedState
+            ? inter.likeCount + 1
+            : Math.max(inter.likeCount - 1, 0),
         };
       }
-      return art;
+      return inter;
     });
-    setArticles(updatedArticles);
-    // console.log("Updating article state ", updatedArticles);
+    setInteractions(updatedInteractions);
   };
 
   const handleSaveButton = (
@@ -77,24 +85,38 @@ const SocialActionsComp = ({
     // TODO: To check whether this logic is correct
     const newSaveState = !isSaved;
 
-    const updatedArticles = articles.map((art) => {
-      if (art.id === article?.id) {
+    const updatedInteractins = interactions.map((inter) => {
+      if (inter.articleId === articleId) {
+        console.log("new interaction state => ", {
+          ...inter,
+          isSaved: newSaveState,
+        });
         return {
-          ...art,
+          ...inter,
           isSaved: newSaveState,
         };
       }
-      return art;
+      return inter;
     });
-    setArticles(updatedArticles);
+
+    setInteractions(updatedInteractins);
+
+    //     return {
+    //       ...art,
+    //       isSaved: newSaveState,
+    //     };
+    //   }
+    //   return art;
+    // });
+    // setArticles(updatedArticles);
     // console.log("Updating article state ", updatedArticles);
   };
 
-  // useEffect(() => {
-  //   console.log(chalk.bgBlack("SocialActions component mounted"));
-  // }, []);
+  useEffect(() => {
+    console.log(chalk.bgBlack("SocialActions component mounted"));
+  }, []);
 
-  if (!article)
+  if (!interaction || !article)
     return <div className="p-4 text-gray-500">Article not found</div>;
 
   return (

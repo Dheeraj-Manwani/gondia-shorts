@@ -1,7 +1,7 @@
 import { Dialog, DialogContent } from "@radix-ui/react-dialog";
 import { useModal } from "@/store/modal";
 
-export const Modal = () => {
+export const GenericModal = () => {
   const isOpen = useModal((state) => state.isOpen);
   //   const setIsOpen = useModal(stat)
   return (

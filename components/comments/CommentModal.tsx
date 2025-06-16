@@ -8,7 +8,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X } from "lucide-react";
 import { useComments } from "@/hooks/use-comments";
-import SortDropdown from "@/components/comments/SortDropdown";
+// import SortDropdown from "@/components/comments/SortDropdown";
 import AddComment from "@/components/comments/AddComment";
 import CommentItem from "@/components/comments/CommentItem";
 import { Article } from "@/db/schema/article";
@@ -59,10 +59,10 @@ const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
             {comments.length} Comments
           </DialogTitle>
           <div className="flex items-center gap-2">
-            <SortDropdown
+            {/* <SortDropdown
               sortOption={sortOption}
               setSortOption={setSortOption}
-            />
+            /> */}
             <button
               onClick={onClose}
               className="text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer"
@@ -107,31 +107,39 @@ const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
             <BrandLoader />
           ) : (
             <div className="mt-4">
-              {comments.map((comment) => (
-                <CommentItem
-                  key={comment.id}
-                  session={session}
-                  comment={comment}
-                  getReplies={getReplies}
-                  isReplyLoading={isReplyLoading}
-                  isReply={false}
-                  onLike={() =>
-                    toggleCommentInteraction({
-                      commentId: Number(comment.id),
-                      type: "LIKE",
-                    })
-                  }
-                  onDislike={() =>
-                    toggleCommentInteraction({
-                      commentId: Number(comment.id),
-                      type: "DISLIKE",
-                    })
-                  }
-                  onReply={(text: string, parentId: number) =>
-                    addComment(text, parentId)
-                  }
-                />
-              ))}
+              {comments.length > 0 ? (
+                comments.map((comment) => (
+                  <CommentItem
+                    key={comment.id}
+                    session={session}
+                    comment={comment}
+                    getReplies={getReplies}
+                    isReplyLoading={isReplyLoading}
+                    isReply={false}
+                    onLike={(givenId) =>
+                      toggleCommentInteraction({
+                        commentId: Number(comment.id),
+                        type: "LIKE",
+                        replyId: givenId,
+                      })
+                    }
+                    onDislike={(givenId) =>
+                      toggleCommentInteraction({
+                        commentId: Number(comment.id),
+                        type: "DISLIKE",
+                        replyId: givenId,
+                      })
+                    }
+                    onReply={(text: string, parentId: number) =>
+                      addComment(text, parentId)
+                    }
+                  />
+                ))
+              ) : (
+                <div className="text-center pb-3">
+                  Be the first to comment on this Article.
+                </div>
+              )}
             </div>
           )}
         </ScrollArea>
