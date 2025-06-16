@@ -113,7 +113,7 @@ export const SignIn = () => {
             </form>
 
             <div className="mt-6 text-center text-sm text-slate-600">
-              Don't have an account?
+              Don&apos;t have an account?
               <a href="/signup" className="font-medium text-[#4285f4]">
                 Sign up
               </a>

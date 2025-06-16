@@ -33,8 +33,8 @@ const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
     getReplies,
     // likeComment,
     toggleCommentInteraction,
-    sortOption,
-    setSortOption,
+    // sortOption,
+    // setSortOption,
     // error,
   } = useComments(Number(article.id));
 
