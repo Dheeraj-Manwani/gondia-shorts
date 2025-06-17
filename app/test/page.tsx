@@ -5,7 +5,6 @@ import { useModal } from "@/store/modal";
 
 export default function Test() {
   const openModal = useModal((state) => state.setIsOpen);
-  const isOpen = useModal((state) => state.isOpen);
   return (
     <div className="mt-48">
       <Button
