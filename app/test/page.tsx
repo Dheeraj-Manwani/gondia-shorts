@@ -1,7 +1,23 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { useModal } from "@/store/modal";
+
 export default function Test() {
-  return <div>Test</div>;
+  const openModal = useModal((state) => state.setIsOpen);
+  const isOpen = useModal((state) => state.isOpen);
+  return (
+    <div className="mt-48">
+      <Button
+        onClick={() => {
+          openModal(true);
+        }}
+      >
+        Sign In
+      </Button>
+      {/* <SignIn /> */}
+    </div>
+  );
 }
 
 // import React, { useEffect, useState, useRef } from "react";

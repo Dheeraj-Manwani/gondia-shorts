@@ -38,7 +38,7 @@ export const UserProfile = () => {
       ) : (
         <Button
           className="cursor-pointer text-gray-600  hover:underline hover:bg-white px-1"
-          onClick={() => signIn("google")}
+          onClick={() => signIn("google", { redirect: false })}
           variant={"ghost"}
         >
           <Avatar className="w-10 h-10" />

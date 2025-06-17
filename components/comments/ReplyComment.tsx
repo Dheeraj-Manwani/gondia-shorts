@@ -22,12 +22,12 @@ const ReplyComment = ({ parentId, onReply, onClose }: ReplyCommentProps) => {
   };
 
   return (
-    <div className="flex flex-col w-full items-start mt-3">
+    <div className="flex flex-col w-full items-start mt-3 ml-2">
       <div className="flex flex-col flex-1 w-full items-center">
         <Input
           type="text"
           placeholder="Add a reply..."
-          className="w-full bg-gray-200 rounded-md p-2 text-black border-white  focus-visible:border-white text-sm h-8"
+          className="w-full bg-gray-200 rounded-md p-2 text-black border-white  focus-visible:border-white text-sm h-9"
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
         />
@@ -37,7 +37,7 @@ const ReplyComment = ({ parentId, onReply, onClose }: ReplyCommentProps) => {
           </div>
         )}
       </div>
-      <div className="flex gap-2 w-full h-3 ml-1">
+      <div className="flex gap-2 w-full h-3 ml-1 mb-3">
         <Button
           onClick={() => handleSubmit()}
           variant={"link"}

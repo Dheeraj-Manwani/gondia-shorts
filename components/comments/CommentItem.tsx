@@ -218,6 +218,19 @@ const CommentItem = ({
             </button>
           )}
 
+          {/* Form to post a reply */}
+          {isReplyOpen && (
+            <ReplyComment
+              parentId={comment.id ?? -1}
+              onClose={() => setIsReplyOpen(false)}
+              onReply={(text, parentId) => {
+                console.log("Replying with:", text, "to parent ID:", parentId);
+                onReply(text, parentId);
+                setIsReplyOpen(false);
+              }}
+            />
+          )}
+
           {isShowReplies && comment.repliesCount > 0 && (
             <div className="mt-2">
               {isReplyLoading ? (
@@ -249,36 +262,6 @@ const CommentItem = ({
                 </div>
               )}
             </div>
-          )}
-
-          {/* Form to post a reply */}
-          {isReplyOpen && (
-            <ReplyComment
-              parentId={comment.id ?? -1}
-              onClose={() => setIsReplyOpen(false)}
-              onReply={(text, parentId) => {
-                console.log("Replying with:", text, "to parent ID:", parentId);
-                onReply(text, parentId);
-                setIsReplyOpen(false);
-              }}
-            />
-            // <div
-            //   className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-            //   onClick={() => setIsReplyOpen(false)}
-            // >
-            //   <div
-            //     className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-sm"
-            //     onClick={(e) => e.stopPropagation()}
-            //   >
-            //     <div> Reply here </div>
-            //     <button
-            //       onClick={() => setIsReplyOpen(false)}
-            //       className="mt-4 text-sm text-gray-500 hover:underline"
-            //     >
-            //       Close
-            //     </button>
-            //   </div>
-            // </div>
           )}
         </div>
       </div>

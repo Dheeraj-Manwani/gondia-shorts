@@ -52,7 +52,10 @@ const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         className="bg-[#ffffff] text-gray-500 max-w-[95%] max-h-[90vh] p-0 rounded-md"
-        onInteractOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => {
+          e.preventDefault();
+          onClose();
+        }}
       >
         <DialogHeader className="flex flex-row items-center justify-between p-4 pb-2 border-b border-gray-500">
           <DialogTitle className="text-lg  text-gray-500 tracking-wide">
@@ -92,7 +95,7 @@ const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    signIn("google");
+                    signIn("google", { redirect: false });
                   }}
                 >
                   signin

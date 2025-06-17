@@ -1,16 +1,17 @@
 "use client";
 
-export const SignIn = () => {
+export const SignIn = ({ onClose }: { onClose?: () => void }) => {
   return (
     <div
       id="login-popup"
       className="bg-black/50 overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 h-full items-center justify-center flex"
     >
-      <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+      <div className="relative p-4 w-full max-w-md">
         <div className="relative bg-white rounded-lg shadow">
           <button
             type="button"
             className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center popup-close"
+            onClick={() => onClose?.()}
           >
             <svg
               aria-hidden="true"
@@ -41,14 +42,14 @@ export const SignIn = () => {
             </div>
 
             <div className="mt-7 flex flex-col gap-2">
-              <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#333] focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60">
+              {/* <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#333] focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60">
                 <img
                   src="https://www.svgrepo.com/show/512317/github-142.svg"
                   alt="GitHub"
                   className="h-[18px] w-[18px] "
                 />
                 Continue with GitHub
-              </button>
+              </button> */}
 
               <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#333] focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60">
                 <img
@@ -59,14 +60,14 @@ export const SignIn = () => {
                 Continue with Google
               </button>
 
-              <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#333] focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60">
+              {/* <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#333] focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60">
                 <img
                   src="https://www.svgrepo.com/show/448234/linkedin.svg"
                   alt="Google"
                   className="h-[18px] w-[18px] "
                 />
                 Continue with LinkedIn
-              </button>
+              </button> */}
             </div>
 
             <div className="flex w-full items-center gap-2 py-6 text-sm text-slate-600">
