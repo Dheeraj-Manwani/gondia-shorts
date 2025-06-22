@@ -10,7 +10,8 @@ import { Metadata } from "next";
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: { article?: string | undefined };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  searchParams: any;
 }): Promise<Metadata> {
   const awaitedSearchParams = await searchParams;
   if (!awaitedSearchParams.article) return {};
@@ -42,12 +43,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function Home(props: {
-  searchParams: { article?: string };
-}) {
-  // const awaitedProps = await props;
-  console.log("searchParams ", (await props.searchParams).article);
-  const articleSlug = (await props.searchParams).article;
+export default async function Home(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  props: any
+) {
+  const awaitedProps = await props;
+  console.log("searchParams ", (await awaitedProps.searchParams).article);
+  const articleSlug = (await awaitedProps.searchParams).article;
 
   return <SwipeableNewsFeed categoryId={0} articleSlug={articleSlug} />;
 }
