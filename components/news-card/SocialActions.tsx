@@ -156,7 +156,7 @@ const SocialActionsComp = ({
                   " " +
                   // window.location.href +
                   "https://gondia-shorts.vercel.app" +
-                  "?article=" +
+                  "/article/" +
                   article.slug
               )}`,
               "_blank"
