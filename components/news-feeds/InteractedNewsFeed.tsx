@@ -15,6 +15,8 @@ import { InteractionType } from "@prisma/client/index-browser";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
+import { getInteractionsFromArticles } from "@/lib/converters";
+import { useInteractions } from "@/store/interaction";
 
 interface InteractedNewsFeedProps {
   interactionType: InteractionType;
@@ -27,6 +29,8 @@ const InteractedNewsFeed: React.FC<InteractedNewsFeedProps> = ({
   // const [page, setPage] = useState(1);
   const articles = useArticles((state) => state.articles);
   const setArticles = useArticles((state) => state.setArticles);
+  const setInteractions = useInteractions((state) => state.setInteractions);
+
   const limit = Number(process.env.NEXT_PUBLIC_FETCH_LIMIT); // Number of articles to fetch at once
 
   const { execute, data, isLoading, error } = useAction(fetchArticles, {
@@ -45,6 +49,9 @@ const InteractedNewsFeed: React.FC<InteractedNewsFeedProps> = ({
     if (data && data.length > 0) {
       const articleData = data as Article[];
       // setArticles((prev) => [...prev, ...articleData]);
+      const interactionData = getInteractionsFromArticles(articleData);
+      setInteractions(interactionData, true);
+
       const newArticles = [...articles, ...articleData];
       setArticles(newArticles);
       console.log("newArticles ======= ", newArticles);
@@ -54,11 +61,7 @@ const InteractedNewsFeed: React.FC<InteractedNewsFeedProps> = ({
   // Reset articles and page when category changes
   useEffect(() => {
     setArticles([]);
-    if (
-      !isLoading &&
-      (session.status === "unauthenticated" ||
-        session.status === "authenticated")
-    )
+    if (!isLoading && session.status === "authenticated")
       execute({
         limit,
         offset: 0,
@@ -166,7 +169,7 @@ const InteractedNewsFeed: React.FC<InteractedNewsFeedProps> = ({
                 } articles will be visible here 😊`}
           </div>
           <Link
-            href={"/feed"}
+            href={"/"}
             className=" hover:text-gray-200 text-center bg-black text-white rounded-md m-auto py-1 px-4 mt-1"
           >
             Go to feed

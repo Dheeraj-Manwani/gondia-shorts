@@ -34,8 +34,8 @@ export default function Page() {
   const handleSubmit = async () => {
     if (currentArticle) {
       const res = await execute(currentArticle);
-      console.log("routing to ", "/feed?article=" + res.routeParam);
-      router.push("/feed?article=" + res.routeParam);
+      console.log("routing to ", "/?article=" + res.routeParam);
+      router.push("/?article=" + res.routeParam);
     }
   };
   const articleId = uuid();

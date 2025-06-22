@@ -279,7 +279,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   onClick={(e) => {
                     e.preventDefault();
                     onClose();
-                    router.push("/feed");
+                    router.push("/");
                   }}
                 >
                   <Film />

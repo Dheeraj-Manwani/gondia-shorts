@@ -7,7 +7,7 @@ import "swiper/css/pagination";
 import Image from "next/image";
 import { ArticleType } from "@prisma/client/index.js";
 import { Article } from "@/db/schema/article";
-import chalk from "chalk";
+// import chalk from "chalk";
 
 interface NewsMediaProp {
   article: Article;
@@ -49,11 +49,11 @@ const NewsMediaComp = ({ article, isCurrentActive }: NewsMediaProp) => {
     }
   }, [article.type]);
 
-  useEffect(() => {
-    console.log(
-      chalk.red("News MEdia component re rendered ::::::::::: ======= ")
-    );
-  }, []);
+  // useEffect(() => {
+  //   console.log(
+  //     chalk.red("News MEdia component re rendered ::::::::::: ======= ")
+  //   );
+  // }, []);
 
   return (
     <div className="h-[40vh] flex items-center justify-center bg-gray-200 relative">

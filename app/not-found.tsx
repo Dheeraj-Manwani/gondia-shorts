@@ -12,7 +12,7 @@ export default function NotFound() {
           The page you are looking for is not available.
         </h1>
         <Button
-          onClick={() => router.push("/feed")}
+          onClick={() => router.push("/")}
           className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition"
         >
           Go to Feed

@@ -2,7 +2,7 @@ import { useLikes } from "@/hooks/use-likes";
 import { useSave } from "@/hooks/use-saves";
 import { useArticles } from "@/store/articles";
 import { useInteractions } from "@/store/interaction";
-import chalk from "chalk";
+// import chalk from "chalk";
 
 import { Bookmark, Heart, MessageSquareMore, Share2 } from "lucide-react";
 import React, { useEffect } from "react";
@@ -112,9 +112,9 @@ const SocialActionsComp = ({
     // console.log("Updating article state ", updatedArticles);
   };
 
-  useEffect(() => {
-    console.log(chalk.bgBlack("SocialActions component mounted"));
-  }, []);
+  // useEffect(() => {
+  // console.log(chalk.bgBlack("SocialActions component mounted"));
+  // }, []);
 
   if (!interaction || !article)
     return <div className="p-4 text-gray-500">Article not found</div>;
@@ -152,7 +152,12 @@ const SocialActionsComp = ({
           onClick={() =>
             window.open(
               `https://api.whatsapp.com/send?text=${encodeURIComponent(
-                article.title + " " + window.location.href
+                article.title +
+                  " " +
+                  // window.location.href +
+                  "https://gondia-shorts.vercel.app" +
+                  "?article=" +
+                  article.slug
               )}`,
               "_blank"
             )

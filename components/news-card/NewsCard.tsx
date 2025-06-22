@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { v4 as uuid } from "uuid";
 import { Article } from "@/db/schema/article";
 import CommentModal from "@/components/comments/CommentModal";
@@ -27,9 +27,9 @@ function NewsCard({
   // const [translatedHeadline, setTranslatedHeadline] = useState(article.title);
   // const [translatedSummary, setTranslatedSummary] = useState(article.content);
 
-  useEffect(() => {
-    console.log("NewsCard mounted with article:", article.id);
-  }, []);
+  // useEffect(() => {
+  //   console.log("NewsCard mounted with article:", article.id);
+  // }, []);
 
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
 

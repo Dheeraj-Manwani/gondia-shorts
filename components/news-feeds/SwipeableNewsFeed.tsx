@@ -22,6 +22,7 @@ import { useArticles } from "@/store/articles";
 import { useSession } from "next-auth/react";
 import { getInteractionsFromArticles } from "@/lib/converters";
 import { useInteractions } from "@/store/interaction";
+import chalk from "chalk";
 
 interface SwipeableNewsFeedProps {
   categoryId: number;
@@ -112,9 +113,15 @@ const SwipeableNewsFeedComp: React.FC<SwipeableNewsFeedProps> = ({
     setPage(() => currentIndex);
 
     console.log("swiper real index => ", currentIndex, "limit ===> ", limit);
+    console.log(
+      "shouldFetch => ",
+      shouldFetch,
+      "swipedForward => ",
+      swipedForward
+    );
 
-    if (shouldFetch && swipedForward && currentIndex >= limit) {
-      console.log("Fetching more articles...");
+    if (shouldFetch && swipedForward) {
+      console.log(chalk.red("Fetching more articles..."));
       await execute({
         limit,
         offset: articles.length,
