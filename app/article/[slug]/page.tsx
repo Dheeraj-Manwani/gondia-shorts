@@ -10,7 +10,8 @@ import { Metadata } from "next";
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: any;
 }): Promise<Metadata> {
   const slug = (await params).slug;
   if (!slug) return {};
@@ -72,7 +73,8 @@ export async function generateMetadata({
 export default async function ArticlePage({
   params,
 }: {
-  params: { slug: string };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: any;
 }) {
   const slug = (await params).slug;
   console.log("article slug ", slug);
