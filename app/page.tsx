@@ -9,18 +9,40 @@ import { Article } from "@/db/schema/article";
 import Head from "next/head";
 import { ArticleType } from "@prisma/client/index-browser";
 import { getThumbnailFromYouTube } from "@/actions/misc";
+import { Metadata } from "next";
 // import { useSearchParams } from "next/navigation";
 
-export async function getServerSideProps(context: {
-  query: { article: string };
-}) {
-  const slug = context.query.article;
-  const article = await getArticleBySlug(slug);
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: { article?: string | undefined };
+}): Promise<Metadata> {
+  const awaitedSearchParams = await searchParams;
+  if (!awaitedSearchParams.article) return {};
+  const article = await getArticleBySlug(awaitedSearchParams.article);
+  if (!article) return {};
+
+  const mediaUrl =
+    article?.type == ArticleType.VIDEO_N_TEXT
+      ? article?.imageUrls?.[0]
+      : article?.type == ArticleType.YOUTUBE
+      ? getThumbnailFromYouTube(article?.videoUrl)
+      : "https://your-default-image.jpg";
 
   return {
-    props: {
-      article: article || null,
-      articleSlug: slug || null,
+    title: article.title,
+    description: "Read this article on Gondia Shorts",
+    openGraph: {
+      title: article.title,
+      description: article.content || "",
+      url: `https://gondia-shorts.vercel.app?article=${article.slug}`,
+      images: [
+        {
+          url: mediaUrl ?? "https://your-default-image.jpg",
+          width: 1200,
+          height: 630,
+        },
+      ],
     },
   };
 }
@@ -44,17 +66,17 @@ const Home = ({
   // };
   // const searchParams = useSearchParams();
   // const articleSlug = searchParams.get("article");
-  const imageUrl =
-    article?.type == ArticleType.VIDEO_N_TEXT
-      ? article?.imageUrls?.[0]
-      : article?.type == ArticleType.YOUTUBE
-      ? getThumbnailFromYouTube(article?.videoUrl)
-      : "https://your-default-image.jpg";
-  const fullUrl = `https://gondia-shorts.vercel.app?article=${article?.slug}`;
+  // const imageUrl =
+  //   article?.type == ArticleType.VIDEO_N_TEXT
+  //     ? article?.imageUrls?.[0]
+  //     : article?.type == ArticleType.YOUTUBE
+  //     ? getThumbnailFromYouTube(article?.videoUrl)
+  //     : "https://your-default-image.jpg";
+  // const fullUrl = `https://gondia-shorts.vercel.app?article=${article?.slug}`;
 
   return (
     <>
-      {article && (
+      {/* {article && (
         <Head>
           <title>{article.title}</title>
           <meta property="og:title" content={article.title} />
@@ -67,7 +89,7 @@ const Home = ({
           <meta property="og:type" content="article" />
           <meta name="twitter:card" content="summary_large_image" />
         </Head>
-      )}
+      )} */}
 
       <SwipeableNewsFeed
         categoryId={0}
