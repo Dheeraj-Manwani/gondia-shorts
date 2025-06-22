@@ -5,7 +5,7 @@ import { useInteractions } from "@/store/interaction";
 // import chalk from "chalk";
 
 import { Bookmark, Heart, MessageSquareMore, Share2 } from "lucide-react";
-import React, { useEffect } from "react";
+import React from "react";
 
 import { twMerge } from "tailwind-merge";
 
