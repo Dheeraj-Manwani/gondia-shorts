@@ -19,6 +19,28 @@ interface FetchParams {
   interactionType?: InteractionType;
 }
 
+export const getArticleBySlug = async (slug: string) => {
+  return await prisma.article.findFirst({
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      imageUrls: true,
+      videoUrl: true,
+      type: true,
+      slug: true,
+      sourceLogoUrl: true,
+      categoryId: true,
+      submittedById: true,
+      createdAt: true,
+      likeCount: true,
+    },
+    where: {
+      slug: slug,
+    },
+  });
+};
+
 async function getCombinedArticles(
   categoryId: number | undefined,
   limit: number,
@@ -28,26 +50,7 @@ async function getCombinedArticles(
   let mainArticle: Article | null = null;
 
   if (articleSlug) {
-    mainArticle = await prisma.article.findFirst({
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        imageUrls: true,
-        videoUrl: true,
-        type: true,
-        slug: true,
-        sourceLogoUrl: true,
-        categoryId: true,
-        submittedById: true,
-        createdAt: true,
-        likeCount: true,
-      },
-      where: {
-        slug: articleSlug,
-        ...(categoryId ? { categoryId } : {}),
-      },
-    });
+    mainArticle = await getArticleBySlug(articleSlug);
   }
 
   // Fetch other articles (excluding the main one by ID or slug)
