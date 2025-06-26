@@ -165,7 +165,7 @@ const SwipeableNewsFeedComp: React.FC<SwipeableNewsFeedProps> = ({
   }
 
   return (
-    <div className="h-screen w-full pt-14 relative">
+    <div className="h-screen w-full  relative">
       {/* Add padding top for header */}
       <Swiper
         modules={[Virtual, Mousewheel, Keyboard, Navigation]}
@@ -227,7 +227,7 @@ const SwipeableNewsFeedComp: React.FC<SwipeableNewsFeedProps> = ({
         )}
       </Swiper>
       {/* Swipe indicator */}
-      {articles.length > 0 && (
+      {articles.length > 0 && page == 0 && (
         <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center justify-center pointer-events-none z-20">
           <div className="flex flex-col items-center animate-bounce">
             <svg

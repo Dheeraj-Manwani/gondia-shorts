@@ -9,6 +9,7 @@ import CommentModal from "@/components/comments/CommentModal";
 // import { likeArticle } from "@/actions/interaction";
 import { SocialActions } from "./SocialActions";
 import { NewsMedia } from "./NewsMedia";
+import { isTextContentRequired } from "@/lib/utils";
 
 interface NewsCardProps {
   isCurrentActive: boolean;
@@ -47,15 +48,18 @@ function NewsCard({
       {/* SOCIAL ACTIONS */}
       <SocialActions
         articleId={article.id}
+        articleType={article.type}
         setIsCommentModalOpen={setIsCommentModalOpen}
         isPreview={isPreview}
       />
 
       {/* TEXT CONTENT */}
-      <div className="p-4 flex-1 flex flex-col">
-        <h2 className="font-bold text-xl mb-2">{article.title}</h2>
-        <p className="flex-1 text-gray-700">{article.content}</p>
-      </div>
+      {isTextContentRequired(article.type) && (
+        <div className="p-4 flex-1 flex flex-col">
+          <h2 className="font-bold text-xl mb-2">{article.title}</h2>
+          <p className="flex-1 text-gray-700">{article.content}</p>
+        </div>
+      )}
 
       {/* COMMENTS */}
       {isCommentModalOpen && (

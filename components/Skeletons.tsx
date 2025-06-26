@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function NewsCardSkeleton() {
   return (
-    <article className="news-card w-full h-full bg-white overflow-hidden relative flex flex-col">
+    <article className="news-card w-full h-full bg-white overflow-hidden relative flex flex-col mt-11">
       {/* Skeleton for Media */}
       <div className="h-[48vh]  w-full relative bg-gray-200 m-auto">
         <Skeleton className=" w-full h-[48vh]  bg-gray-400" />

@@ -1,7 +1,9 @@
 import { useLikes } from "@/hooks/use-likes";
 import { useSave } from "@/hooks/use-saves";
+import { cn, isTextContentRequired } from "@/lib/utils";
 import { useArticles } from "@/store/articles";
 import { useInteractions } from "@/store/interaction";
+import { ArticleType } from "@prisma/client";
 // import chalk from "chalk";
 
 import { Bookmark, Heart, MessageSquareMore, Share2 } from "lucide-react";
@@ -11,12 +13,14 @@ import { twMerge } from "tailwind-merge";
 
 interface SocialActionsProps {
   articleId: number;
+  articleType: ArticleType;
   setIsCommentModalOpen: (open: boolean) => void;
   isPreview: boolean;
 }
 
 const SocialActionsComp = ({
   articleId,
+  articleType,
   setIsCommentModalOpen,
   isPreview,
 }: SocialActionsProps) => {
@@ -121,24 +125,57 @@ const SocialActionsComp = ({
 
   return (
     <div
+      id="social-actions"
       className={twMerge(
-        "px-4 py-2 flex items-center justify-between border-b border-gray-700",
-        isPreview ? "pointer-events-none cursor-not-allowed" : ""
+        " py-2 flex items-center justify-between border-b border-gray-700",
+        isPreview ? "pointer-events-none cursor-not-allowed" : "",
+        !isTextContentRequired(articleType)
+          ? "absolute bottom-18 right-3.5 z-10 bg-gray-800/40 flex-col rounded-sm justify-center align-baseline px-2 py-4"
+          : "px-4"
       )}
     >
-      <div className="flex space-x-4">
+      <div
+        className={twMerge(
+          "flex ",
+          !isTextContentRequired(articleType)
+            ? "flex-col space-y-8 mb-8"
+            : "space-x-4"
+        )}
+      >
         <button
           onClick={handleLikeButton}
-          className="cursor-pointer flex gap-0.5"
+          className={cn(
+            "cursor-pointer flex gap-0.5",
+            !isTextContentRequired(articleType) && "flex-col"
+          )}
           aria-pressed={isLiked}
           aria-label={isLiked ? "Unlike this post" : "Like this post"}
         >
           {isLiked ? (
-            <Heart size={18} className="fill-red-500 text-red-500" />
+            <Heart
+              size={isTextContentRequired(articleType) ? 18 : 24}
+              className="fill-red-500 text-red-500"
+            />
           ) : (
-            <Heart size={18} className="text-gray-700" />
+            <Heart
+              size={isTextContentRequired(articleType) ? 18 : 24}
+              className={cn(
+                isTextContentRequired(articleType)
+                  ? "text-gray-700"
+                  : "text-gray-400"
+              )}
+            />
           )}
-          <span className="text-red-500 text-[10px]">
+          <span
+            className={cn(
+              " text-[10px]",
+              isLiked
+                ? "text-red-500"
+                : isTextContentRequired(articleType)
+                ? "text-gray-700"
+                : "text-gray-400"
+            )}
+          >
             {likeCount != 0 && likeCount}
           </span>
         </button>
@@ -146,7 +183,14 @@ const SocialActionsComp = ({
           onClick={() => setIsCommentModalOpen(true)}
           className="cursor-pointer"
         >
-          <MessageSquareMore size={18} className="text-gray-700" />
+          <MessageSquareMore
+            size={isTextContentRequired(articleType) ? 18 : 24}
+            className={cn(
+              isTextContentRequired(articleType)
+                ? "text-gray-700"
+                : "text-gray-400"
+            )}
+          />
         </button>
         <button
           onClick={() =>
@@ -164,7 +208,14 @@ const SocialActionsComp = ({
           }
           className="text-gray-700 cursor-pointer"
         >
-          <Share2 size={18} className="text-gray-700" />
+          <Share2
+            size={isTextContentRequired(articleType) ? 18 : 24}
+            className={cn(
+              isTextContentRequired(articleType)
+                ? "text-gray-700"
+                : "text-gray-400"
+            )}
+          />
         </button>
       </div>
       <button
@@ -173,9 +224,23 @@ const SocialActionsComp = ({
         aria-label="Save"
       >
         {isSaved ? (
-          <Bookmark size={18} className="fill-black text-black" />
+          <Bookmark
+            size={isTextContentRequired(articleType) ? 18 : 24}
+            className={cn(
+              isTextContentRequired(articleType)
+                ? "fill-black text-black"
+                : "fill-gray-400 text-gray-400"
+            )}
+          />
         ) : (
-          <Bookmark size={18} className="text-gray-700" />
+          <Bookmark
+            size={isTextContentRequired(articleType) ? 18 : 24}
+            className={cn(
+              isTextContentRequired(articleType)
+                ? "text-gray-700"
+                : "text-gray-400"
+            )}
+          />
         )}
       </button>
     </div>

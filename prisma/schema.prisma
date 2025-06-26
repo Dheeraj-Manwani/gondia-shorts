@@ -19,15 +19,23 @@ enum ArticleType {
   FULL_IMAGE
   FULL_VIDEO
   YOUTUBE
+  YOUTUBE_SHORTS
+}
+
+enum AuthType {
+  EMAIL
+  GOOGLE
 }
 
 model User {
-  id         Int     @id @default(autoincrement())
-  email      String  @unique
-  number     String? @unique
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  number     String?  @unique
   name       String
-  password   String
-  role       Role    @default(USER)
+  password   String?
+  salt       String?
+  role       Role     @default(USER)
+  type       AuthType @default(GOOGLE)
   profilePic String?
 
   createdAt DateTime @default(now())

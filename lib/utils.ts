@@ -81,3 +81,7 @@ export const isAuthorised = (session: appSession) =>
   session.data.user.id
     ? true
     : false;
+
+export const isTextContentRequired = (articleType: ArticleType) => {
+  return ["IMAGE_N_TEXT", "VIDEO_N_TEXT", "YOUTUBE"].includes(articleType);
+};

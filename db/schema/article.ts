@@ -20,6 +20,7 @@ export const ArticleTypeEnum = z.enum([
   "FULL_IMAGE",
   "FULL_VIDEO",
   "YOUTUBE",
+  "YOUTUBE_SHORTS",
 ]);
 export type ArticleType = z.infer<typeof ArticleTypeEnum>;
 

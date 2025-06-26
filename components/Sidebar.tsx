@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import {
+  FlaskConical,
   BookmarkCheck,
   Download,
   Film,
@@ -275,6 +276,19 @@ const Sidebar: React.FC<SidebarProps> = ({
             <ul className="space-y-1 text-gray-600">
               <li>
                 <button
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer text-amber-500"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onClose();
+                    router.push("/test");
+                  }}
+                >
+                  <FlaskConical className="text-amber-500" />
+                  Experimental Features
+                </button>
+              </li>
+              <li>
+                <button
                   className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
@@ -316,19 +330,21 @@ const Sidebar: React.FC<SidebarProps> = ({
                   </li>
                   {(session.data.user?.role === "ADMIN" ||
                     session.data.user?.role === "PUBLISHER") && (
-                    <li>
-                      <button
-                        className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onClose();
-                          router.push("/new");
-                        }}
-                      >
-                        <Plus />
-                        New Article
-                      </button>
-                    </li>
+                    <>
+                      <li>
+                        <button
+                          className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            onClose();
+                            router.push("/new");
+                          }}
+                        >
+                          <Plus />
+                          New Article
+                        </button>
+                      </li>
+                    </>
                   )}
                   <li>
                     <button
