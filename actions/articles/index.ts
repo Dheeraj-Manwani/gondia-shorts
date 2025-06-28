@@ -8,6 +8,7 @@ import { Article } from "@/db/schema/article";
 import { InteractionType } from "@/db/schema/interaction";
 import { isAuthorised } from "@/lib/utils";
 import { getInteractedArticles } from "./interacted-articles";
+// import { seed } from "../data";
 // import { updateCountsFromRedis } from "../interaction/articleInteractions";
 
 interface FetchParams {
@@ -89,6 +90,8 @@ async function getCombinedArticles(
 export const fetchArticles = async (
   fetchParams: FetchParams
 ): Promise<{ success: boolean; data: Article[] }> => {
+  // await seed();
+  // return { success: true, data: [] }; // For dev, remove this line later
   const { categoryId, limit, offset, articleSlug, session, interactionType } =
     fetchParams;
 
@@ -170,8 +173,6 @@ export const fetchArticles = async (
   // } catch (e) {
   // }
   // }
-
-  // await seed();
 
   // ! For dev
   // const articles = sampleArticles.slice(offset, offset + limit);

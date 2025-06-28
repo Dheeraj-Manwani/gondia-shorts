@@ -32,6 +32,8 @@ export default function Page() {
   );
 
   const handleSubmit = async () => {
+    console.log("currentArticle ======= ", currentArticle);
+    // return;
     if (currentArticle) {
       const res = await execute(currentArticle);
       console.log("routing to ", "/?article=" + res.routeParam);

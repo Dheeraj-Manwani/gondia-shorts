@@ -153,7 +153,7 @@ export default function NewArticle({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6 max-w-full pt-4 mb-20 mx-5"
+        className="space-y-6 max-w-full pt-4 mx-5"
       >
         <FormField
           control={form.control}
@@ -168,6 +168,12 @@ export default function NewArticle({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
+                  <SelectItem value={ArticleType.FULL_IMAGE}>
+                    Only Image (Full Verticle)
+                  </SelectItem>
+                  <SelectItem value={ArticleType.FULL_VIDEO}>
+                    Only Video (Full Verticle)
+                  </SelectItem>
                   <SelectItem value={ArticleType.IMAGE_N_TEXT}>
                     Image with Text
                   </SelectItem>

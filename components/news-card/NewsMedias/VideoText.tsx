@@ -54,7 +54,7 @@ const VideoTextMedia = ({ article }: { article: Article }) => {
             setVideoMuted(!videoMuted);
           }
         }}
-        className="absolute bottom-5 right-5 p-2 bg-gray-800/40 rounded-full"
+        className="absolute bottom-6 right-5 p-2 bg-gray-800/40 rounded-full"
       >
         {videoMuted ? "🔇" : "🔊"}
       </button>

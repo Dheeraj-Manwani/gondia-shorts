@@ -47,10 +47,13 @@ export async function seed() {
     await prisma.article.create({
       data: {
         ...article,
+        slug: article.slug || article.title.toLowerCase().replace(/\s+/g, "-"),
         type: (article.type as ArticleType) || "IMAGE",
         categoryId: defaultCategory.id,
         author: "system",
         submittedById: defaultUser.id,
+        sourceLogoUrl: article.sourceLogoUrl || "https://example.com/logo.png",
+        source: article.source || "Demo Source",
       },
     });
 

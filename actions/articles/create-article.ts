@@ -1,6 +1,10 @@
+"use server";
+
 import prisma from "@/db/db";
 import { CreateArticle } from "@/db/schema/article";
+import { authConfig } from "@/lib/auth";
 import { Role } from "@prisma/client/index-browser";
+import { getServerSession } from "next-auth";
 
 async function generateUniqueSlug(title: string): Promise<string> {
   try {
@@ -37,6 +41,7 @@ async function generateUniqueSlug(title: string): Promise<string> {
 export const createArticle = async (article: CreateArticle) => {
   // @ts-expect-error to be taken care of
   const session: session | null = await getServerSession(authConfig);
+  console.log("createArticle called with ", article, Number(session.user.id));
 
   if (!session || !session?.user?.id || !session?.user?.role) {
     return { error: "UNAUTHORISED" };

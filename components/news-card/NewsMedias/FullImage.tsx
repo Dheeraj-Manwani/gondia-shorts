@@ -58,7 +58,7 @@ const FullImageMedia = ({ article }: { article: Article }) => {
                 <div
                   className="relative z-10 m-auto"
                   style={{
-                    height: "100vh",
+                    height: "90vh",
                     // width: width ? `${width}px` : "auto",
                   }}
                 >
@@ -81,7 +81,7 @@ const FullImageMedia = ({ article }: { article: Article }) => {
 
       {/* SINGLE IMAGE */}
       {article.imageUrls?.length === 1 && (
-        <div className="relative h-[100vh] w-full">
+        <div className="relative h-[90vh] w-full">
           <Image
             src={article.imageUrls[0]}
             alt="Cover"

@@ -25,7 +25,7 @@ const YoutubeShortsMedia = ({
         playing={isCurrentActive}
         controls={true}
         width="100%"
-        height="100vh"
+        height="60vh"
         style={{
           position: "absolute",
           top: 0,

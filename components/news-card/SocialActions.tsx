@@ -18,6 +18,12 @@ interface SocialActionsProps {
   isPreview: boolean;
 }
 
+export function triggerHaptic(duration: number = 50) {
+  if (typeof window !== "undefined" && navigator.vibrate) {
+    navigator.vibrate(duration);
+  }
+}
+
 const SocialActionsComp = ({
   articleId,
   articleType,
@@ -130,7 +136,7 @@ const SocialActionsComp = ({
         " py-2 flex items-center justify-between border-b border-gray-700",
         isPreview ? "pointer-events-none cursor-not-allowed" : "",
         !isTextContentRequired(articleType)
-          ? "absolute bottom-18 right-3.5 z-10 bg-gray-800/40 flex-col rounded-sm justify-center align-baseline px-2 py-4"
+          ? "absolute bottom-36 right-3.5 z-10 bg-gray-800/40 flex-col rounded-sm justify-center align-baseline px-2 py-4"
           : "px-4"
       )}
     >
@@ -176,7 +182,7 @@ const SocialActionsComp = ({
                 : "text-gray-400"
             )}
           >
-            {likeCount != 0 && likeCount}
+            {likeCount}
           </span>
         </button>
         <button

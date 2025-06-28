@@ -49,7 +49,7 @@ const articles: Article[] = [
       "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
     ],
     videoUrl: "https://youtube.com/shorts/G4-ds5UNZck?si=zqmOTEB9cCOTNZX0",
-    type: "YOUTUBE_SHORTS",
+    type: "YOUTUBE",
     source: "National Health Journal",
     sourceLogoUrl: null,
 
@@ -104,7 +104,7 @@ const articles: Article[] = [
     content:
       "The newly announced Maharashtra Premier League will include a Gondia Tigers franchise among its eight teams. Local cricketers will get opportunities alongside established players in the tournament starting next season. The Vidarbha Cricket Association is developing international-standard facilities in Gondia for training and matches.",
     imageUrls: [],
-    videoUrl: "https://d7z3col9dhc88.cloudfront.net/verticle_video.mp4",
+    videoUrl: "https://d7z3col9dhc88.cloudfront.net/Comfort.mp4",
     type: "FULL_VIDEO",
     sourceLogoUrl: null,
     categoryId: 1,

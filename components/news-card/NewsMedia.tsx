@@ -27,7 +27,7 @@ const NewsMediaComp = ({ article, isCurrentActive }: NewsMediaProp) => {
     <div
       className={cn(
         "flex items-center justify-center bg-gray-200 relative",
-        isTextContentRequired(article.type) ? "h-[40vh] mt-12" : "h-[100vh]"
+        isTextContentRequired(article.type) ? "h-[40vh] mt-12" : "h-[90vh]"
       )}
     >
       {/* Video + Text*/}
