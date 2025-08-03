@@ -1,44 +1,65 @@
 "use client";
 
-// import { Button } from "@/components/ui/button";
-// import { useModal } from "@/store/modal";
-
-// export default function Test() {
-//   const openModal = useModal((state) => state.setIsOpen);
-//   return (
-//     <div className="mt-48">
-//       <Button
-//         onClick={() => {
-//           openModal(true);
-//         }}
-//       >
-//         Sign In
-//       </Button>
-//       {/* <SignIn /> */}
-//     </div>
-//   );
-// }
-
 import React, { useEffect, useState, useRef } from "react";
-// import { useQuery } from '@tanstack/react-query';
-// import { Article } from '@shared/schema';
-import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import NewsCard from "@/components/news-card/NewsCard";
 import { v4 as uuid } from "uuid";
 
-// Import required modules from swiper
-import { Virtual, Mousewheel, Keyboard, Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
-// import { translateToHindi } from "@/lib/translateService";
 import { Article } from "@/db/schema/article";
 import { NewsCardSkeleton } from "@/components/Skeletons";
 import { useArticles } from "@/store/articles";
 import { sleep } from "@/hooks/hook-actions";
 import { useInteractions } from "@/store/interaction";
+import {
+  Carousel,
+  CarouselItem,
+  CarouselContent,
+} from "@/components/ui/carousel";
 
 const articles: Article[] = [
+  {
+    id: 1055,
+    title: "New Study Reveals Promising Treatment for Alzheimer's Disease",
+    slug: "new-study-reveals-promising-treatment-for-alzheimers-disease",
+    content:
+      "Researchers at Johns Hopkins University have discovered a new treatment approach that significantly slows Alzheimer's progression in clinical trials. The treatment targets specific protein formations in the brain responsible for neural degeneration. In the 18-month study involving 412 patients, those receiving the treatment showed 47% less cognitive decline compared to the control group.",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
+    ],
+    videoUrl:
+      "https://d2jow4rnitzfmr.cloudfront.net/ba206116-5e68-44be-9c6d-8d2af810dcf4_VID20250726WA0056.mp4",
+    type: "FULL_VIDEO",
+    source: "National Health Journal",
+    sourceLogoUrl: null,
+
+    categoryId: 1,
+    submittedById: 1,
+    likeCount: 0,
+    isLiked: false,
+    isSaved: false,
+  },
+  {
+    id: 151,
+    title: "New Study Reveals Promising Treatment for Alzheimer's Disease",
+    slug: "new-study-reveals-promising-treatment-for-alzheimers-disease",
+    content:
+      "Researchers at Johns Hopkins University have discovered a new treatment approach that significantly slows Alzheimer's progression in clinical trials. The treatment targets specific protein formations in the brain responsible for neural degeneration. In the 18-month study involving 412 patients, those receiving the treatment showed 47% less cognitive decline compared to the control group.",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80",
+    ],
+    videoUrl: "https://youtube.com/shorts/G4-ds5UNZck?si=zqmOTEB9cCOTNZX0",
+    type: "YOUTUBE_SHORTS",
+    source: "National Health Journal",
+    sourceLogoUrl: null,
+
+    categoryId: 1,
+    submittedById: 1,
+    likeCount: 0,
+    isLiked: false,
+    isSaved: false,
+  },
   {
     id: 101,
     title: "New Study Reveals Promising Treatment for Alzheimer's Disease",
@@ -180,18 +201,11 @@ const TestPage = ({}) => {
   const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const swiperRef = useRef<SwiperType | null>(null);
+  // const swiperRef = useRef<SwiperType | null>(null);
 
-  const handleSwipe = async (swiper: SwiperType) => {
-    setPage(() => swiper.realIndex);
-    // console.log("swiper real index => ", swiper.realIndex);
-    // if (
-    //   swiper.realIndex ===
-    //   articles.length - (Number(process.env.NEXT_PUBLIC_FETCH_BEFORE) || 4)
-    // ) {
-    //   console.log("Fetching more articles...");
-    // }
-  };
+  // const handleSwipe = async (swiper: SwiperType) => {
+  //   setPage(() => swiper.realIndex);
+  // };
 
   useEffect(() => {
     setIsLoading(true);
@@ -208,56 +222,33 @@ const TestPage = ({}) => {
     });
   }, []);
 
-  // Initial loading state
+  return <></>;
+
   if (page === 0 && isLoading) {
-    return (
-      // <div className="h-screen w-full pt-14 flex items-center justify-center">
-      //   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      // </div>
-      <NewsCardSkeleton />
-    );
+    return <NewsCardSkeleton />;
   }
 
   return (
     <div className="h-screen w-full relative">
-      {/* Add padding top for header */}
-      <Swiper
-        modules={[Virtual, Mousewheel, Keyboard, Navigation]}
-        direction="vertical"
-        spaceBetween={0}
-        slidesPerView={1}
-        virtual
-        mousewheel
-        keyboard
-        // onReachEnd={handleReachEnd}
-        className="h-full"
-        onSwiper={(swiper) => (swiperRef.current = swiper)}
-        onSlideChange={(swiper) => {
-          handleSwipe(swiper);
+      <Carousel
+        opts={{
+          align: "start",
         }}
+        orientation="vertical"
+        className="w-full"
       >
-        {articles.map((article, index) => (
-          <SwiperSlide
-            virtualIndex={index}
-            className="h-full w-full"
-            key={uuid()}
-          >
-            <NewsCard
-              article={article}
-              isCurrentActive={page === index}
-              key={uuid()}
-            />
-          </SwiperSlide>
-        ))}
-
-        {/* Loading indicator at the bottom */}
-        {isLoading && (
-          <SwiperSlide className="h-full flex items-center justify-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-          </SwiperSlide>
-        )}
-      </Swiper>
-      {/* Swipe indicator */}
+        <CarouselContent className="-mt-1 h-[100dvh]">
+          {articles.map((article, index) => (
+            <CarouselItem key={index} className="pt-1 md:basis-1/2 h-[100dvh]">
+              <NewsCard
+                article={article}
+                isCurrentActive={page === index}
+                key={uuid()}
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
       {articles.length > 0 && page == 0 && (
         <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center justify-center pointer-events-none z-20">
           <div className="flex flex-col items-center animate-bounce">

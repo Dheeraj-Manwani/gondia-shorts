@@ -18,12 +18,12 @@
 //   const router = useRouter();
 
 //   return (
-//     <section className="relative bg-gradient-to-r from-cyan-500 to-blue-500 text-white h-[90vh]">
+//     <section className="relative bg-gradient-to-r from-cyan-500 to-blue-500 text-white h-[90dvh]">
 //       {/* <div className="absolute inset-0 overflow-hidden z-0">
 //         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6TTYwIDEyYzAtMi4yMDktMS43OTEtNC00LTRzLTQgMS43OTEtNCA0IDEuNzkxIDQgNCA0IDQtMS43OTEgNC00ek0xMiAzNGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHptMC0yMmMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-10"></div>
 //       </div> */}
 
-//       <div className="container mx-auto px-4 relative z-10 flex flex-col justify-center h-[90vh]">
+//       <div className="container mx-auto px-4 relative z-10 flex flex-col justify-center h-[90dvh]">
 //         <div className="mx-auto text-center">
 //           <motion.h1
 //             className="text-4xl md:text-6xl font-bold font-montserrat mb-6 flex flex-col"

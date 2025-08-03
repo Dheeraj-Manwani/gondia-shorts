@@ -4,8 +4,8 @@ export function NewsCardSkeleton() {
   return (
     <article className="news-card w-full h-full bg-white overflow-hidden relative flex flex-col mt-11">
       {/* Skeleton for Media */}
-      <div className="h-[48vh]  w-full relative bg-gray-200 m-auto">
-        <Skeleton className=" w-full h-[48vh]  bg-gray-400" />
+      <div className="h-[48dvh]  w-full relative bg-gray-200 m-auto">
+        <Skeleton className=" w-full h-[48dvh]  bg-gray-400" />
         {/* <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div> */}
 
         {/* Source Info */}

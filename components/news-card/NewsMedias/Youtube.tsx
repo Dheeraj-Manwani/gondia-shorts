@@ -13,7 +13,7 @@ export const YoutubeMedia = ({
     <div
       style={{
         width: "100vw",
-        height: "40vh",
+        height: "40dvh",
         position: "relative",
         display: "flex",
         flexDirection: "column",

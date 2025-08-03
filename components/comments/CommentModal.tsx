@@ -51,7 +51,7 @@ const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className="bg-[#ffffff] text-gray-500 max-w-[95%] max-h-[90vh] p-0 rounded-md"
+        className="bg-[#ffffff] text-gray-500 max-w-[95%] max-h-[90dvh] p-0 rounded-md"
         onInteractOutside={(e) => {
           e.preventDefault();
           onClose();
@@ -75,7 +75,7 @@ const CommentModal = ({ article, isOpen, onClose }: CommentModalProps) => {
           </div>
         </DialogHeader>
         {/* p-4  */}
-        <ScrollArea className="max-h-[70vh] p-2.5">
+        <ScrollArea className="max-h-[70dvh] p-2.5">
           {session.status === "authenticated" && (
             <AddComment
               onAddComment={addComment}

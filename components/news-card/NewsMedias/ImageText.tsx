@@ -58,7 +58,7 @@ const ImageTextMedia = ({ article }: { article: Article }) => {
                 <div
                   className="relative z-10 m-auto"
                   style={{
-                    height: "40vh",
+                    height: "40dvh",
                     width: width ? `${width}px` : "auto",
                   }}
                 >
@@ -81,7 +81,7 @@ const ImageTextMedia = ({ article }: { article: Article }) => {
 
       {/* SINGLE IMAGE */}
       {article.imageUrls?.length === 1 && (
-        <div className="relative h-[40vh] w-full">
+        <div className="relative h-[40dvh] w-full">
           <Image
             src={article.imageUrls[0]}
             alt="Cover"

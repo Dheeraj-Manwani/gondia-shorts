@@ -13,7 +13,7 @@ const YoutubeShortsMedia = ({
     <div
       style={{
         width: "100vw",
-        height: "100vh",
+        height: "100dvh",
         position: "relative",
         display: "flex",
         flexDirection: "column",
@@ -25,7 +25,7 @@ const YoutubeShortsMedia = ({
         playing={isCurrentActive}
         controls={true}
         width="100%"
-        height="60vh"
+        height="60dvh"
         style={{
           position: "absolute",
           top: 0,
