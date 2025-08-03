@@ -27,8 +27,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CreateArticle, createArticleSchema } from "@/db/schema/article";
 import { ArticleType } from "@prisma/client/index.js";
-import { isAttachmentRequired } from "@/lib/utils";
+import { isAttachmentRequired, isVideoRequired } from "@/lib/utils";
 import { MultiFilepnd } from "./Attachment";
+import { VideoAttachment } from "./VideoAttachment";
 
 export default function NewArticle({
   article,
@@ -42,6 +43,7 @@ export default function NewArticle({
   const [fileMap, setFileMap] = React.useState<Map<string, File>>(new Map());
   console.log("fileMap", fileMap);
   const [files, setFiles] = React.useState<string[]>([]);
+  const [uploadedVideoUrl, setUploadedVideoUrl] = React.useState<string>("");
 
   const form = useForm<z.infer<typeof createArticleSchema>>({
     resolver: zodResolver(createArticleSchema),
@@ -77,6 +79,7 @@ export default function NewArticle({
       if (name === "type") {
         form.setValue("videoUrl", "");
         form.setValue("imageUrls", []);
+        setUploadedVideoUrl("");
       }
     });
     return () => subscription.unsubscribe();
@@ -124,35 +127,42 @@ export default function NewArticle({
     form.setValue("imageUrls", newFiles);
   };
 
+  const handleUploadedVideoUrl = (url: string) => {
+    setUploadedVideoUrl(url);
+    form.setValue("videoUrl", url);
+  };
+
   function onSubmit(values: z.infer<typeof createArticleSchema>) {
     try {
-      // if (selectedType == ArticleType.YOUTUBE && !values.videoUrl) {
-      //   form.setError("videoUrl", {
-      //     type: "manual",
-      //     message: "Youtube URL is required",
-      //   });
-      //   return;
-      // }
-      const finalValues = { ...values, imageUrls: files };
+      // Handle video URL - prioritize uploaded video over YouTube URL
+      let finalVideoUrl = values.videoUrl;
+      if (uploadedVideoUrl && isVideoRequired(selectedType)) {
+        finalVideoUrl = uploadedVideoUrl;
+      }
+
+      const finalValues = {
+        ...values,
+        imageUrls: files,
+        videoUrl: finalVideoUrl,
+      };
       console.log("finalValues", finalValues);
 
       setArticle(finalValues);
       togglePreviewMode(true);
-      // toast(
-      //   <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-      //     <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-      //   </pre>
-      // );
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Failed to submit the form. Please try again.");
     }
   }
 
+  const onInvalid = (inv: any) => {
+    console.log("inv ===== ", inv);
+  };
+
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
         className="space-y-6 max-w-full pt-4 mx-5"
       >
         <FormField
@@ -176,6 +186,9 @@ export default function NewArticle({
                   </SelectItem>
                   <SelectItem value={ArticleType.IMAGE_N_TEXT}>
                     Image with Text
+                  </SelectItem>
+                  <SelectItem value={ArticleType.VIDEO_N_TEXT}>
+                    Video with Text
                   </SelectItem>
                   <SelectItem value={ArticleType.YOUTUBE}>
                     Youtube Video
@@ -207,6 +220,16 @@ export default function NewArticle({
               </FormItem>
             )}
           />
+        )}
+
+        {isVideoRequired(selectedType) && (
+          <FormItem>
+            <VideoAttachment
+              label="Upload Video File (max 100MB)"
+              videoUrl={uploadedVideoUrl}
+              setVideoUrl={handleUploadedVideoUrl}
+            />
+          </FormItem>
         )}
 
         {isAttachmentRequired(selectedType) && (

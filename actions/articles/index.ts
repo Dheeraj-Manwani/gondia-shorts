@@ -12,7 +12,6 @@ import { getInteractedArticles } from "./interacted-articles";
 // import { updateCountsFromRedis } from "../interaction/articleInteractions";
 
 interface FetchParams {
-  categoryId?: number; // optional now
   articleSlug?: string;
   limit: number;
   offset: number;
@@ -31,7 +30,6 @@ export const getArticleBySlug = async (slug: string) => {
       type: true,
       slug: true,
       sourceLogoUrl: true,
-      categoryId: true,
       submittedById: true,
       createdAt: true,
       likeCount: true,
@@ -43,7 +41,6 @@ export const getArticleBySlug = async (slug: string) => {
 };
 
 async function getCombinedArticles(
-  categoryId: number | undefined,
   limit: number,
   offset: number,
   articleSlug: string | undefined
@@ -65,13 +62,11 @@ async function getCombinedArticles(
       type: true,
       slug: true,
       sourceLogoUrl: true,
-      categoryId: true,
       submittedById: true,
       createdAt: true,
       likeCount: true,
     },
     where: {
-      ...(categoryId ? { categoryId } : {}),
       ...(mainArticle ? { slug: { not: articleSlug } } : {}),
     },
     orderBy: {
@@ -92,18 +87,12 @@ export const fetchArticles = async (
 ): Promise<{ success: boolean; data: Article[] }> => {
   // await seed();
   // return { success: true, data: [] }; // For dev, remove this line later
-  const { categoryId, limit, offset, articleSlug, session, interactionType } =
-    fetchParams;
+  const { limit, offset, articleSlug, session, interactionType } = fetchParams;
 
   try {
     let articles: Article[] = [];
     if (!interactionType) {
-      articles = await getCombinedArticles(
-        categoryId,
-        limit,
-        offset,
-        articleSlug
-      );
+      articles = await getCombinedArticles(limit, offset, articleSlug);
     } else if (isAuthorised(session)) {
       articles = await getInteractedArticles(
         Number(session.data.user?.id),

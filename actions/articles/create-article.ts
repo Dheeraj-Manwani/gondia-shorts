@@ -67,7 +67,6 @@ export const createArticle = async (article: CreateArticle) => {
         videoUrl: article.videoUrl,
 
         submittedById: Number(session.user.id),
-        categoryId: 1,
 
         source: article.sourceText ?? "",
         sourceLogoUrl: article.sourceLogoUrl,

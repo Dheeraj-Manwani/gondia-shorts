@@ -98,13 +98,11 @@ export default function Page() {
               ? {
                   ...currentArticle,
                   id: Number(articleId),
-                  categoryId: 1,
                   sourceText: "Gondia ",
                   submittedById: 5,
                 }
               : {
                   id: Number(articleId),
-                  categoryId: 1,
                   sourceText: "Gondia ",
                   submittedById: 5,
                   title: "",

@@ -1,13 +1,8 @@
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 import { Article } from "@/db/schema/article";
 import Image from "next/image";
 import React from "react";
-// import { Autoplay, Navigation, Pagination } from "swiper/modules";
-// import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 const FullImageMedia = ({ article }: { article: Article }) => {
   // const [slideWidths, setSlideWidths] = useState<Record<string, number>>({});
@@ -24,59 +19,49 @@ const FullImageMedia = ({ article }: { article: Article }) => {
     <>
       {/* IMAGE CAROUSEL */}
       {article.imageUrls?.length && article.imageUrls?.length > 1 && (
-        // <Swiper
-        //   modules={[Pagination, Autoplay, Navigation]}
-        //   slidesPerView={1}
-        //   centeredSlides
-        //   loop
-        //   pagination={{ clickable: true }}
-        //   autoplay={{ delay: 4000 }}
-        //   spaceBetween={2}
-        //   className="w-full h-full"
-        // >
-        <Carousel
-          opts={{
-            align: "start",
-          }}
-          // orientation="vertical"
-          className="w-full"
+        <Swiper
+          modules={[Pagination, Autoplay, Navigation]}
+          slidesPerView={1}
+          centeredSlides
+          loop
+          pagination={{ clickable: true }}
+          autoplay={{ delay: 4000 }}
+          spaceBetween={2}
+          className="w-full h-full"
         >
-          <CarouselContent className="-mt-1 h-[100dvh]">
-            {article.imageUrls.map((url, idx) => {
-              // const width = slideWidths[url];
-              return (
-                // <SwiperSlide
-                //   key={idx}
-                <CarouselItem
-                  key={idx}
-                  className="relative w-full h-full overflow-hidden flex items-center justify-center"
-                >
-                  {/* Blurred Background */}
-                  {/* <div className="absolute inset-0 z-0">
-                    <Image
-                      src={url}
-                      alt={`bg ${idx}`}
-                      fill
-                      priority={false}
-                      style={{
-                        objectFit: "cover",
-                        filter: "blur(20px)",
-                        transform: "scale(1.1)",
-                      }}
-                      // onLoadingComplete={({ naturalWidth, naturalHeight }) =>
-                      //   handleLoad(url, naturalWidth, naturalHeight)
-                      // }
-                    />
-                  </div> */}
-
-                  {/* Foreground */}
-                  {/* <div
-                    className="relative z-10 m-auto"
+          {article.imageUrls.map((url, idx) => {
+            // const width = slideWidths[url];
+            return (
+              <SwiperSlide
+                key={idx}
+                className="relative w-full h-full overflow-hidden flex items-center justify-center"
+              >
+                {/* Blurred Background */}
+                <div className="absolute inset-0 z-0">
+                  <Image
+                    src={url}
+                    alt={`bg ${idx}`}
+                    fill
+                    priority={false}
                     style={{
-                      height: "100dvh",
-                      // width: width ? `${width}px` : "auto",
+                      objectFit: "cover",
+                      filter: "blur(20px)",
+                      transform: "scale(1.1)",
                     }}
-                  > */}
+                    // onLoadingComplete={({ naturalWidth, naturalHeight }) =>
+                    //   handleLoad(url, naturalWidth, naturalHeight)
+                    // }
+                  />
+                </div>
+
+                {/* Foreground */}
+                <div
+                  className="relative z-10 m-auto"
+                  style={{
+                    height: "100dvh",
+                    // width: width ? `${width}px` : "auto",
+                  }}
+                >
                   <Image
                     src={url}
                     alt={`slide ${idx}`}
@@ -87,19 +72,16 @@ const FullImageMedia = ({ article }: { article: Article }) => {
                     //   handleLoad(url, naturalWidth, naturalHeight)
                     // }
                   />
-                  {/* </div> */}
-                </CarouselItem>
-                // </SwiperSlide>
-              );
-            })}
-          </CarouselContent>
-        </Carousel>
-        //</Swiper>
+                </div>
+              </SwiperSlide>
+            );
+          })}
+        </Swiper>
       )}
 
       {/* SINGLE IMAGE */}
       {article.imageUrls?.length === 1 && (
-        <div className="relative h-[90dvh] w-full">
+        <div className="relative h-[100dvh] w-full">
           <Image
             src={article.imageUrls[0]}
             alt="Cover"

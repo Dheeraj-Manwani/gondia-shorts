@@ -51,5 +51,5 @@ export default async function Home(
   console.log("searchParams ", (await awaitedProps.searchParams).article);
   const articleSlug = (await awaitedProps.searchParams).article;
 
-  return <SwipeableNewsFeed categoryId={0} articleSlug={articleSlug} />;
+  return <SwipeableNewsFeed articleSlug={articleSlug} />;
 }

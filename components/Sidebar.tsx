@@ -26,8 +26,8 @@ interface BeforeInstallPromptEvent extends Event {
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedCategoryId: number;
-  onSelectCategory: (categoryId: number) => void;
+  // selectedCategoryId: number;
+  // onSelectCategory: (categoryId: number) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({

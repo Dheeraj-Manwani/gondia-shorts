@@ -13,7 +13,7 @@ type AppWrapperProps = {
 };
 
 export const AppWrapper: FC<AppWrapperProps> = ({ children }) => {
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1); // Default to "All" category
+  // const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1); // Default to "All" category
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   const handleMenuClick = () => {
@@ -31,8 +31,8 @@ export const AppWrapper: FC<AppWrapperProps> = ({ children }) => {
         <Sidebar
           isOpen={sidebarOpen}
           onClose={handleCloseSidebar}
-          selectedCategoryId={selectedCategoryId}
-          onSelectCategory={setSelectedCategoryId}
+          // selectedCategoryId={selectedCategoryId}
+          // onSelectCategory={setSelectedCategoryId}
         />
         <Toaster
           richColors

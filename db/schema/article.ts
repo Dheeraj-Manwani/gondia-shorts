@@ -1,4 +1,4 @@
-import { isAttachmentRequired } from "@/lib/utils";
+import { isAttachmentRequired, isVideoRequired } from "@/lib/utils";
 import { z } from "zod";
 
 export const insertUserSchema = z.object({
@@ -36,7 +36,6 @@ export const articleSchema = z.object({
   sourceLogoUrl: z.string().url().optional().nullable(),
   author: z.string().optional(),
   publishedAt: z.date().optional(),
-  categoryId: z.number(),
   submittedById: z.number(),
   source: z.string().optional(),
 
@@ -57,7 +56,6 @@ export const createArticleSchema = z
     sourceText: z.string().min(1).optional(),
     sourceLogoUrl: z.string().url().optional(),
     author: z.string().optional(),
-    categoryId: z.number().optional(),
     submittedById: z.number().optional(),
   })
 
@@ -69,6 +67,15 @@ export const createArticleSchema = z
         code: z.ZodIssueCode.custom,
       });
     }
+
+    if (isVideoRequired(data.type as any) && !data.videoUrl) {
+      ctx.addIssue({
+        path: ["videoUrl"],
+        message: "Video file is required for video articles",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
     if (
       isAttachmentRequired(data.type) &&
       (!data.imageUrls || data.imageUrls.length === 0)

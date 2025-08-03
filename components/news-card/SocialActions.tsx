@@ -136,7 +136,7 @@ const SocialActionsComp = ({
         " py-2 flex items-center justify-between border-b border-gray-700",
         isPreview ? "pointer-events-none cursor-not-allowed" : "",
         !isTextContentRequired(articleType)
-          ? "absolute bottom-36 right-3.5 z-10 bg-gray-800/40 flex-col rounded-sm justify-center align-baseline px-2 py-4"
+          ? "absolute bottom-20 right-3.5 z-10 bg-gray-800/40 flex-col rounded-sm justify-center align-baseline px-2 py-4"
           : "px-4"
       )}
     >
@@ -168,7 +168,7 @@ const SocialActionsComp = ({
               className={cn(
                 isTextContentRequired(articleType)
                   ? "text-gray-700"
-                  : "text-gray-400"
+                  : "text-gray-300"
               )}
             />
           )}
@@ -179,7 +179,7 @@ const SocialActionsComp = ({
                 ? "text-red-500"
                 : isTextContentRequired(articleType)
                 ? "text-gray-700"
-                : "text-gray-400"
+                : "text-gray-300"
             )}
           >
             {likeCount}
@@ -194,7 +194,7 @@ const SocialActionsComp = ({
             className={cn(
               isTextContentRequired(articleType)
                 ? "text-gray-700"
-                : "text-gray-400"
+                : "text-gray-300"
             )}
           />
         </button>
@@ -219,7 +219,7 @@ const SocialActionsComp = ({
             className={cn(
               isTextContentRequired(articleType)
                 ? "text-gray-700"
-                : "text-gray-400"
+                : "text-gray-300"
             )}
           />
         </button>
@@ -235,7 +235,7 @@ const SocialActionsComp = ({
             className={cn(
               isTextContentRequired(articleType)
                 ? "fill-black text-black"
-                : "fill-gray-400 text-gray-400"
+                : "fill-gray-400 text-gray-300"
             )}
           />
         ) : (
@@ -244,7 +244,7 @@ const SocialActionsComp = ({
             className={cn(
               isTextContentRequired(articleType)
                 ? "text-gray-700"
-                : "text-gray-400"
+                : "text-gray-300"
             )}
           />
         )}

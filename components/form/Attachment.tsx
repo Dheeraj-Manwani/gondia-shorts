@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { Plus, X } from "lucide-react";
 import { storeFileInS3 } from "@/actions/s3";
-import { checkValidImageExtension } from "@/lib/utils";
+import { validateImageFile } from "@/lib/utils";
 // import { uploadFile } from "@/actions/index";
 
 export function MultiFilepnd({
@@ -32,10 +32,9 @@ export function MultiFilepnd({
       const newUrlList = [...src];
       for (const file of e.target.files) {
         //   const file = e.target.files[0];
-        const splittedFile = file.name.split(".");
-        const extension = splittedFile[splittedFile.length - 1];
-        if (!checkValidImageExtension(extension)) {
-          toast.error("Invalid image file.");
+        const validation = validateImageFile(file, 5);
+        if (!validation.valid) {
+          toast.error(validation.error);
           continue;
         }
         //   const fileNameWithoutSpecialChars = file?.name.replace(

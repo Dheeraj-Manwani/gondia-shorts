@@ -17,24 +17,9 @@ export async function seed() {
     },
   });
 
-  const defaultCategory = await prisma.category.upsert({
-    where: { name: "demoCategory" },
-    update: {},
-    create: {
-      name: "demoCategory",
-    },
-  });
-
   let inserted = 0;
 
   for (const article of sampleArticles) {
-    if (!article.categoryId) {
-      console.warn(
-        `⚠️ Skipping article "${article.title}" due to missing categoryId`
-      );
-      continue;
-    }
-
     const exists = await prisma.article.findFirst({
       where: { title: article.title },
     });
@@ -49,7 +34,7 @@ export async function seed() {
         ...article,
         slug: article.slug || article.title.toLowerCase().replace(/\s+/g, "-"),
         type: (article.type as ArticleType) || "IMAGE",
-        categoryId: defaultCategory.id,
+
         author: "system",
         submittedById: defaultUser.id,
         sourceLogoUrl: article.sourceLogoUrl || "https://example.com/logo.png",

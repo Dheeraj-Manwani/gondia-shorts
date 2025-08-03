@@ -25,12 +25,10 @@ import { useInteractions } from "@/store/interaction";
 import chalk from "chalk";
 
 interface SwipeableNewsFeedProps {
-  categoryId: number;
   articleSlug?: string | null;
 }
 
 const SwipeableNewsFeedComp: React.FC<SwipeableNewsFeedProps> = ({
-  categoryId,
   articleSlug,
 }) => {
   const [page, setPage] = useState(0);
@@ -88,7 +86,7 @@ const SwipeableNewsFeedComp: React.FC<SwipeableNewsFeedProps> = ({
     if (swiperRef.current) {
       swiperRef.current.slideTo(0, 0);
     }
-  }, [categoryId, session.status]);
+  }, [session.status]);
 
   // Load more articles when reaching the end
   // const handleReachEnd = () => {
@@ -256,10 +254,7 @@ export const SwipeableNewsFeed = React.memo(
   SwipeableNewsFeedComp,
   (prevProps, nextProps) => {
     // Prevent re-render if article id is the same
-    return (
-      prevProps.articleSlug === nextProps.articleSlug &&
-      prevProps.categoryId === nextProps.categoryId
-    );
+    return prevProps.articleSlug === nextProps.articleSlug;
   }
 );
 SwipeableNewsFeed.displayName = "SwipeableNewsFeed";

@@ -79,5 +79,5 @@ export default async function ArticlePage({
   const slug = (await params).slug;
   console.log("article slug ", slug);
 
-  return <SwipeableNewsFeed categoryId={0} articleSlug={slug} />;
+  return <SwipeableNewsFeed articleSlug={slug} />;
 }
