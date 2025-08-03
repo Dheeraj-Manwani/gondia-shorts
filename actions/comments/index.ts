@@ -98,6 +98,18 @@ export const createComment = async (
   userId: number,
   parentId: number | undefined
 ): Promise<Comment> => {
+  // Check if user is restricted
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isRestricted: true },
+  });
+
+  if (user?.isRestricted) {
+    throw new Error(
+      "You are restricted from commenting. Please contact an administrator."
+    );
+  }
+
   const newComment = await prisma.comment.create({
     data: {
       content: text,

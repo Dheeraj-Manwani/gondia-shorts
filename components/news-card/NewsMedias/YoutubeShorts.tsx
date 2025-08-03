@@ -33,7 +33,7 @@ const YoutubeShortsMedia = ({
         }}
         config={{
           playerVars: {
-            start: 0,
+            start: article.videoStartTime || 0,
             modestbranding: 1, // hides YouTube logo in controls
             rel: 0, // disables showing related videos from other channels
             showinfo: 0, // hides video title and uploader

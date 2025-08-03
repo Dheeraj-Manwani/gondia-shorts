@@ -31,6 +31,7 @@ export const articleSchema = z.object({
   content: z.string().min(1),
   imageUrls: z.array(z.string().url()).default([]).optional(),
   videoUrl: z.string().url().optional().nullable(),
+  videoStartTime: z.number().optional().nullable(),
   type: ArticleTypeEnum,
   sourceText: z.string().optional(),
   sourceLogoUrl: z.string().url().optional().nullable(),
@@ -53,6 +54,7 @@ export const createArticleSchema = z
     content: z.string().min(1),
     imageUrls: z.array(z.string().url()).default([]).optional(),
     videoUrl: z.string().trim().url().or(z.literal("")).optional(),
+    videoStartTime: z.number().min(0).optional(),
     sourceText: z.string().min(1).optional(),
     sourceLogoUrl: z.string().url().optional(),
     author: z.string().optional(),
@@ -64,6 +66,30 @@ export const createArticleSchema = z
       ctx.addIssue({
         path: ["videoUrl"],
         message: "YouTube URL is required for YouTube articles",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    if (
+      data.type === "YOUTUBE" &&
+      (data.videoStartTime === undefined || data.videoStartTime === null)
+    ) {
+      ctx.addIssue({
+        path: ["videoStartTime"],
+        message: "Start time is required for YouTube articles",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    if (
+      data.type === "YOUTUBE" &&
+      data.videoStartTime !== undefined &&
+      data.videoStartTime !== null &&
+      data.videoStartTime < 0
+    ) {
+      ctx.addIssue({
+        path: ["videoStartTime"],
+        message: "Start time must be a positive number",
         code: z.ZodIssueCode.custom,
       });
     }

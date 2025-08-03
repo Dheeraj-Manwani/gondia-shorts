@@ -28,15 +28,16 @@ enum AuthType {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
-  number     String?  @unique
-  name       String
-  password   String?
-  salt       String?
-  role       Role     @default(USER)
-  type       AuthType @default(GOOGLE)
-  profilePic String?
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  number       String?  @unique
+  name         String
+  password     String?
+  salt         String?
+  role         Role     @default(USER)
+  type         AuthType @default(GOOGLE)
+  profilePic   String?
+  isRestricted Boolean  @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -48,19 +49,20 @@ model User {
 }
 
 model Article {
-  id            Int         @id @default(autoincrement())
-  title         String
-  slug          String      @unique
-  type          ArticleType
-  content       String
-  imageUrls     String[]
-  videoUrl      String?
-  source        String
-  sourceLogoUrl String?
-  author        String
-  publishedAt   DateTime    @default(now())
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id             Int         @id @default(autoincrement())
+  title          String
+  slug           String      @unique
+  type           ArticleType
+  content        String
+  imageUrls      String[]
+  videoUrl       String?
+  videoStartTime Int? // Start time in seconds for YouTube videos
+  source         String
+  sourceLogoUrl  String?
+  author         String
+  publishedAt    DateTime    @default(now())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   // categoryId Int
   // category   Category @relation(fields: [categoryId], references: [id])

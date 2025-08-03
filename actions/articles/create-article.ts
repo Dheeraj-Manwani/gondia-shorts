@@ -65,6 +65,7 @@ export const createArticle = async (article: CreateArticle) => {
         slug: slug,
         imageUrls: article.imageUrls,
         videoUrl: article.videoUrl,
+        videoStartTime: article.videoStartTime,
 
         submittedById: Number(session.user.id),
 

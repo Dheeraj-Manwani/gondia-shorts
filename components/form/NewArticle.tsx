@@ -27,7 +27,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CreateArticle, createArticleSchema } from "@/db/schema/article";
 import { ArticleType } from "@prisma/client/index.js";
-import { isAttachmentRequired, isVideoRequired } from "@/lib/utils";
+import {
+  isAttachmentRequired,
+  isVideoRequired,
+  extractYouTubeStartTime,
+} from "@/lib/utils";
 import { MultiFilepnd } from "./Attachment";
 import { VideoAttachment } from "./VideoAttachment";
 
@@ -54,6 +58,7 @@ export default function NewArticle({
     if (article) {
       form.setValue("type", article.type);
       form.setValue("videoUrl", article.videoUrl);
+      form.setValue("videoStartTime", article.videoStartTime);
       form.setValue("imageUrls", article.imageUrls);
       form.setValue("title", article.title);
       form.setValue("content", article.content);
@@ -78,6 +83,7 @@ export default function NewArticle({
     const subscription = form.watch((value, { name }) => {
       if (name === "type") {
         form.setValue("videoUrl", "");
+        form.setValue("videoStartTime", undefined);
         form.setValue("imageUrls", []);
         setUploadedVideoUrl("");
       }
@@ -202,24 +208,67 @@ export default function NewArticle({
         />
 
         {selectedType == ArticleType.YOUTUBE && (
-          <FormField
-            control={form.control}
-            name="videoUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Youtube URL</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Paste YouTube URL here"
-                    type="text"
-                    {...field}
-                  />
-                </FormControl>
+          <>
+            <FormField
+              control={form.control}
+              name="videoUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Youtube URL</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Paste YouTube URL here"
+                      type="text"
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(value);
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                        // Auto-extract start time from URL if present
+                        if (value) {
+                          const startTime = extractYouTubeStartTime(value);
+                          if (startTime !== null) {
+                            form.setValue("videoStartTime", startTime);
+                          }
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="videoStartTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Start Time (seconds)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter start time in seconds (e.g., 30)"
+                      type="number"
+                      min="0"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value ? parseInt(e.target.value) : undefined
+                        )
+                      }
+                      value={field.value || ""}
+                    />
+                  </FormControl>
+                  <p className="text-sm text-gray-500">
+                    Enter the time in seconds when the video should start
+                    playing. If your YouTube URL contains a start time (e.g.,
+                    ?t=30), it will be automatically extracted.
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
         )}
 
         {isVideoRequired(selectedType) && (
@@ -289,7 +338,7 @@ export default function NewArticle({
         <div className="flex flex-col items-center justify-between gap-2">
           <Button
             type="submit"
-            className="w-full"
+            className="w-full mb-36"
             // disabled={!form.formState.isValid}
           >
             Submit

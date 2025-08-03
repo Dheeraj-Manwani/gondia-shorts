@@ -8,7 +8,9 @@ import {
   Film,
   Heart,
   LogOut,
+  PieChart,
   Plus,
+  User,
 } from "lucide-react";
 // import Image from "next/image";
 // import googleIcon from "@/public/google-icon.svg";
@@ -372,7 +374,42 @@ const Sidebar: React.FC<SidebarProps> = ({
               )}
             </ul>
           </div>
-
+          {session.status == "authenticated" &&
+            session.data.user?.role == "ADMIN" && (
+              <div className="p-5 text-red-600 bg-red-50 ">
+                <h3 className="text-sm font-medium uppercase mb-3">
+                  Admin Options
+                </h3>
+                <ul className="space-y-1 text-gray-600">
+                  <li>
+                    <button
+                      className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onClose();
+                        router.push("/admin/access");
+                      }}
+                    >
+                      <User />
+                      Users
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="w-full text-left px-4 py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onClose();
+                        router.push("/admin/articles");
+                      }}
+                    >
+                      <PieChart />
+                      Manage Articles
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
           {/* Version info */}
           <div className="mt-auto p-5 text-xs text-gray-500">
             GondiaShorts v1.0.0

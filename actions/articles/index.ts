@@ -10,6 +10,9 @@ import { isAuthorised } from "@/lib/utils";
 import { getInteractedArticles } from "./interacted-articles";
 // import { seed } from "../data";
 // import { updateCountsFromRedis } from "../interaction/articleInteractions";
+import { authConfig } from "@/lib/auth";
+import { Role } from "@prisma/client/index-browser";
+import { getServerSession } from "next-auth";
 
 interface FetchParams {
   articleSlug?: string;
@@ -33,6 +36,7 @@ export const getArticleBySlug = async (slug: string) => {
       submittedById: true,
       createdAt: true,
       likeCount: true,
+      videoStartTime: true,
     },
     where: {
       slug: slug,
@@ -65,6 +69,7 @@ async function getCombinedArticles(
       submittedById: true,
       createdAt: true,
       likeCount: true,
+      videoStartTime: true,
     },
     where: {
       ...(mainArticle ? { slug: { not: articleSlug } } : {}),
@@ -167,4 +172,103 @@ export const fetchArticles = async (
   // const articles = sampleArticles.slice(offset, offset + limit);
 
   // return { success: true, data: articles };
+};
+
+export const getAllArticles = async () => {
+  // @ts-expect-error to be taken care of
+  const session: session | null = await getServerSession(authConfig);
+
+  if (!session || !session?.user?.id || session?.user?.role !== Role.ADMIN) {
+    return { error: "UNAUTHORISED" };
+  }
+
+  try {
+    const articles = await prisma.article.findMany({
+      include: {
+        submittedBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            // isRestricted: true, // Temporarily commented out until Prisma client is regenerated
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return { success: true, data: articles };
+  } catch (e) {
+    console.log("Error fetching articles", e);
+    return { success: false, error: "Error fetching articles" };
+  }
+};
+
+export const deleteArticle = async (articleId: number) => {
+  // @ts-expect-error to be taken care of
+  const session: session | null = await getServerSession(authConfig);
+
+  if (!session || !session?.user?.id || session?.user?.role !== Role.ADMIN) {
+    return { error: "UNAUTHORISED" };
+  }
+
+  try {
+    await prisma.article.delete({
+      where: { id: articleId },
+    });
+
+    return { success: true };
+  } catch (e) {
+    console.log("Error deleting article", e);
+    return { success: false, error: "Error deleting article" };
+  }
+};
+
+export const updateArticle = async (
+  articleId: number,
+  data: {
+    title: string;
+    content: string;
+    type: any;
+    videoUrl?: string | null;
+    videoStartTime?: number | null;
+    imageUrls: string[];
+    source: string;
+    author: string;
+  }
+) => {
+  // @ts-expect-error to be taken care of
+  const session: session | null = await getServerSession(authConfig);
+
+  if (!session || !session?.user?.id || session?.user?.role !== Role.ADMIN) {
+    return { error: "UNAUTHORISED" };
+  }
+
+  try {
+    const article = await prisma.article.update({
+      where: { id: articleId },
+      data: {
+        title: data.title,
+        content: data.content,
+        type: data.type,
+        videoUrl: data.videoUrl,
+        videoStartTime: data.videoStartTime,
+        imageUrls: data.imageUrls,
+        source: data.source,
+        author: data.author,
+      },
+    });
+
+    return { success: true, data: article };
+  } catch (e) {
+    console.log("Error updating article", e);
+    return { success: false, error: "Error updating article" };
+  }
 };

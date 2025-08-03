@@ -155,3 +155,37 @@ export const isAuthorised = (session: appSession) =>
 export const isTextContentRequired = (articleType: ArticleType) => {
   return ["IMAGE_N_TEXT", "VIDEO_N_TEXT", "YOUTUBE"].includes(articleType);
 };
+
+export const extractYouTubeStartTime = (url: string): number | null => {
+  try {
+    const urlObj = new URL(url);
+    const startParam = urlObj.searchParams.get("t");
+    if (startParam) {
+      return parseInt(startParam);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+export const validateYouTubeUrl = (
+  url: string
+): { valid: boolean; error?: string } => {
+  if (!url) {
+    return { valid: false, error: "YouTube URL is required" };
+  }
+
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.toLowerCase();
+
+    if (!hostname.includes("youtube.com") && !hostname.includes("youtu.be")) {
+      return { valid: false, error: "Please enter a valid YouTube URL" };
+    }
+
+    return { valid: true };
+  } catch {
+    return { valid: false, error: "Please enter a valid URL" };
+  }
+};
