@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { Plus, X, Play } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { storeFileInS3 } from "@/actions/s3";
 import { validateVideoFile } from "@/lib/utils";
 

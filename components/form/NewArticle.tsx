@@ -155,14 +155,14 @@ export default function NewArticle({
     }
   }
 
-  const onInvalid = (inv: any) => {
-    console.log("inv ===== ", inv);
-  };
+  // const onInvalid = (inv: any) => {
+  //   console.log("inv ===== ", inv);
+  // };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+        onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-6 max-w-full pt-4 mx-5"
       >
         <FormField
