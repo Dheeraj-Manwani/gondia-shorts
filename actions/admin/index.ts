@@ -20,7 +20,7 @@ export const getAllUsers = async () => {
         name: true,
         email: true,
         role: true,
-        // isRestricted: true, // Temporarily commented out until Prisma client is regenerated
+        isRestricted: true,
         createdAt: true,
         _count: {
           select: {
@@ -52,17 +52,16 @@ export const updateUserRestriction = async (
   }
 
   try {
-    // Temporarily comment out until Prisma client is regenerated
-    // const user = await prisma.user.update({
-    //   where: { id: userId },
-    //   data: { isRestricted },
-    //   select: {
-    //     id: true,
-    //     name: true,
-    //     email: true,
-    //     isRestricted: true,
-    //   },
-    // });
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { isRestricted },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        isRestricted: true,
+      },
+    });
 
     // For now, return success without actual update
     return { success: true, data: { id: userId, isRestricted } };
@@ -109,7 +108,7 @@ export const getArticleComments = async (articleId: number) => {
             id: true,
             name: true,
             email: true,
-            // isRestricted: true, // Temporarily commented out until Prisma client is regenerated
+            isRestricted: true,
           },
         },
         replies: {
@@ -119,7 +118,7 @@ export const getArticleComments = async (articleId: number) => {
                 id: true,
                 name: true,
                 email: true,
-                // isRestricted: true, // Temporarily commented out until Prisma client is regenerated
+                isRestricted: true,
               },
             },
           },

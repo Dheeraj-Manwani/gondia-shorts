@@ -60,6 +60,7 @@ model Article {
   source         String
   sourceLogoUrl  String?
   author         String
+  isPublic       Boolean     @default(false) // Controls article visibility in feed
   publishedAt    DateTime    @default(now())
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt

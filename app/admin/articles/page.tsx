@@ -31,7 +31,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArticleType, Role } from "@prisma/client";
-import { Edit, Trash2, Eye, Ban, MessageSquare } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  Eye,
+  Ban,
+  MessageSquare,
+  Globe,
+  Lock,
+} from "lucide-react";
 import {
   getAllArticles,
   deleteArticle,
@@ -39,6 +47,7 @@ import {
 } from "@/actions/articles";
 import { getAllUsers, updateUserRestriction } from "@/actions/admin/index";
 import { getTimeDifference } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 
 interface Article {
   id: number;
@@ -51,6 +60,7 @@ interface Article {
   videoStartTime?: number | null;
   source: string;
   author: string;
+  isPublic: boolean;
   publishedAt: Date;
   createdAt: Date;
   likeCount: number;
@@ -58,7 +68,7 @@ interface Article {
     id: number;
     name: string;
     email: string;
-    // isRestricted: boolean; // Temporarily commented out until Prisma client is regenerated
+    isRestricted: boolean;
   };
   _count: {
     comments: number;
@@ -70,7 +80,7 @@ interface User {
   name: string;
   email: string;
   role: Role;
-  // isRestricted: boolean; // Temporarily commented out until Prisma client is regenerated
+  isRestricted: boolean;
   createdAt: Date;
   _count: {
     comments: number;
@@ -86,6 +96,7 @@ export default function AdminArticlesPage() {
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showUserDialog, setShowUserDialog] = useState(false);
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
   // Check admin access
   useEffect(() => {
@@ -192,6 +203,28 @@ export default function AdminArticlesPage() {
     }
   };
 
+  const handleToggleArticlePublic = async (
+    articleId: number,
+    isPublic: boolean
+  ) => {
+    try {
+      const result = await updateArticle(articleId, {
+        isPublic,
+      });
+      if (result.success) {
+        toast.success(
+          `Article ${isPublic ? "made public" : "made private"} successfully`
+        );
+        fetchData();
+      } else {
+        toast.error(result.error || "Failed to update article visibility");
+      }
+    } catch (error) {
+      console.error("Error updating article visibility:", error);
+      toast.error("Failed to update article visibility");
+    }
+  };
+
   if (status === "loading" || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -209,6 +242,18 @@ export default function AdminArticlesPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <div className="flex gap-2">
+          <Button
+            variant={viewMode === "table" ? "default" : "outline"}
+            onClick={() => setViewMode("table")}
+          >
+            Table View
+          </Button>
+          <Button
+            variant={viewMode === "cards" ? "default" : "outline"}
+            onClick={() => setViewMode("cards")}
+          >
+            Card View
+          </Button>
           <Button variant="outline" onClick={() => setShowUserDialog(true)}>
             <Ban className="w-4 h-4 mr-2" />
             Manage Users
@@ -225,84 +270,171 @@ export default function AdminArticlesPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Author</TableHead>
-                  <TableHead>Comments</TableHead>
-                  <TableHead>Likes</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {articles.map((article) => (
-                  <TableRow key={article.id}>
-                    <TableCell className="max-w-xs truncate">
-                      {article.title}
-                    </TableCell>
-                    <TableCell>
+          {viewMode === "table" ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Author</TableHead>
+                    <TableHead>Comments</TableHead>
+                    <TableHead>Likes</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {articles.map((article) => (
+                    <TableRow key={article.id}>
+                      <TableCell className="max-w-xs truncate">
+                        {article.title}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">
+                          {article.type.replace("_", " ")}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{article.author}</span>
+                          <span className="text-sm text-gray-500">
+                            {article.submittedBy.name}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{article._count.comments}</TableCell>
+                      <TableCell>{article.likeCount}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={article.isPublic}
+                            onCheckedChange={(checked) =>
+                              handleToggleArticlePublic(article.id, checked)
+                            }
+                          />
+                          {article.isPublic ? (
+                            <Globe className="w-4 h-4 text-green-600" />
+                          ) : (
+                            <Lock className="w-4 h-4 text-gray-600" />
+                          )}
+                          <Badge variant="secondary">Private</Badge>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {getTimeDifference(article.createdAt)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingArticle(article);
+                              setShowEditDialog(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              router.push(`/article/${article.slug}`)
+                            }
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDeleteArticle(article.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {articles.map((article) => (
+                <div
+                  key={article.id}
+                  className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-3">
                       <Badge variant="secondary">
                         {article.type.replace("_", " ")}
                       </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{article.author}</span>
-                        <span className="text-sm text-gray-500">
-                          {article.submittedBy.name}
-                        </span>
-                        {/* Temporarily commented out until Prisma client is regenerated */}
-                        {/* {article.submittedBy.isRestricted && (
-                          <Badge variant="destructive" className="text-xs">
-                            Restricted
-                          </Badge>
-                        )} */}
-                      </div>
-                    </TableCell>
-                    <TableCell>{article._count.comments}</TableCell>
-                    <TableCell>{article.likeCount}</TableCell>
-                    <TableCell>
-                      {getTimeDifference(article.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setEditingArticle(article);
-                            setShowEditDialog(true);
-                          }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            router.push(`/article/${article.slug}`)
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={article.isPublic}
+                          onCheckedChange={(checked) =>
+                            handleToggleArticlePublic(article.id, checked)
                           }
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteArticle(article.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        />
+                        {article.isPublic ? (
+                          <Globe className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Lock className="w-4 h-4 text-gray-600" />
+                        )}
+                        <Badge variant="secondary">Private</Badge>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                    </div>
+                    <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                      {article.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-3 line-clamp-3">
+                      {article.content}
+                    </p>
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                      <span>By {article.author}</span>
+                      <span>{getTimeDifference(article.createdAt)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <span>{article._count.comments} comments</span>
+                      <span>{article.likeCount} likes</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setEditingArticle(article);
+                          setShowEditDialog(true);
+                        }}
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => router.push(`/article/${article.slug}`)}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteArticle(article.id)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -353,12 +485,11 @@ export default function AdminArticlesPage() {
                     </TableCell>
                     <TableCell>{user._count.comments}</TableCell>
                     <TableCell>
-                      {/* Temporarily commented out until Prisma client is regenerated */}
-                      {/* {user.isRestricted ? (
+                      {user.isRestricted ? (
                         <Badge variant="destructive">Restricted</Badge>
                       ) : (
                         <Badge variant="default">Active</Badge>
-                      )} */}
+                      )}
                       <Badge variant="default">Active</Badge>
                     </TableCell>
                     <TableCell>

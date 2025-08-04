@@ -100,6 +100,7 @@ export default function Page() {
                   id: Number(articleId),
                   sourceText: "Gondia ",
                   submittedById: 5,
+                  isPublic: true,
                 }
               : {
                   id: Number(articleId),
@@ -109,6 +110,7 @@ export default function Page() {
                   content: "",
                   type: "IMAGE_N_TEXT",
                   imageUrls: [""],
+                  isPublic: true,
                 }
           }
           isPreview={true}

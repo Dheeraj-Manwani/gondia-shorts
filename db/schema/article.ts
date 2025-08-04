@@ -39,6 +39,7 @@ export const articleSchema = z.object({
   publishedAt: z.date().optional(),
   submittedById: z.number(),
   source: z.string().optional(),
+  isPublic: z.boolean(),
 
   isLiked: z.boolean().optional(),
   isSaved: z.boolean().optional(),

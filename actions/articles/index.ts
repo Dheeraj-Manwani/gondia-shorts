@@ -37,6 +37,7 @@ export const getArticleBySlug = async (slug: string) => {
       createdAt: true,
       likeCount: true,
       videoStartTime: true,
+      isPublic: true,
     },
     where: {
       slug: slug,
@@ -70,9 +71,11 @@ async function getCombinedArticles(
       createdAt: true,
       likeCount: true,
       videoStartTime: true,
+      isPublic: true,
     },
     where: {
       ...(mainArticle ? { slug: { not: articleSlug } } : {}),
+      isPublic: true,
     },
     orderBy: {
       id: "desc",
@@ -190,7 +193,7 @@ export const getAllArticles = async () => {
             id: true,
             name: true,
             email: true,
-            // isRestricted: true, // Temporarily commented out until Prisma client is regenerated
+            isRestricted: true,
           },
         },
         _count: {
@@ -220,6 +223,16 @@ export const deleteArticle = async (articleId: number) => {
   }
 
   try {
+    await prisma.comment.deleteMany({
+      where: {
+        articleId,
+      },
+    });
+
+    await prisma.article.delete({
+      where: { id: articleId },
+    });
+
     await prisma.article.delete({
       where: { id: articleId },
     });
@@ -234,14 +247,15 @@ export const deleteArticle = async (articleId: number) => {
 export const updateArticle = async (
   articleId: number,
   data: {
-    title: string;
-    content: string;
-    type: any;
+    title?: string;
+    content?: string;
+    type?: any;
     videoUrl?: string | null;
     videoStartTime?: number | null;
-    imageUrls: string[];
-    source: string;
-    author: string;
+    imageUrls?: string[];
+    source?: string;
+    author?: string;
+    isPublic?: boolean;
   }
 ) => {
   // @ts-expect-error to be taken care of
@@ -255,14 +269,17 @@ export const updateArticle = async (
     const article = await prisma.article.update({
       where: { id: articleId },
       data: {
-        title: data.title,
-        content: data.content,
-        type: data.type,
-        videoUrl: data.videoUrl,
-        videoStartTime: data.videoStartTime,
-        imageUrls: data.imageUrls,
-        source: data.source,
-        author: data.author,
+        ...(data.title && { title: data.title }),
+        ...(data.content && { content: data.content }),
+        ...(data.type && { type: data.type }),
+        ...(data.videoUrl !== undefined && { videoUrl: data.videoUrl }),
+        ...(data.videoStartTime !== undefined && {
+          videoStartTime: data.videoStartTime,
+        }),
+        ...(data.imageUrls && { imageUrls: data.imageUrls }),
+        ...(data.source && { source: data.source }),
+        ...(data.author && { author: data.author }),
+        ...(data.isPublic !== undefined && { isPublic: data.isPublic }),
       },
     });
 
